@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!-- Inherited Template -->
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>Energize Game</title>
+
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.theme.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/topmenu_home.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/infobox.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/selectbox.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/select-facility.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/build-facility.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/facility-build-dialog.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.4.1.1.min.css') }}"> 
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">  
+
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+
+<body class="">
+  <div class="top-menu">
+    {% if current_user.is_authenticated %}  
+      <div class="top-dropdown no-hover go">
+    {% else %}
+      <div class="top-dropdown no-hover">
+    {% endif %}
+        <button class="dropbtn no-hover">
+          Game <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="top-dropdown-content">
+          <a href="{{ url_for('main.creategame') }}">Create New Game</a>
+          <a href="{{ url_for('main.joingame') }}">Join New Game</a>
+          <a href="#">Rejoin Current Game</a>
+          <a href="#">About Energize</a>
+        </div>
+      </div>
+    <div><!-- Grid Column place holder --></div>
+    <a class="title no-hover" href="{{ url_for('main.home') }}">ENERGIZE!</a>
+    <div><!-- Grid Column place holder --></div>
+    {% if current_user.is_authenticated %}
+      <a class="" href="{{ url_for('users.account') }}">Account</a>
+      <a class="" href="{{ url_for('users.logout') }}">Logout</a>
+    {% else %}
+      <a class="" href="{{ url_for('users.login') }}">Login </a>
+      <a class="" href="{{ url_for('users.register') }}">Register</a>
+    {% endif %}    
+  </div> 
+  
+  {% block middle_content %} {% endblock middle_content %}
+
+  <div class="flash-msgs">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <h4 class="alert alert-{{ category }}"> {{ message }} </h4>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}  
+</div>
+
+</body>
+</html>

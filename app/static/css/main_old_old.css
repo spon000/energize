@@ -1,0 +1,25 @@
+#map-viewport-window {
+	border-style: solid;
+	border-color: white;
+	border-width: 0px;
+	background-color: black;
+	
+	padding-left: 0;
+  padding-right: 0;
+	margin-top: 66px;
+  margin-left: 0;
+	margin-right: 0;
+  display: block;
+}
+
+#top-menu-bar {
+	height: 70px;
+	padding-top: 0;
+	padding-bottom: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+#zoom-button.active {
+	
+}

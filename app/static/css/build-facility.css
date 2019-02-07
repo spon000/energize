@@ -1,0 +1,96 @@
+#build-facility-dialog hr{
+  margin: 15px;
+}
+
+.bfd-facility-header-info {
+
+}
+
+.bfd-facility-header-type {
+  padding: 10px 0 5px 0;
+}
+
+.bfd-facility-header-type label {
+  margin: 0;
+  width: 100%;
+  text-align: center;  
+  font-size: 18px;
+}
+
+.bfd-facility-header-gentype label {
+  margin-top: 10x;
+  padding: 0 3px 3px 3px;
+}
+
+.bfd-facility-header-gentype button {
+  border-radius: 5px;
+}
+
+.bfd-facility-generator-list {
+  height: 200px;
+  margin-left: 40px;
+  overflow: auto;
+  /* background: lightblue; */
+}
+
+.bfd-facility-generator-list-button {
+  /* border-style: solid;
+  border-width: 1px; */
+  float: left;
+  margin: 3px;
+  background-color: rgb(203, 228, 236);
+  border-radius: 5px;
+  padding-top: 10px;
+  height: 90px;
+  width: 100px;
+}
+
+.bfd-facility-generator-list button {
+  margin: 0 20px;
+  width: 60px;
+  height: 30px;
+  border-radius: 5px
+}
+
+.bfd-facility-generator-list select {
+  margin: 0;
+  margin-top: 3px;
+  width: 100%;  
+}
+
+.bfd-generator-cost {
+  margin: 0 2px;
+  width: 100%;
+}
+
+.bfd-facility-generator-list .tooltip-text {
+  display: none;
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;  
+}
+
+.bfd-facility-header-info .tooltip-text {
+  display: none;
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;  
+}
+
+.bfd-facility-summary-info label {
+  margin: 3px;
+  font-size: 10pt;
+}
+
+.bfd-facility-buttons button {
+  border-radius: 3px;
+  margin: 3px;
+}

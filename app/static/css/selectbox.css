@@ -1,0 +1,19 @@
+.predefined-facility-table {
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.predefined-facility-table tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
+
+.predefined-facility-table tr:nth-child(odd) {
+	background-color: #d2d2d2;
+}
+
+.predefined-facility-table tr:hover {
+	background-color: #4a4;
+	border: 1px solid #ddd;
+	padding: 8px;
+}

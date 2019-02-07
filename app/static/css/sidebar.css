@@ -1,0 +1,89 @@
+/* The sidebar menu */
+.side-game-bar {
+	overflow: hidden;
+	width: 250px;
+	background-color: #333;
+}
+
+.side-menu-iso {
+	display: block;
+	padding: 15px;
+	text-align: center;
+	color: #f2f2f2;
+}
+
+.side-menu-iso label {
+	display: block;
+	font-size: 20px;
+	height: 30px;
+}
+
+.market-demand-content {
+	height: 130px;
+	background-color: #f2f2f2;
+	border-radius: 20px;
+}
+.market-demand-content label {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	color: black;
+}
+
+#timeline-graph {
+	height: 60px;
+	border: 2px dotted black;
+}
+
+.iso-btn {
+    background-color: #f2f2f2; /* Green */
+    border: grey;
+    color: black;
+		border-radius: 12px;
+		margin: 15px;
+		margin-bottom: 2px;
+		width: 120px;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.side-menu-portfolio {
+	overflow: hidden;
+	display: block;
+	padding: 15px;
+	text-align: center;
+	color: #f2f2f2;	
+
+}
+
+.side-menu-portfolio label {
+	display: block;
+	font-size: 20px;
+	height: 30px;
+}
+
+	
+.portfolio-content {
+	text-align: center;
+	height: 50px;
+	width: 70%;
+	margin: 0px;
+	margin-left: 35px;
+	margin-bottom: 10px;
+	background-color: #f2f2f2;
+	border-radius: 20px;	
+}
+
+.portfolio-content label {
+
+	color: black;
+}
+
+.side-menu-maptools {
+	background-color: blue;
+}
+
+
+

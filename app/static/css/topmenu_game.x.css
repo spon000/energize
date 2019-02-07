@@ -1,0 +1,150 @@
+.top-game-menu {
+  overflow: scroll;
+  background-color: #333;
+  overflow: hidden;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.top-game-menu a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+#top-game-menu-title {
+  text-decoration:none;
+  display: flex;
+  width: 100%;
+  color: yellow;
+  text-align: center;
+  padding: 0;
+  margin: 0 auto;
+  text-decoration: none;
+  font-size: 30px;
+}
+
+#top-game-menu-title:not(.no-hover):hover {
+  color: #333;
+  background-color:#ddd;
+}
+
+#top-game-menu-title:link {
+  text-decoration:none;
+}
+
+
+.top-game-menu a:not(.no-hover):hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.top-game-menu.go {
+  background-color: #228b22;
+  color: #f2f2f2;
+}
+
+.stop {
+  background-color: #cc3300;
+  color: #f2f2f2;
+}
+
+.top-game-menu.stop {
+  background-color: #cc3300;
+  color: #f2f2f2;
+}
+
+.top-game-menu.running {
+  background-color: #ffaa00;
+  color: #f2f2f2;
+}
+
+.dropdown {
+  float: left;
+  overflow: hidden;
+}
+
+.dropdown .dropbtn.go {
+  background-color: #228b22;
+  color: #f2f2f2;
+}
+
+.dropdown .dropbtn {
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+
+.dropdown .dropbtn:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #333;
+  width: 140px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-content ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.dropdown-content a {
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  float: center;
+  color: #f2f2f2;
+  display: block;
+  text-align: center;
+}
+
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content a.hidden {
+  display: none;
+}
+
+.submenu {
+  display: block;
+  position: absolute;
+  left: 140px;
+  width: 140px;
+  background-color: #999;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+}
+
+.left-justify {
+  float: left;
+}
+
+.right-justify {
+  float: right;
+}
+
+.toggle-on {
+  color: white;
+  background-color: blue;
+}

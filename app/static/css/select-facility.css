@@ -1,0 +1,168 @@
+.sfd-facility-tab {
+  float: left;
+  margin: 5px;
+  padding: 0px 3px;
+  width: 160px;
+  height: 32px;
+  background-color: #ddd;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 5px;
+}
+
+.sfd-facility-tab-type {
+  font-size: 14px;
+  width: 100%;
+  padding: 5px 1px 1px 1px;
+}
+
+.sfd-facility-button {
+  float: left;
+  padding: 3px;
+}
+
+.sfd-facility-button .tooltip-text {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.sfd-facility-button:hover .tooltip-text {
+  visibility: visible;
+}
+
+.sfd-facility-button button {
+  width: 50px;
+  height: 50px;
+  border-style: none;
+}
+
+.sfd-facility-button button:focus {
+  outline: none;
+}
+
+.sfd-facility-button button.selected{
+  border-style: solid;
+  border-width: 4px;
+  border-color: green;
+}
+
+.sfd-facility-button button:disabled {
+  -webkit-filter: opacity(20%); /* Safari 6.0 - 9.0 */
+  filter: opacity(20%);
+}
+
+.sfd-facility-button button:not([disabled]):not(.selected):hover {
+  border-style: solid;
+  border-width: 2px;
+  border-color: blue;
+}
+
+.sfd-facility-button-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+
+.sfd-facility-button-tooltip .sfd-facility-button-tooltip {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  position: absolute;
+  z-index: 1;
+}
+
+.sfd-facility-button-tooltip:hover .sfd-facility-button-tooltip {
+  visibility: visible;
+}
+
+
+.sfd-facility-details {
+  background:#EFEFEF; 
+  box-shadow: 1px 1px 10px #999; 
+  margin: auto; 
+  text-align: center; 
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  width: 100%;
+  padding-top: 5px;
+}
+
+.sfd-facility-detail-scroll {
+  margin-top: 40px;
+  min-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  text-align: center;
+}
+
+
+.sfd-facility-detail-window {
+  border-style: dashed;
+  border-radius: 5px;
+  padding: 0px;
+  text-align: center;
+  overflow: hidden; 
+  max-height: 400px;
+  height: 400px;
+  width: 32.7%;
+  display: inline-block;
+}
+
+.sfd-not-selected {
+  display: none;
+}
+
+.sfd-facility-details-data {
+  height: 90%;
+}
+
+.sfd-facility-details-data-facilitytype {
+  background-color: lightblue;
+  margin-top: 15px;
+}
+
+.sfd-generator-type-row {
+  margin-top: -10px;
+  float: left
+}
+
+.sfd-data-row-label {
+  margin-left: 5px;
+}
+
+.sfd-select-facility-data-btn {
+  position: fixed;
+  bottom: -25px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

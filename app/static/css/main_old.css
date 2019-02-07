@@ -1,0 +1,127 @@
+body {
+  width: 1200px;
+  height: 800px;
+  background-color: #e2e2f2;
+  overflow: hidden;
+}
+
+.content-section {
+  background: #ffffff;
+  padding: 10px 20px;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  margin-bottom: 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #444444;
+}
+
+.bg-steel {
+  background-color: #5f788a;
+}
+.account-img {
+  height: 125px;
+  width: 125px;
+  margin-right: 20px;
+  margin-bottom: 16px;
+}
+
+.account-heading {
+  font-size: 2.5rem;
+} 
+
+.middle-area {
+  margin-top: 3px;
+  width: 1200px;
+  height: 600px;
+  background-color: lightblue;
+}
+
+.user-messages {
+  overflow: auto;
+  display: block;
+  /* display: inline-block; */
+  border-style: solid;
+  border-width: 1;
+  border-color: black; 
+  width: 1200px;
+  height: 200px;
+  margin: 0;
+}
+
+.map-canvas-element {
+  position: relative;
+  overflow: hidden;
+  float: left;
+}
+
+.no-text-highlight {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
+}
+
+.not-visible {
+  display: none
+}
+
+#oil-facility-btn {
+  background-image: url(images/oil.png);
+  background-size: contain;
+}
+
+#coal-facility-btn {
+  background-image: url(images/coal.png);
+  background-size: contain;
+}
+
+#wind-facility-btn {
+  background-image: url(images/wind.png);
+  background-size: contain;
+}
+
+#solar-facility-btn {
+  background-image: url(images/solar.png);
+  background-size: contain;
+}
+
+#nuclear-facility-btn {
+  background-image: url(images/nuclear.png);
+  background-size: contain;
+}
+
+#nuclear-SMR-facility-btn {
+  background-image: url(images/nuclear-SMR.png);
+  background-size: contain;
+}
+
+
+#hydro-facility-btn {
+  background-image: url(images/hydro.png);
+  background-size: contain;
+}
+
+#natural-gas-peaker-facility-btn {
+  background-image: url(images/natural-gas-peaker.png);
+  background-size: contain;
+}
+
+#natural-gas-facility-btn {
+  background-image: url(images/natural-gas.png);
+  background-size: contain;
+}
+
+.middle-area.title-image {
+  background-color: white;
+  background-image: url(../img/background/logo.png);
+  background-size: contain;
+  background-position: center;   
+  background-repeat: no-repeat;
+}
+
+
+

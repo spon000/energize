@@ -1,0 +1,21 @@
+body {
+  background-color: lightgray;
+  margin: auto;
+}
+
+#game {
+  margin: auto;
+  width: 1200px;
+  height: 800px;
+  background-color: lightpink;
+}
+
+#gamecanvas {
+  width: 1200px;
+  height: 600px;
+  background-color: lightblue;
+}
+
+
+
+

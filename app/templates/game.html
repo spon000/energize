@@ -1,0 +1,14 @@
+{% extends "layout.html" %} #}
+
+{% block head_script %}
+	<script
+		data-main="{{ url_for('static', filename='js/main.js') }}" 
+		src="{{ url_for('static', filename='js/lib/requirejs/require.2.3.5.min.js') }}">
+	</script>
+{% endblock head_script %}
+
+{% block middle_content %}
+	<canvas id="gamecanvas" width="1200" height="600"></canvas>
+{% endblock middle_content %}
+
+

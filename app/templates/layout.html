@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!-- Inherited Template -->
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<title>Energize Game</title>
+
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.theme.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/topmenu_game.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/infobox.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/selectbox.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/select-facility.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/build-facility.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/facility-build-dialog.css') }}">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.4.1.1.min.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  {% if current_user.is_authenticated %}
+    {% block head_script %} {% endblock head_script %}
+  {% else %} 
+  {% endif %}
+<head>
+
+<body class="">
+  <div class="top-menu">
+    <a class="company-btn" href="#">{{ company.name }}</a>
+    <a class="budget-btn push-up" href="#">Budget: {{ budget }}</a>
+    <a class="market-btn push-up" href="#"> World Market</a>
+    <a class="social-btn" href="#"> Social</a>
+    <a class="q-report-btn push-up" href="#"> Quarterly Report</a>
+    <a class="turn-btn push-up" href="#"> Q{{ game.current_quarter }} {{ game.current_year }} Turn: {{ game.turn_number }}</a>
+    <a class="top-game-menu no-hover stop" href="#" id="next-btn">Next</a>
+    <div><!-- Grid Column place holder --></div>
+    <a class="build-btn push-up" id="facility-btn" href="#">Build Facility</a>
+    <a class="help-btn" href="#">Help</a>
+    <a class="options-btn" href="#">Options</a>
+    <a class="next-btn no-hover stop" href="#" id="next-btn">Next >></a>
+  </div> 
+
+  <div>
+  {% block middle_content %} {% endblock middle_content %}
+  </div>
+
+  <div class="user-messages">
+    <div class="">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <h4 class="alert alert-{{ category }}"> {{ message }} </h4>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}  
+    </div>
+	</div>
+</body>
+
+</html>
