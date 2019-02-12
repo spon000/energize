@@ -5,7 +5,8 @@ define([
   "canvasData",
   "networkCallMap",
   "CityLayer",
-], function ($, ResourceLoader, terrainLayer, canvasData, networkCallMap, CityLayer) {
+  "FacilityLayer"
+], function ($, ResourceLoader, terrainLayer, canvasData, networkCallMap, CityLayer, FacilityLayer) {
 
   return (
     class CanvasModel {
@@ -46,11 +47,31 @@ define([
               canvasData.terrainSpriteConfig,
               resources[networkCallMap.cityTable.name].data.cities
             );
-            console.log("CityLayer resource = ", resources);
             resolve(cityLayer.createTileMap());
           })
 
         });
       }
-    })
+
+      createFacilityTileMap() {
+        return new Promise(resolve => {
+          const loaded = ResourceLoader.loadResources([
+            { name: canvasData.facilitySpriteConfig.name, type: "img", path: canvasData.facilitySpriteConfig.path },
+            { name: networkCallMap.facilityTable.name, type: "ajax", path: networkCallMap.facilityTable.path }
+          ]);
+
+          loaded.then((results) => {
+            let resources = ResourceLoader.resourcesToObject(results);
+            let facilityLayer = new FacilityLayer(
+              resources[canvasData.facilitySpriteConfig.name].data,
+              canvasData.facilitySpriteConfig,
+              canvasData.terrainImageConfig,
+              canvasData.terrainSpriteConfig,
+              resources[networkCallMap.facilityTable.name].data.facilities
+            );
+            resolve(facilityLayer.createTileMap());
+          });
+        });
+      }
+    });
 });

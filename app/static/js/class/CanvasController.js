@@ -32,7 +32,7 @@ define([
 
       _getFacilityLayer() {
         this._canvasModel.createFacilityTileMap().then(tileMap => {
-          console.log("tileMap = ", tileMap);
+          this._canvasView.addTileMap(tileMap);
         });
       }
 

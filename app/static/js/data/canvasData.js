@@ -31,12 +31,28 @@ define([
       "path": "static/img/tiles/tech-tilesd.png",
       "width": 50,
       "height": 50,
+      "sprites": [
+        { "type": "cityblock1", "frame": 0 }
+      ]
     },
     "facilitySpriteConfig": {
       "name": "facilitySprites",
       "path": "static/img/tiles/tech-tilesd.png",
       "width": 50,
       "height": 50,
+      "sprites": [
+        // type 1 - 8 match facility_type table ID field.
+        // type 0 is generic facility icon.
+        { "type": 0, "frame": 20 },
+        { "type": 1, "frame": 21 },
+        { "type": 2, "frame": 22 },
+        { "type": 3, "frame": 23 },
+        { "type": 4, "frame": 24 },
+        { "type": 5, "frame": 25 },
+        { "type": 6, "frame": 26 },
+        { "type": 7, "frame": 27 },
+        { "type": 8, "frame": 28 }
+      ]
     }
   });
 });				

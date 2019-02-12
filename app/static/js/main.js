@@ -24,6 +24,7 @@ requirejs.config({
     City: "class/City",
     CityLayer: "class/CityLayer",
     Dim2: "class/Dim2",
+    Facility: "class/Facility",
     FacilityLayer: "class/FacilityLayer",
     ResourceLoader: "class/ResourceLoader",
     TerrainMap: "class/TerrainMap",
@@ -33,6 +34,7 @@ requirejs.config({
 
     // Data objects
     canvasData: "data/canvasData",
+    facilityTileDefs: "data/facilityTileDefs",
     grassTileDefs: "data/grassTileDefs",
     networkCallMap: "data/networkCallMap",
 

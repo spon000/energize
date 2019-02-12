@@ -58,7 +58,7 @@ define([
 				});
 
 				this._citiesData.forEach((cityData) => {
-					let citySprite = new createjs.Sprite(citySpriteSheet, 0)
+					let citySprite = new createjs.Sprite(citySpriteSheet, this._citySpriteConfig.sprites[0].frame);
 					let tile = this._scaleTile(cityData, new Tile("city", this._citySpriteConfig.width, this._citySpriteConfig.height, citySprite, false));
 					let city = new City(cityData.id, cityData.name, cityData.population, cityData.daily_consumption, tile);
 					this._cityList.push(city);
