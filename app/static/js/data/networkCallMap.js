@@ -20,6 +20,18 @@ define([
       name: "facilityTable",
       path: "/facilities"
     },
+    "viewCity": {
+      name: "singleCity",
+      path: "/viewcity/"
+    },
+    "viewFacility": {
+      name: "viewFaciltiy",
+      path: "/viewfacility/"
+    },
+    "playerFacilities": {
+      name: "playerFacilities",
+      path: "/facilityplayer/"
+    }
 
   });
 });				

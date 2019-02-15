@@ -6,20 +6,21 @@ define([
   return (
     // Class that represents a grid of tiles.
     class TileMap {
-      constructor(rows, columns, width, height, parentMap = null, name = null) {
+      constructor(rows, columns, width, height, name) {
         this._rows = rows;
         this._columns = columns;
         this._width = width;
         this._height = height;
-        this._parentMap = parentMap;
-        this._container = new createjs.Container();
-        this._container.x = 0;
-        this._container.y = 0;
+        this._name = name;
+
         this._scaleX = 1;
         this._scaleY = 1;
         this._scrollable = false;
         this._tileMapTiles = {};
-        this._name = name;
+
+        this._container = new createjs.Container();
+        this._container.x = 0;
+        this._container.y = 0;
       }
 
       // Getters...
@@ -39,8 +40,8 @@ define([
         return this._height;
       }
 
-      get parentMap() {
-        return this._parentMap;
+      get name() {
+        return this._name;
       }
 
       get container() {
@@ -55,8 +56,8 @@ define([
         return this._scaleY;
       }
 
-      set parentMap(parentMap) {
-        this._parentMap = parentMap;
+      get tileMapTiles() {
+        return this._tileMapTiles;
       }
 
       // Private Methods

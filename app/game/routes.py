@@ -120,9 +120,9 @@ def power_types():
   power_types_schema = PowerTypeSchema(many=True)
   serialized_power_types = power_types_schema.dump(power_types).data
   return jsonify({'power_types': serialized_power_types})
+
+
 ###############################################################
-
-
 @game.route("/buildfacility", methods=["GET", "POST"])
 @login_required
 def buildfacility():
@@ -141,6 +141,11 @@ def viewfacility(facility_id):
   generator_type = GeneratorType.query.get(facility.generators[0].id_type)
   return render_template("viewfacility.html", facility=facility, facility_type=facility_type, generator_type=generator_type)
 
+@game.route("/viewcity/<int:city_id>", methods=["GET", "POST"])
+@login_required
+def viewcity(city_id):
+  city = City.query.get(city_id)
+  return render_template("viewcity.html", city=city)
 
 ##################################################################
 @game.route("/runturn", methods=["GET", "POST"])

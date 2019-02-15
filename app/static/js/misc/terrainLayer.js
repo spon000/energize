@@ -9,6 +9,7 @@ define([
 
   const init = (terrainMapImage, terrainTilesImage, terrainImageConfig, terrainSpriteConfig) => {
     let terrainMap = new TerrainMap(terrainMapImage);
+    let tileMapName = "terrain";
 
     // create spritesheet.
     let terrainSpriteSheet = new createjs.SpriteSheet({
@@ -27,7 +28,8 @@ define([
       terrainImageConfig.height,
       terrainImageConfig.width,
       terrainSpriteConfig.width,
-      terrainSpriteConfig.height
+      terrainSpriteConfig.height,
+      tileMapName
     );
     for (let y = 0; y < terrainTileMap.rows; y++) {
       for (let x = 0; x < terrainTileMap.columns; x++) {
@@ -42,6 +44,7 @@ define([
             y,
             x,
             new Tile(
+              0,
               terrainTileSprite.type,
               terrainSpriteConfig.width,
               terrainSpriteConfig.height,

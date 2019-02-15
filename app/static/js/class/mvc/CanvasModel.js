@@ -5,11 +5,16 @@ define([
   "canvasData",
   "networkCallMap",
   "CityLayer",
-  "FacilityLayer"
-], function ($, ResourceLoader, terrainLayer, canvasData, networkCallMap, CityLayer, FacilityLayer) {
+  "FacilityLayer",
+  "EventEmitter"
+], function ($, ResourceLoader, terrainLayer, canvasData, networkCallMap, CityLayer, FacilityLayer, EventEmitter) {
 
   return (
-    class CanvasModel {
+    class CanvasModel extends EventEmitter {
+      constructor() {
+        super();
+      }
+
       createTerrainTileMap() {
         return new Promise(resolve => {
           const loaded = ResourceLoader.loadResources([
@@ -70,6 +75,28 @@ define([
               resources[networkCallMap.facilityTable.name].data.facilities
             );
             resolve(facilityLayer.createTileMap());
+          });
+        });
+      }
+
+      testFunction() {
+        console.log("testFunction");
+      }
+
+      getCityInformationHTML(id) {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.viewCity.path + id)
+          loaded.then((results) => {
+            resolve(results);
+          });
+        });
+      }
+
+      getFacilityInformationHTML(id) {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.viewFacility.path + id)
+          loaded.then((results) => {
+            resolve(results);
           });
         });
       }

@@ -1,37 +1,25 @@
 define([
   "jquery",
+  "jqueryui",
   "Dim2",
-  "easeljs"
-], function ($, Dim2, createjs) {
+  "easeljs",
+  "EventEmitter"
+], function ($, $UI, Dim2, createjs, EventEmitter) {
 
   return (
-    class CanvasView {
-      constructor(canvasElementId) {
+    class CanvasView extends EventEmitter {
+      constructor(canvasElementId, model) {
+        super();
         this._canvasElementId = canvasElementId;
+        this._canvasModel = model;
+        this._infoDialogElementId = "infodialogbox";
         this._stage = new createjs.Stage(canvasElementId);
+        this._stage.enableMouseOver();
         this._width = $("#" + canvasElementId).attr("width");
         this._height = $("#" + canvasElementId).attr("height");
         this._zoomLevel = 0;
         this._scaleMap = [new Dim2(1, 1)];
         this._tileMaps = [];
-
-        // Event handler stubbs
-        // Mouse events:
-        this._onCityMouseIn = null;
-        this._onCityMouseOut = null;
-        this._onFacilityMouseIn = null;
-        this._onFacilityMouseOut = null;
-        this._onFacilityClick = null;
-        this._onMapClick = null;
-        this._onMapDoubleClick = null;
-        this._onMapShiftDoubleClick = null;
-        this._onMapDrag = null;
-
-        // Keyboard events:
-        this._keyboardInput = null;
-
-        // Network events via socketio:
-
       }
 
       //////////////////////////////////////////////////////////////
@@ -107,7 +95,7 @@ define([
         }
       }
 
-      startCanvasTimer(fps = .4) {
+      startCanvasTimer(fps = 20) {
         createjs.Ticker.framerate = fps;
         createjs.Ticker.on("tick", this._updateCanvas, this);
       }
@@ -115,6 +103,54 @@ define([
       pauseCanvasTimer(pause = true) {
         createjs.Ticker.paused = pause;
       }
+
+      addEventToCanvasMap(tileMap, event, listener, scope) {
+        $(this._stage.canvas).on(event, { tileMap: tileMap, scope: scope }, listener);
+      }
+
+      removeEventsFromCanvasMap(tileMap, events = []) {
+
+      }
+
+      addEventToTileMap(tileMap, event, listener, scope) {
+        // console.log("tileMap = ", tileMap);
+        let tileMapTiles = tileMap.tileMapTiles;
+        for (let tileName in tileMapTiles) {
+          if (!(tileMapTiles[tileName].sprite.hasEventListener(event))) {
+            tileMapTiles[tileName].sprite.on(event, listener, scope, false, tileMapTiles[tileName]);
+            //$(tileMapTiles[tileName].sprite).on(event, tileMapTiles[tileName], listener);
+          }
+        }
+      }
+
+      removeEventsFromTileMap(tileMap, events = []) {
+
+      }
+
+      // Event functions
+      displayRolloverInfo(evt, html) {
+        if (html) {
+          // console.log("html = ", html);
+          $("#" + this._infoDialogElementId).dialog({
+            position: { my: "left+10 bottom-10", of: evt.nativeEvent },
+            dialogClass: "no-close-button",
+            // width: 350
+          });
+          $("#" + this._infoDialogElementId).append(html);
+          $("#" + this._infoDialogElementId).dialog({
+            title: $("#dialog").attr("title"),
+            width: parseInt($("#dialog").attr("width")) || 350
+          })
+        }
+        else {
+          $("#" + this._infoDialogElementId).empty();
+          $("#" + this._infoDialogElementId).dialog("destroy");
+        }
+      }
+
+      faclityUpdateDialog(html) { }
+
+      facilityBuildDialog(html) { }
 
       ///////////////////////////////////////////////////////////////////
       // Private Methods
@@ -134,11 +170,8 @@ define([
       }
 
       _getTileMapIndex(tileMapName) {
-        this._tileMaps.find((tileMap, idx) => {
-          if (tileMap.name === tileMapName)
-            return idx;
-        });
-        return -1;
+        return this._tileMaps.findIndex((tileMap) => (tileMap.name === tileMapName));
       }
-    })
+
+    });
 });

@@ -14,16 +14,18 @@ requirejs.config({
     "jq.bootstrap": "lib/bootstrap/bootstrap.bundle.4.1.1.min",
     easeljs: "lib/easeljs/easeljs.1.0.0.min",
     Handlebars: "lib/handlebars/handlebars-v4.0.12",
-    //"dojo": "//download.dojotoolkit.org/release-1.13.0/dojo",
+
+    // MVC classes
+    CanvasController: "class/mvc/CanvasController",
+    CanvasModel: "class/mvc/CanvasModel",
+    CanvasView: "class/mvc/CanvasView",
 
     // Javascript classes
     Biome: "class/Biome",
-    CanvasController: "class/CanvasController",
-    CanvasModel: "class/CanvasModel",
-    CanvasView: "class/CanvasView",
     City: "class/City",
     CityLayer: "class/CityLayer",
     Dim2: "class/Dim2",
+    EventEmitter: "class/EventEmitter",
     Facility: "class/Facility",
     FacilityLayer: "class/FacilityLayer",
     ResourceLoader: "class/ResourceLoader",
@@ -73,8 +75,8 @@ require([
 ) {
     console.log("JS: main.js starting...");
 
-    canvasView = new CanvasView("gamecanvas");
     canvasModel = new CanvasModel();
+    canvasView = new CanvasView("gamecanvas", canvasModel);
     canvasController = new CanvasController(canvasModel, canvasView);
     canvasController.initialize();
 

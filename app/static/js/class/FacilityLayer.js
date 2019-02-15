@@ -15,6 +15,7 @@ define([
         this._facilitySpriteConfig = facilitySpriteConfig;
         this._facilityList = [];
         this._tileMap = null;
+        this._tileMapName = "facilities";
         this._terrainImageConfig = terrainImageConfig;
         this._terrainSpriteConfig = terrainSpriteConfig;
         this._scaleMap = [new Dim2(1.3, 1.3)];
@@ -26,7 +27,8 @@ define([
           this._terrainImageConfig.height,
           this._terrainImageConfig.width,
           this._terrainSpriteConfig.width,
-          this._terrainSpriteConfig.height
+          this._terrainSpriteConfig.height,
+          this._tileMapName
         );
         this._createFacilityTiles();
         return this._tileMap;
@@ -46,7 +48,7 @@ define([
           let typeIndex = this._facilitySpriteConfig.sprites.findIndex(x => x.type === facilityData.facility_type);
           if (typeIndex === -1) typeIndex = 0;
           let facilitySprite = new createjs.Sprite(facilitySpriteSheet, this._facilitySpriteConfig.sprites[typeIndex].frame);
-          let tile = new Tile("facility", this._facilitySpriteConfig.width, this._facilitySpriteConfig.height, facilitySprite, false);
+          let tile = new Tile(facilityData.id, "facility", this._facilitySpriteConfig.width, this._facilitySpriteConfig.height, facilitySprite, false);
           tile.scaleX = this._scaleMap[0].x;
           tile.scaleY = this._scaleMap[0].y;
           let facility = new Facility(

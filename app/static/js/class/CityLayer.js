@@ -14,6 +14,7 @@ define([
 				this._citySpriteConfig = citySpriteConfig;
 				this._cityList = [];
 				this._tileMap = null;
+				this._tileMapName = "cities";
 				this._terrainImageConfig = terrainImageConfig;
 				this._terrainSpriteConfig = terrainSpriteConfig;
 				this._scaleMap = [new Dim2(1, 1), new Dim2(2, 2), new Dim2(3, 3)];
@@ -40,7 +41,8 @@ define([
 					this._terrainImageConfig.height,
 					this._terrainImageConfig.width,
 					this._terrainSpriteConfig.width,
-					this._terrainSpriteConfig.height
+					this._terrainSpriteConfig.height,
+					this._tileMapName
 				);
 				this._createCityTiles();
 				return this._tileMap;
@@ -59,7 +61,7 @@ define([
 
 				this._citiesData.forEach((cityData) => {
 					let citySprite = new createjs.Sprite(citySpriteSheet, this._citySpriteConfig.sprites[0].frame);
-					let tile = this._scaleTile(cityData, new Tile("city", this._citySpriteConfig.width, this._citySpriteConfig.height, citySprite, false));
+					let tile = this._scaleTile(cityData, new Tile(cityData.id, "city", this._citySpriteConfig.width, this._citySpriteConfig.height, citySprite, false));
 					let city = new City(cityData.id, cityData.name, cityData.population, cityData.daily_consumption, tile);
 					this._cityList.push(city);
 				});
