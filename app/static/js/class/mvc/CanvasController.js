@@ -9,6 +9,9 @@ define([
         super();
         this._canvasModel = canvasModel;
         this._canvasView = canvasView;
+        this._clicked = 0;
+        this._dragging = false;
+        this._leftMouseDown = false;
       }
 
       ///////////////////////////////////////////////////////////////////////////
@@ -18,8 +21,7 @@ define([
         this._getTerrainLayer();
         this._getCityLayer();
         this._getFacilityLayer();
-        this._canvasView.scaleMap = canvasData.canvasConfig.scaleMap;
-        this._canvasView.zoomLevel = 0;
+        this._setGeneralWindow
         this._canvasView.startCanvasTimer();
       }
 
@@ -50,8 +52,19 @@ define([
         });
       }
 
+
+      _setGeneralWindowEvents() {
+        this._canvasView.addEventToCanvasMap(null, "keydown", this._onTerrainEvent, this);
+      }
+
       _setTerrainEvents(tileMap) {
         this._canvasView.addEventToCanvasMap(tileMap, "click", this._onTerrainEvent, this);
+        this._canvasView.addEventToCanvasMap(tileMap, "dblclick", this._onTerrainEvent, this);
+        this._canvasView.addEventToCanvasMap(tileMap, "wheel", this._onTerrainEvent, this);
+        this._canvasView.addEventToCanvasMap(tileMap, "mouseleave", this._onTerrainEvent, this);
+        this._canvasView.addEventToCanvasMap(tileMap, "mousedown", this._onTerrainEvent, this);
+        this._canvasView.addEventToCanvasMap(tileMap, "mouseup", this._onTerrainEvent, this);
+        this._canvasView.addEventToCanvasMap(tileMap, "mousemove", this._onTerrainEvent, this);
         //this._canvasView.addEventToCanvasMap(tileMap, "mouseenter", this._onTerrainEvent);
       }
 
@@ -72,7 +85,45 @@ define([
       // this uses jquery event handler. data and scope of the event is in 
       // evt.data
       _onTerrainEvent(evt) {
-        console.log("CanvasController._onTerrainEvent", evt);
+        let scope = evt.data.scope;
+        switch (evt.type) {
+          case "click":
+            break;
+          case "mousedown":
+            scope._leftMouseDown = true;
+            const mouseDownTimer = setTimeout(() => {
+              if (scope._leftMouseDown) {
+                scope._dragging = true;
+                console.log("dragging started...");
+              }
+            }, 350);
+            break;
+          case "mouseup":
+            scope._leftMouseDown = false;
+            if (scope._dragging) {
+              scope._clicked = -1;
+              scope._dragging = false;
+              console.log("dragging stopped...");
+            }
+            break;
+          case "mousemove":
+            if (scope._dragging) {
+              scope._canvasView.dragMap(evt)
+              console.log("dragging", evt);
+            }
+            break
+          case "dblclick":
+            break;
+          case "wheel":
+            if (!scope._dragging)
+              scope._canvasView.wheelMapZoom(evt);
+            break;
+          case "mouseleave":
+            scope._dragging = false;
+            scope._canvasView.displayRolloverInfo(evt, null);
+            break;
+        }
+        // console.log("CanvasController._onTerrainEvent", evt);
       }
 
       // This uses easeljs event handler which specifies different listener function prototype
@@ -81,9 +132,11 @@ define([
         const tile = data;
         switch (evt.type) {
           case "rollover":
-            this._canvasModel.getCityInformationHTML(tile.id).then((html) => {
-              this._canvasView.displayRolloverInfo(evt, html)
-            });
+            if (!this._dragging) {
+              this._canvasModel.getCityInformationHTML(tile.id).then((html) => {
+                this._canvasView.displayRolloverInfo(evt, html)
+              });
+            }
             break;
           case "rollout":
             this._canvasView.displayRolloverInfo(evt, null);
@@ -97,9 +150,11 @@ define([
         const tile = data;
         switch (evt.type) {
           case "rollover":
-            this._canvasModel.getFacilityInformationHTML(tile.id).then((html) => {
-              this._canvasView.displayRolloverInfo(evt, html)
-            });
+            if (!this._dragging) {
+              this._canvasModel.getFacilityInformationHTML(tile.id).then((html) => {
+                this._canvasView.displayRolloverInfo(evt, html)
+              });
+            }
             break;
           case "rollout":
             this._canvasView.displayRolloverInfo(evt, null);
@@ -107,6 +162,5 @@ define([
         }
       }
 
-
-    })
+    });
 });

@@ -1,13 +1,14 @@
 body {
   background-color: lightgray;
   margin: auto;
+  overflow: hidden;
 }
 
 #game {
   margin: auto;
   width: 1200px;
   height: 800px;
-  background-color: lightpink;
+  background-color: #ededed;
 }
 
 #gamecanvas {

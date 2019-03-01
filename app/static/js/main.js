@@ -28,10 +28,12 @@ requirejs.config({
     EventEmitter: "class/EventEmitter",
     Facility: "class/Facility",
     FacilityLayer: "class/FacilityLayer",
+    Game: "class/Game",
     ResourceLoader: "class/ResourceLoader",
     TerrainMap: "class/TerrainMap",
     Tile: "class/Tile",
     TileMap: "class/TileMap",
+    TopMenu: "class/TopMenu",
     Vector2: "class/Vector2",
 
     // Data objects
@@ -63,21 +65,10 @@ requirejs.config({
 //////////////////////////////////////////////////////////////////////////
 // Main.js starts here...
 require([
-  "jquery",
-  "CanvasController",
-  "CanvasModel",
-  "CanvasView"
+  "Game",
 ], function (
-  $,
-  CanvasController,
-  CanvasModel,
-  CanvasView
+  Game
 ) {
     console.log("JS: main.js starting...");
-
-    canvasModel = new CanvasModel();
-    canvasView = new CanvasView("gamecanvas", canvasModel);
-    canvasController = new CanvasController(canvasModel, canvasView);
-    canvasController.initialize();
-
+    game = new Game();
   });

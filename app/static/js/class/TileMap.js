@@ -70,12 +70,13 @@ define([
         let tileHeight = this._height * this._scaleY;
         let maxWidth = tileWidth * this._columns - canvasWidth;
         let maxHeight = tileHeight * this._rows - canvasHeight;
+        console.log("-- ", tileHeight, this._rows, canvasHeight);
+        console.log("maxWidth : maxHeight  = " + maxWidth + " : " + maxHeight);
 
         if (this._container.x < -maxWidth) this._container.x = -maxWidth;
         if (this._container.x > 0) this._container.x = 0;
         if (this._container.y < -maxHeight) this._container.y = -maxHeight;
         if (this._container.y > 0) this._container.y = 0;
-
         //console.log("tilemap = ", this);
         //console.log("check:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
       }
@@ -117,27 +118,19 @@ define([
         }
       }
 
-      setScale(width, height, canvasWidth, canvasHeight) {
-        this._container.scaleX = this._scaleX = width / this._width;
-        this._container.scaleY = this._scaleY = height / this._height;
-        //console.log("container.scaleX : container.scaleY = " + this._container.scaleX + " : " + this._container.scaleY);
-        //this.moveTileMap(0, 0, canvasWidth, canvasHeight);
+      setScale(scaleX, scaleY) {
+        this._container.scaleX = this._scaleX = scaleX;
+        this._container.scaleY = this._scaleY = scaleY;
       }
 
       moveTileMap(deltaX, deltaY, canvasWidth, canvasHeight) {
-        //console.log("before:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
-
-        let scaleWidth = this._width * this._container.scaleX;
-        let scaleHeight = this._height * this._container.scaleY;
+        console.log("deltaX : deltaY = " + deltaX + " : " + deltaY);
+        console.log("before: this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
         this._container.x += deltaX;
         this._container.y += deltaY;
-        this._container.x =
-          Math.floor(this._container.x / scaleWidth) * scaleWidth;
-        this._container.y =
-          Math.floor(this._container.y / scaleHeight) * scaleHeight;
-
-        //console.log("after:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
+        console.log("after:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
         this._checkMapBounds(canvasWidth, canvasHeight);
+        console.log("after check:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
       }
 
       getPoint(x, y, mapCoords = true) {

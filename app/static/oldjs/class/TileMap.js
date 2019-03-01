@@ -125,7 +125,8 @@ define([
       }
 
       moveTileMap(deltaX, deltaY, canvasWidth, canvasHeight) {
-        //console.log("before:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
+        console.log("deltaX : deltaY = " + deltaX + " : " + deltaY);
+        console.log("before:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
 
         let scaleWidth = this._width * this._container.scaleX;
         let scaleHeight = this._height * this._container.scaleY;
@@ -136,7 +137,7 @@ define([
         this._container.y =
           Math.floor(this._container.y / scaleHeight) * scaleHeight;
 
-        //console.log("after:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
+        console.log("after:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
         this._checkMapBounds(canvasWidth, canvasHeight);
       }
 

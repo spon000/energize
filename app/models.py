@@ -33,7 +33,7 @@ class Company(db.Model):
   name = db.Column(db.String(30), nullable=False, default='Company #')
   score = db.Column(db.Integer, nullable=False, default=0)
   budget = db.Column(db.Float, nullable=False, default=10000)
-  state = db.Column(db.Enum("view", "build", "ready"), default="view")
+  state = db.Column(db.Enum("view", "build", "turn", "ready"), default="view")
   cost_operational = db.Column(db.Float)
 
   def __repr__(self):

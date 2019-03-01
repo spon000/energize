@@ -16,13 +16,13 @@ define([
       }
 
       on(evt, listener) {
-        console.log("EventEmitter.on = ", evt, " : ", listener);
+        // console.log("EventEmitter.on = ", evt, " : ", listener);
         (this._events[evt] || (this._events[evt] = [])).push(listener);
         return this;
       }
 
       emit(evt, arg) {
-        console.log("EventEmitter.emit = ", evt, " : ", arg);
+        // console.log("EventEmitter.emit = ", evt, " : ", arg);
         if (!this._paused) (this._events[evt] || []).slice().forEach(lsn => lsn(arg));
       }
 

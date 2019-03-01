@@ -6,12 +6,15 @@ define([
   return ({
     "canvasConfig": {
       "scaleMap": [new Dim2(.2, .2), new Dim2(.4, .4), new Dim2(1, 1), new Dim2(2, 2)],
+      "initialZoomLevel": 0,
+      "initialOriginX": 0,
+      "initialOriginY": 0,
       "width": 1200,
       "height": 600
     },
     "terrainImageConfig": {
       "name": "terrainBitmap",
-      "path": "static/img/world-map-240x120b.png",
+      "path": "static/img/world-map-240x120c.png",
       "width": 240,
       "height": 120,
     },

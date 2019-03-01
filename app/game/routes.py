@@ -4,6 +4,7 @@ from app import db
 from app.models import User, Game, Company, Facility, City, FacilityType, GeneratorType, PowerType
 from app.models import FacilitySchema, GeneratorSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema, GeneratorTypeSchema, PowerTypeSchema
 from app.game.initgame import initgame
+# from app.game.runturn import runturn
 
 game = Blueprint('game', __name__)
 
@@ -69,15 +70,24 @@ def game_data():
 @game.route("/company", methods=["GET", "POST"])
 @login_required
 def company():
-  company = Company.query.filter_by(id=current_user.current_company).first()  
+  company = Company.query.filter_by(id=current_user.current_company).first()
+  game = Game.query.filter_by(id=company.id_game).first()
+ 
   if request.method == 'GET':
     company_schema = CompanySchema()
     serialized_company = company_schema.dump(company).data
     return jsonify({'player_company': serialized_company})
   else:
-    company.state = request.args.get('pcstate');
+    company.state = request.args.get('pcstate')
     db.session.commit()
-    return "success"
+    if company.state == "turn":
+      companies_ready = Company.query.filter_by(id_game=game.id, state="turn").count()
+      if companies_ready == 2: 
+        return "Running Quarterly Turn"
+      else:
+        return "Waiting For Players"
+    else:
+      return ("Success - state = " + company.state)
 
 @game.route("/companies", methods=["GET", "POST"])
 @login_required
@@ -151,7 +161,8 @@ def viewcity(city_id):
 @game.route("/runturn", methods=["GET", "POST"])
 @login_required
 def runturn():
-  pass
+  companies = Company.query.all()
+  
 
 
 

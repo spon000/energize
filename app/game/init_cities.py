@@ -18,6 +18,5 @@ def init_cities():
       layer=city['layer']
     )
     db.session.add(newcity)
-
   db.session.commit()
   return 0

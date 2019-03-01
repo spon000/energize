@@ -20,7 +20,10 @@ def creategame():
   form = CreateGameForm()
   if form.validate_on_submit():
     num_companies = Company.query.filter_by(id_user=current_user.id).count()
+    # print("num_companies = ", num_companies)
+    # print("current_user.companies_max = ", current_user.companies_max)
     if num_companies < current_user.companies_max:
+
       game = Game(name=form.gamename.data)
       db.session.add(game)
       db.session.commit()

@@ -9,8 +9,9 @@ define([
     "gameTable": {
 
     },
-    "playerTable": {
-
+    "companyTable": {
+      name: "companyTable",
+      path: "/company"
     },
     "cityTable": {
       name: "cityTable",
