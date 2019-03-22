@@ -34,6 +34,18 @@ define([
         return this._tileMap;
       }
 
+      createTempFacilityTile() {
+        let facilitySprite = new createjs.Sprite(facilitySpriteSheet, this._facilitySpriteConfig.sprites[0].frame);
+        let tile = new Tile(-1, "temp-facility", this._facilitySpriteConfig.width, this._facilitySpriteConfig.height, facilitySprite, false);
+        tile.scaleX = this._scaleMap[0].x;
+        tile.scaleY = this._scaleMap[0].y;
+        return tile;
+      }
+
+      createFacilityTile() {
+
+      }
+
       _createFacilityTiles() {
         this._facilityList = [];
         let facilitySpriteSheet = new createjs.SpriteSheet({

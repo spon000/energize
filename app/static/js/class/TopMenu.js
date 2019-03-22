@@ -10,6 +10,7 @@ define([
         super();
         this._facilityButtonId = "facility-btn";
         this._nextTurnButtonId = "next-btn";
+        this._buildStatus = "build";
 
         this._getCompanyData().then((company) => {
           this._setBuildBtnStatus(company.state);
@@ -17,6 +18,11 @@ define([
         });
 
         this._setNextBtnEvent();
+      }
+
+      // Getters...
+      buildStatus() {
+        return this._buildStatus;
       }
 
       clickBuildButton() {
@@ -45,14 +51,17 @@ define([
         if (state === "view") {
           $('#' + this._facilityButtonId).removeClass(["building", "no-hover"]);
           $.post("/company?pcstate=" + state, (data) => { console.log("successful POST", data) });
+          this._buildStatus = "view";
         }
         else if (state === "build") {
           $('#' + this._facilityButtonId).addClass(["building", "no-hover"]);
           $.post("/company?pcstate=" + state, (data) => { console.log("successful POST", data) });
+          this._buildStatus = "build";
         }
         else if (state === "turn") {
           $('#' + this._facilityButtonId).addClass(["no-hover"]);
           $('#' + this._facilityButtonId).removeClass(["building"]);
+          this._buildStatus = "turn";
         }
       }
 

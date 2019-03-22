@@ -1,7 +1,10 @@
 define([
   "canvasData",
-  "EventEmitter"
-], function (canvasData, EventEmitter) {
+  "Dim2",
+  "EventEmitter",
+  "facilityTileDefs"
+
+], function (canvasData, Dim2, EventEmitter, facilityTileDefs) {
 
   return (
     class CanvasController extends EventEmitter {
@@ -9,7 +12,7 @@ define([
         super();
         this._canvasModel = canvasModel;
         this._canvasView = canvasView;
-        this._clicked = 0;
+        this._terrainClicked = false;
         this._dragging = false;
         this._leftMouseDown = false;
       }
@@ -88,28 +91,39 @@ define([
         let scope = evt.data.scope;
         switch (evt.type) {
           case "click":
+            if (scope._terrainClicked) {
+              let colRow = scope._canvasView.getRowCol(evt.offsetX, evt.offsetY);
+              scope._canvasModel.getCompanyData().then((companyData) => {
+                if (companyData.state === "build") {
+                  let facilityListObj = scope._buildFacilityEvent(colRow);
+                  console.log("facilityListObj = ", facilityListObj);
+                }
+                // console.log("companyData = ", companyData);
+              });
+            }
             break;
           case "mousedown":
             scope._leftMouseDown = true;
+            scope._terrainClicked = true
             const mouseDownTimer = setTimeout(() => {
               if (scope._leftMouseDown) {
                 scope._dragging = true;
-                console.log("dragging started...");
+                // console.log("dragging started...");
               }
             }, 350);
             break;
           case "mouseup":
             scope._leftMouseDown = false;
             if (scope._dragging) {
-              scope._clicked = -1;
+              scope._terrainClicked = false;
               scope._dragging = false;
-              console.log("dragging stopped...");
+              // console.log("dragging stopped...");
             }
             break;
           case "mousemove":
             if (scope._dragging) {
               scope._canvasView.dragMap(evt)
-              console.log("dragging", evt);
+              // console.log("dragging", evt);
             }
             break
           case "dblclick":
@@ -131,6 +145,9 @@ define([
         // console.log("CanvasController._onCityEvent", evt, data);
         const tile = data;
         switch (evt.type) {
+          case "click":
+            this._terrainClicked = false;
+            break;
           case "rollover":
             if (!this._dragging) {
               this._canvasModel.getCityInformationHTML(tile.id).then((html) => {
@@ -149,6 +166,9 @@ define([
         //console.log("CanvasController._onFacilityEvent", evt, data);
         const tile = data;
         switch (evt.type) {
+          case "click":
+            this._terrainClicked = false;
+            break;
           case "rollover":
             if (!this._dragging) {
               this._canvasModel.getFacilityInformationHTML(tile.id).then((html) => {
@@ -162,5 +182,64 @@ define([
         }
       }
 
+      _buildFacilityEvent(colRow) {
+        //console.log("terrainTileGrid = ", terrainTileGrid);
+        let cityTileGrid = this._canvasView.getTileGrid("cities", colRow, 3, 3);
+        let facilityTileGrid = this._canvasView.getTileGrid("facilities", colRow, 7, 7);
+        let allowedFacilities = null;
+
+        if (this._canvasView.checkForTile("facility", facilityTileGrid)) {
+          return ({
+            "facilityList": null,
+            "message": "Can't build near or on a facility"
+          });
+        }
+
+        if (this._canvasView.checkForTile("city", cityTileGrid)) {
+          return ({
+            "facilityList": null,
+            "message": "Can't build near or on a city"
+          });
+        }
+
+        const terrainDefs = facilityTileDefs.allowedFacilityTypesByTerrain;
+        let terrainTileGrid = this._canvasView.getTileGrid("terrain", colRow, 3, 3);
+        let facilitiesAllowed = [];
+
+        for (let facilityId in terrainDefs) {
+          console.log("facilityId = ", facilityId)
+          if (this._canvasView.checkForTileRange(terrainDefs[facilityId], terrainTileGrid)) {
+            facilitiesAllowed.push(facilityId);
+            console.log("we found one = ", facilityId);
+          }
+        }
+        facilitiesAllowed = [...new Set(facilitiesAllowed)];
+        console.log("facilitiesAllowed = ", facilitiesAllowed);
+        //     let gridLength = terrainDefs[facilityId][terrain] * 2 + 1
+        //     let gridOrigin = Math.floor(gridLength / 2);
+        //     let tileGrid = this._canvasView.getTileGrid("terrain", colRow, gridLength, gridLength, new Dim2(gridOrigin, gridOrigin));
+        //     if (this._canvasView.checkForTile(terrain, tileGrid)) { 
+        //         terrainFound = true;
+        //         break;
+        //   }
+        // if (terrainFound) facilitiesAllowed.push(parseInt(facilityId));
+        // }
+        // console.log("terrainDefs[" + facilityId + "] = ", terrainDefs[facilityId]);
+        // }
+
+
+        if (allowedFacilities) {
+          return ({
+            "facilityList": allowedFacilities,
+            "message": "building..."
+          });
+        }
+        else {
+          return ({
+            "facilityList": null,
+            "message": "You can't build a facility on this terrain"
+          });
+        }
+      }
     });
 });

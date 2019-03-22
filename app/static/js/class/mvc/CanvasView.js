@@ -90,6 +90,126 @@ define([
         this._zoomMap();
       }
 
+      getTileMap(tileMapName) {
+        const index = this._getTileMapIndex(tileMapName);
+        return index >= 0 ? this._tileMaps[index] : null;
+      }
+
+      getRowCol(x, y) {
+        let rowCol = this._tileMaps[0].getPoint(x, y)
+        return new Dim2(rowCol.x, rowCol.y)
+      }
+
+      getTileGrid(tileMapName, colRow, width, height) {
+        let tileMap = this.getTileMap(tileMapName);
+        let originXY = new Dim2(Math.floor(width / 2), Math.floor(height / 2));
+        let tileGrid = [];
+        for (let row = 0 - originXY.y; row < height - originXY.y; row++) {
+          let tileRow = [];
+          for (let col = 0 - originXY.x; col < width - originXY.x; col++) {
+            tileRow.push(this.getTile(tileMap, colRow.y + row, colRow.x + col));
+          }
+          tileGrid.push(tileRow);
+        }
+        return tileGrid;
+      }
+
+      getTile(tileMap, row, col) {
+        return tileMap.getTile(row, col);
+      }
+
+      getTileForAllMaps(row, col) {
+        let tileList = [];
+        this.tileMaps.forEach((tileMap) => {
+          tileList.push({
+            [tileMap.name]: getTile.getTile(tileMap, row, col)
+          });
+        });
+        return tileList;
+      }
+
+      checkForTile(tileName, tileGrid) {
+        let tileFound = false;
+        tileGrid.forEach((tileGridRow) => {
+          if (tileGridRow.find(tile => tile && tile.name == tileName))
+            tileFound = true;
+        });
+        return tileFound;
+      }
+
+      checkForTileRange(tileChecks, tileGrid) {
+        let originY = Math.floor(tileGrid.length / 2);
+        let originX = Math.floor(tileGrid[0].length / 2);
+        let terrainFound = false;
+        console.log("originY : originX = ", originY + " : " + originX);
+        // Check for prohibited terrains
+        for (let tileRange in tileChecks.prohibited) {
+          let iTileRange = parseInt(tileRange);
+          for (let y = originY - iTileRange; y <= originY + iTileRange; y++) {
+            for (let x = originX - iTileRange; x <= originX + iTileRange; x++) {
+              // console.log("y : x : tileGrid[y][x] = ", y + " : " + x + " : ", tileGrid[y][x]);
+              if (tileChecks.prohibited[tileRange].find(tileName => tileName == tileGrid[y][x].name)) {
+                console.log("prohibitied tile found...");
+                return false;
+              }
+            }
+          }
+        }
+
+        console.log("looks good so far...");
+        console.log("tileGrid = ", tileGrid)
+        for (let tileRange in tileChecks.allowed) {
+          let iTileRange = parseInt(tileRange);
+          for (let y = originY - iTileRange; y <= originY + iTileRange; y++) {
+            for (let x = originX - iTileRange; x <= originX + iTileRange; x++) {
+              if (tileChecks.allowed[tileRange].find(tileName => tileName == tileGrid[y][x].name)) {
+                console.log("allowed tile found...");
+                return true;
+              }
+            }
+          }
+        }
+        return false;
+      }
+
+      // // Check column boundaries for terrain type
+      // for (let y = 0; y < tileGrid.length; y++) {
+      //   console.log("y Tiles = ", tileGrid[y][0].name, " : ", tileGrid[y][tileGrid[0].length - 1].name);
+      //   console.log("tileName = " + tileName);
+      //   if ((tileName == tileGrid[y][0].name) || (tileName == tileGrid[y][tileGrid[0].length - 1].name)) {
+      //     return true;
+      //   }
+      // }
+      // // checking row boundaries for terrain type
+      // for (let x = 0; x < tileGrid[0].length; x++) {
+      //   console.log("x Tiles = ", tileGrid[0][x].name, " : ", tileGrid[tileGrid.length - 1][x].name);
+      //   console.log("tileName = " + tileName);
+      //   if ((tileName == tileGrid[0][x].name) || (tileName == tileGrid[tileGrid.length - 1][x].name)) {
+      //     return true;
+      //   }
+      // }
+
+
+      // let originY = Math.floor(tileGrid.length / 2);
+      // let originX = Math.floor(tileGrid[0].length / 2);
+      // console.log("Tile = ", tileGrid[originY][originX].name);
+      // console.log("tileName = " + tileName);
+      // if (tileName == tileGrid[originY][originX].name) {
+      //   return true;
+      // }
+
+      // // Terrain type not found in range.
+      // return false;
+
+
+      checkForTileAt(tileName, tileGrid, locationXY) {
+        return tileName == tileGrid[locationXY.x][locationXY.y] ? true : false;
+      }
+
+      checkFacilityTerrain(colRow, terrainList) {
+        return null;
+      }
+
       removeTileMap(tileMapName) {
         const index = this._getTileMapIndex(tileMapName);
         if (index >= 0) {
@@ -191,108 +311,39 @@ define([
         this._tileMaps.forEach(tileMap => {
           tileMap.setScale(this._scaleMap[this._zoomLevel].x, this._scaleMap[this._zoomLevel].y);
         });
+        this._moveMap(0, 0);
       }
 
       _centerOrientZoom(x, y, wheelDeltaY) {
         let clientX = x;
         let clientY = y;
-        console.log("x : y : wheelDeltaY = " + x + " : " + y + " : " + wheelDeltaY);
+        // console.log("x : y : wheelDeltaY = " + x + " : " + y + " : " + wheelDeltaY);
 
         let scale = this._scaleMap[this._zoomLevel].x
         let prevScale = this._scaleMap[this._zoomLevel - wheelDeltaY].x;
-        console.log("prevScale : scale = " + prevScale + " : " + scale);
+        // console.log("prevScale : scale = " + prevScale + " : " + scale);
 
         let containerWidth = canvasData.canvasConfig.width;
         let containerHeight = canvasData.canvasConfig.height;
-        console.log("containerWidth : containerHeight = " + containerWidth + " : " + containerHeight);
+        // console.log("containerWidth : containerHeight = " + containerWidth + " : " + containerHeight);
 
         let prevWorldWidth = canvasData.terrainSpriteConfig.width * canvasData.terrainImageConfig.width * prevScale;
         let prevWorldHeight = canvasData.terrainSpriteConfig.height * canvasData.terrainImageConfig.height * prevScale;
-        console.log("prevWorldWidth : prevWorldHeight = " + prevWorldWidth + " : " + prevWorldHeight);
+        // console.log("prevWorldWidth : prevWorldHeight = " + prevWorldWidth + " : " + prevWorldHeight);
 
         let worldWidth = canvasData.terrainSpriteConfig.width * canvasData.terrainImageConfig.width * scale;
         let worldHeight = canvasData.terrainSpriteConfig.height * canvasData.terrainImageConfig.height * scale;
-        console.log("worldWidth : worldHeight = " + worldWidth + " : " + worldHeight);
+        // console.log("worldWidth : worldHeight = " + worldWidth + " : " + worldHeight);
 
         let percentXInCurrentBox = clientX / containerWidth;
         let percentYInCurrentBox = clientY / containerHeight;
-        console.log("percentXInCurrentBox : percentYInCurrentBox = " + percentXInCurrentBox + " : " + percentYInCurrentBox);
-
-        // let currentBoxWidth = areaWidth / scale;
-        // let currentBoxHeight = areaHeight / scale;
-        // console.log("currentBoxWidth : currentBoxHeight = " + currentBoxWidth + " : " + currentBoxHeight);
-
-        // let nextBoxWidth = areaWidth * nextScale;
-        // let nextBoxHeight = areaHeight * nextScale;
-        // console.log("nextBoxWidth : nextBoxHeight = " + nextBoxWidth + " : " + nextBoxHeight);
+        // console.log("percentXInCurrentBox : percentYInCurrentBox = " + percentXInCurrentBox + " : " + percentYInCurrentBox);
 
         let deltaX = -Math.floor((worldWidth - prevWorldWidth) * (percentXInCurrentBox));
         let deltaY = -Math.floor((worldHeight - prevWorldHeight) * (percentYInCurrentBox));
-        console.log("deltaX : deltaY = " + deltaX + " : " + deltaY);
+        // console.log("deltaX : deltaY = " + deltaX + " : " + deltaY);
 
         this._moveMap(deltaX, deltaY);
-
-
-        //   // let scaleChangeX = 0;
-        //   // let scaleChangeY = 0;
-        //   // let scaledTileWidth = canvasData.terrainSpriteConfig.width * this._scaleMap[this._zoomLevel].x
-        //   // let scaledTileHeight = canvasData.terrainSpriteConfig.height * this._scaleMap[this._zoomLevel].y
-        //   // let worldWidth = scaledTileWidth * canvasData.terrainImageConfig.width;
-        //   // let worldHeight = scaledTileHeight * canvasData.terrainImageConfig.height;
-        //   // let worldX = x * Math.floor(worldWidth / canvasData.canvasConfig.width);
-        //   // let worldY = y * Math.floor(worldHeight / canvasData.canvasConfig.height);
-        //   // let deltaX = 0;
-        //   // let deltaY = 0;
-        //   // if (zoomIn) {
-        //   //   scaleChangeX = this._scaleMap[this._zoomLevel].x - this._scaleMap[this._zoomLevel - 1].x;
-        //   //   scaleChangeY = this._scaleMap[this._zoomLevel].y - this._scaleMap[this._zoomLevel - 1].y;
-        //   //   // deltaX = -Math.floor(worldX * this._scaleMap[this._zoomLevel].x);
-        //   //   // deltaY = -Math.floor(worldY * this._scaleMap[this._zoomLevel].y);
-        //   //   deltaX = -Math.floor(x * scaleChangeX) - (worldX * scaleChangeX);
-        //   //   deltaY = -Math.floor(y * scaleChangeY) - (worldY * scaleChangeY);
-        //   // }
-        //   // else {
-        //   //   scaleChangeX = this._scaleMap[this._zoomLevel].x - this._scaleMap[this._zoomLevel + 1].x;
-        //   //   scaleChangeY = this._scaleMap[this._zoomLevel].y - this._scaleMap[this._zoomLevel + 1].y;
-        //   //   // deltaX = -Math.floor(worldX * this._scaleMap[this._zoomLevel].x);
-        //   //   // deltaY = -Math.floor(worldX * this._scaleMap[this._zoomLevel].y);
-        //   //   deltaX = -Math.floor(x * scaleChangeX);
-        //   //   deltaY = -Math.floor(y * scaleChangeY);
-        //   // }
-
-        //   console.log("x : y = " + x + " : " + y);
-        // console.log("worldX : worldY = " + worldX + " : " + worldY);
-        // console.log("deltaX : deltaY = " + deltaX + " : " + deltaY);
-        // console.log("scaleChangeX : scaleChangeY = " + scaleChangeX + " : " + scaleChangeY);
-        //this._moveMap(deltaX, deltaY);
-
-
-        // let canvasCenterX = Math.floor(canvasData.canvasConfig.width / 2);
-        // let canvasCenterY = Math.floor(canvasData.canvasConfig.height / 2);
-
-        // let scaledTileWidth = canvasData.terrainSpriteConfig.width * this._scaleMap[this._zoomLevel].x
-        // let scaledTileHeight = canvasData.terrainSpriteConfig.height * this._scaleMap[this._zoomLevel].y
-        // let worldWidth = scaledTileWidth * canvasData.terrainImageConfig.width;
-        // let worldHeight = scaledTileHeight * canvasData.terrainImageConfig.height;
-        // // let worldCenterX = Math.floor(worldWidth / 2);
-        // // let worldCenterY = Math.floor(worldHeight / 2);
-        // let worldX = x * Math.floor(worldWidth / canvasData.canvasConfig.width);
-        // let worldY = y * Math.floor(worldHeight / canvasData.canvasConfig.height);
-        // let deltaX = (canvasCenterX - worldX) - (canvasCenterX - x);
-        // let deltaY = (canvasCenterY - worldY) - (canvasCenterY - y);
-        // // let deltaX = (canvasCenterX - worldX); //- (canvasCenterX - x);
-        // // let deltaY = (canvasCenterY - worldY); //- (canvasCenterY - y);
-        // if (!zoomIn) {
-        //   // deltaX = -(worldX - canvasCenterX); // + (x - canvasCenterX);
-        //   // deltaY = -(worldY - canvasCenterY); // + (y - canvasCenterY);
-        //   deltaX = -(worldX - canvasCenterX) + (x - canvasCenterX);
-        //   deltaY = -(worldY - canvasCenterY) + (y - canvasCenterY);
-        // }
-        // console.log("x : y = " + x + " : " + y);
-        // console.log("worldX : worldY = " + worldX + " : " + worldY);
-        // console.log("deltaX : deltaY = " + deltaX + " : " + deltaY);
-        // this._moveMap(deltaX, deltaY);
-        // console.log("this = ", this);
       }
 
       _moveMap(deltaX, deltaY) {

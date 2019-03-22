@@ -30,12 +30,12 @@ define([
 
       _onKeyDownEvent(evt) {
         let scope = evt.data.scope;
-        console.log("evt.type = ", evt.type);
+        // console.log("evt.type = ", evt.type);
         switch (evt.type) {
           case "keydown":
-            console.log("keydown...");
+            // console.log("keydown...");
             const emitter = scope._getKeyEmitter(evt)
-            console.log("emitter = ", emitter);
+            // console.log("emitter = ", emitter);
             scope.emit(emitter.text, emitter.data);
             break;
         }
@@ -46,12 +46,25 @@ define([
           this._topMenu.clickBuildButton();
         });
 
-        this.on('zoomIn', () => { });
-        this.on('zoomOut', () => { });
-        this.on('moveMapDown', () => { });
-        this.on('moveMapUp', () => { });
-        this.on('moveMapLeft', () => { });
-        this.on('moveMapRight', () => { });
+        this.on('zoomIn', () => {
+          this._canvasView.zoomLevel += 1;
+        });
+        this.on('zoomOut', () => {
+          this._canvasView.zoomLevel -= 1;
+        });
+
+        this.on('moveMapDown', () => {
+          this._canvasView._moveMap(0, -100);
+        });
+        this.on('moveMapUp', () => {
+          this._canvasView._moveMap(0, 100);
+        });
+        this.on('moveMapLeft', () => {
+          this._canvasView._moveMap(100, 0);
+        });
+        this.on('moveMapRight', () => {
+          this._canvasView._moveMap(-100, 0);
+        });
       }
 
 

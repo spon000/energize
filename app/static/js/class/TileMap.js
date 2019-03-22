@@ -70,8 +70,8 @@ define([
         let tileHeight = this._height * this._scaleY;
         let maxWidth = tileWidth * this._columns - canvasWidth;
         let maxHeight = tileHeight * this._rows - canvasHeight;
-        console.log("-- ", tileHeight, this._rows, canvasHeight);
-        console.log("maxWidth : maxHeight  = " + maxWidth + " : " + maxHeight);
+        // console.log("-- ", tileHeight, this._rows, canvasHeight);
+        // console.log("maxWidth : maxHeight  = " + maxWidth + " : " + maxHeight);
 
         if (this._container.x < -maxWidth) this._container.x = -maxWidth;
         if (this._container.x > 0) this._container.x = 0;
@@ -124,13 +124,13 @@ define([
       }
 
       moveTileMap(deltaX, deltaY, canvasWidth, canvasHeight) {
-        console.log("deltaX : deltaY = " + deltaX + " : " + deltaY);
-        console.log("before: this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
+        // console.log("deltaX : deltaY = " + deltaX + " : " + deltaY);
+        // console.log("before: this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
         this._container.x += deltaX;
         this._container.y += deltaY;
-        console.log("after:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
+        // console.log("after:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
         this._checkMapBounds(canvasWidth, canvasHeight);
-        console.log("after check:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
+        // console.log("after check:this._container.x : this._container.y = " + this._container.x + " : " + this._container.y);
       }
 
       getPoint(x, y, mapCoords = true) {
@@ -155,7 +155,7 @@ define([
 
       getTile(row, column) {
         let locationIndex = "" + (row * this._columns + column);
-        return this._tileMapTiles[locationIndex];
+        return this._tileMapTiles[locationIndex] || null;
       }
 
       getTiles(row, column, range) {

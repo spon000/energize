@@ -13,6 +13,17 @@ define([
     class CanvasModel extends EventEmitter {
       constructor() {
         super();
+        this._facilityLayer = null;
+        this._cityLayer = null;
+      }
+
+      // Getters...
+      facilityLayer() {
+        return this._facilityLayer;
+      }
+
+      cityLayer() {
+        return this._cityLayer;
       }
 
       createTerrainTileMap() {
@@ -52,6 +63,7 @@ define([
               canvasData.terrainSpriteConfig,
               resources[networkCallMap.cityTable.name].data.cities
             );
+            this._cityLayer = cityLayer;
             resolve(cityLayer.createTileMap());
           })
 
@@ -74,6 +86,7 @@ define([
               canvasData.terrainSpriteConfig,
               resources[networkCallMap.facilityTable.name].data.facilities
             );
+            this._facilityLayer = facilityLayer;
             resolve(facilityLayer.createTileMap());
           });
         });
@@ -81,6 +94,18 @@ define([
 
       testFunction() {
         console.log("testFunction");
+      }
+
+      getCompanyData() {
+        return new Promise(resolve => {
+          const loaded = ResourceLoader.loadResources([
+            { name: networkCallMap.companyTable.name, type: "ajax", path: networkCallMap.companyTable.path }
+          ]);
+          loaded.then((results) => {
+            let resultsObj = ResourceLoader.resourcesToObject(results);
+            resolve(resultsObj.companyTable.data.player_company);
+          });
+        });
       }
 
       getCityInformationHTML(id) {
