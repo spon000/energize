@@ -26,6 +26,21 @@ define([
         return this._cityLayer;
       }
 
+      getFacilityTypes() {
+        return new Promise(resolve => {
+          const loaded = ResourceLoader.loadResources([
+            { name: networkCallMap.facilityTypesTable.name, type: "ajax", path: networkCallMap.facilityTypesTable.path },
+            { name: networkCallMap.generatorTypesTable.name, type: "ajax", path: networkCallMap.generatorTypesTable.path },
+            { name: networkCallMap.powerTypesTable.name, type: "ajax", path: networkCallMap.powerTypesTable.path }
+          ]);
+
+          loaded.then((results) => {
+            let resources = ResourceLoader.resourcesToObject(results);
+            resolve(resources);
+          });
+        });
+      }
+
       createTerrainTileMap() {
         return new Promise(resolve => {
           const loaded = ResourceLoader.loadResources([
@@ -90,10 +105,6 @@ define([
             resolve(facilityLayer.createTileMap());
           });
         });
-      }
-
-      testFunction() {
-        console.log("testFunction");
       }
 
       getCompanyData() {

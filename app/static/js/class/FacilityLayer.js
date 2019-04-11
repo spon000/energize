@@ -18,8 +18,7 @@ define([
         this._tileMapName = "facilities";
         this._terrainImageConfig = terrainImageConfig;
         this._terrainSpriteConfig = terrainSpriteConfig;
-        this._scaleMap = [new Dim2(1.3, 1.3)];
-
+        this._scaleMap = [new Dim2(1, 1)];
       }
 
       createTileMap() {

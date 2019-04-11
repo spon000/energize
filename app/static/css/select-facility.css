@@ -1,27 +1,14 @@
-.sfd-facility-tab {
-  float: left;
-  margin: 5px;
-  padding: 0px 3px;
-  width: 160px;
-  height: 32px;
-  background-color: #ddd;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 5px;
+.sfd-flex-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
-.sfd-facility-tab-type {
-  font-size: 14px;
-  width: 100%;
-  padding: 5px 1px 1px 1px;
+.sfd-button-spacer {
+  width: 50px;
 }
 
-.sfd-facility-button {
-  float: left;
-  padding: 3px;
-}
-
-.sfd-facility-button .tooltip-text {
+.sfd-facility-div .tooltip-text {
   visibility: hidden;
   width: 120px;
   background-color: black;
@@ -35,60 +22,38 @@
   z-index: 1;
 }
 
-.sfd-facility-button:hover .tooltip-text {
+.sfd-facility-div:hover .tooltip-text {
   visibility: visible;
 }
 
-.sfd-facility-button button {
-  width: 50px;
-  height: 50px;
+.sfd-facility-div button {
+  width: 100px;
+  height: 100px;
+  margin: 0;
   border-style: none;
+  border-radius: 50%;
 }
 
-.sfd-facility-button button:focus {
+.sfd-facility-div button:focus {
   outline: none;
 }
 
-.sfd-facility-button button.selected{
+.sfd-facility-div button.selected{
   border-style: solid;
   border-width: 4px;
-  border-color: green;
+  border-color: #111;
 }
 
-.sfd-facility-button button:disabled {
-  -webkit-filter: opacity(20%); /* Safari 6.0 - 9.0 */
-  filter: opacity(20%);
-}
+/* .sfd-facility-div button:disabled { */
+  /* -webkit-filter: opacity(20%); Safari 6.0 - 9.0 */
+  /* filter: opacity(20%); */
+/* } */
 
-.sfd-facility-button button:not([disabled]):not(.selected):hover {
+.sfd-facility-div button:not([disabled]):not(.selected):hover {
   border-style: solid;
-  border-width: 2px;
-  border-color: blue;
+  border-width: 4px;
+  border-color: #aaa;
 }
-
-.sfd-facility-button-tooltip {
-  position: relative;
-  display: inline-block;
-}
-
-
-.sfd-facility-button-tooltip .sfd-facility-button-tooltip {
-  visibility: hidden;
-  width: 120px;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  padding: 5px 0;
-  border-radius: 6px;
-
-  position: absolute;
-  z-index: 1;
-}
-
-.sfd-facility-button-tooltip:hover .sfd-facility-button-tooltip {
-  visibility: visible;
-}
-
 
 .sfd-facility-details {
   background:#EFEFEF; 
@@ -113,13 +78,13 @@
 
 
 .sfd-facility-detail-window {
-  border-style: dashed;
+  border-style: solid;
   border-radius: 5px;
   padding: 0px;
   text-align: center;
   overflow: hidden; 
-  max-height: 400px;
-  height: 400px;
+  /* max-height: 400px; */
+  /* height: 400px; */
   width: 32.7%;
   display: inline-block;
 }
@@ -128,41 +93,220 @@
   display: none;
 }
 
-.sfd-facility-details-data {
+/* .sfd-facility-details-data {
   height: 90%;
+} */
+
+.data-details-table td {
+  vertical-align: middle;
+  text-align: left;
 }
 
 .sfd-facility-details-data-facilitytype {
-  background-color: lightblue;
   margin-top: 15px;
+  color: rgba(0, 0, 0, 1);
 }
 
-.sfd-generator-type-row {
-  margin-top: -10px;
-  float: left
+.simpletype-nuclear {
+  background-color: #522d80;
+  opacity: .5;
 }
 
-.sfd-data-row-label {
-  margin-left: 5px;
+.simpletype-wind {
+  background-color: #72c7db;
+  opacity: .5;
 }
 
-.sfd-select-facility-data-btn {
-  position: fixed;
-  bottom: -25px;
+.simpletype-solar {
+  background-color: #ffd671;
+  opacity: .5;
+}
+
+.simpletype-natural {
+  background-color: #f66733;
+  opacity: .5;
+}
+
+.simpletype-coal {
+  background-color: #646a6d;
+  opacity: .5;
+}
+
+.simpletype-hydro {
+  background-color: #0e9096;
+  opacity: .5;
+}
+
+/* Table elements */
+
+.td-label {
+  font-size: 12px;
+}
+
+.td-value {
+  font-size: 10px;
 }
 
 
+/*****************************************************/
+/* Button Images                                     */
+/*****************************************************/
+button[btn-image="coal"] {
+  background-image: url(images/n-coal.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="coal-disabled"] {
+  background-image: url(images/n-coal-d.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="wind"] {
+  background-image: url(images/n-wind.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="wind-disabled"] {
+  background-image: url(images/n-wind-d.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="solar"] {
+  background-image: url(images/n-solar.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="solar-disabled"] {
+  background-image: url(images/n-solar-d.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="nuclear"] {
+  background-image: url(images/n-nuclear.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="nuclear-disabled"] {
+  background-image: url(images/n-nuclear-d.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="hydro"] {
+  background-image: url(images/n-hydro.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="hydro-disabled"] {
+  background-image: url(images/n-hydro-d.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="natural"] {
+  background-image: url(images/n-natural-gas.png);
+  background-size: contain;
+  background-color: #fff;
+}
+
+button[btn-image="natural-disabled"] {
+  background-image: url(images/n-natural-gas-d.png);
+  background-size: contain;
+  background-color: #fff;
+}
 
 
+/*****************************************/
+/* Data tooltip */
 
+.help-tip {
+  /* top: 18px;
+  right: 18px; */
+  text-align: center;
+  background-color: #BCDBEA;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  /* line-height: 20px; */
+  cursor: default;
+}
 
+.help-tip:before {
+  content:'?';
+  text-align: left;
+  font-weight: bold;
+  color:#fff;
+}
 
+.help-tip:hover p {
+  display: inline-block;
+  /* transform-origin: 100% 0%;
+  -webkit-animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.3s ease-in-out; */
 
+}
 
+.help-tip p {    /* The tooltip */
+  overflow: hidden;
+  display: none;
+  white-space: normal;
+  text-align: left;
+  background-color: #1E2021;
+  padding: 15px;
+  width: 230px;
+  position: absolute;
+  border-radius: 3px; 
+  /* box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);  */
+  color: #FFF;
+  font-size: 13px;
+  /* line-height: 1.4;  */
+  z-index: 10; 
+}
 
+.help-tip p:before { /* The pointer of the tooltip */
+  /* position: absolute;
+  content: '';
+  width:0;
+  height: 0;
+  border:6px solid transparent;
+  border-bottom-color:#1E2021;
+  left:10px;
+  top:-2px; */
+}
 
+.help-tip p:after { /* Prevents the tooltip from being hidden */
+  /* width:100%;
+  height:40px;
+  content:'';
+  position: absolute;
+  top:-40px;
+  left:0; */
+}
 
+/* CSS animation */
 
+/* @-webkit-keyframes fadeIn {
+  0% { 
+      opacity:0; 
+      transform: scale(0.6);
+  }
 
+  100% {
+      opacity:100%;
+      transform: scale(1);
+  }
+}
 
-
+@keyframes fadeIn {
+  0% { opacity:0; }
+  100% { opacity:100%; }
+} */

@@ -4,7 +4,7 @@ define([
 ], function () {
   return ({
     "prohibitedTechTiles": [
-      { "city": 2 },
+      { "city": 3 },
       { "facility": 3 },
     ],
 

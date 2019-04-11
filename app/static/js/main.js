@@ -19,6 +19,15 @@ requirejs.config({
     CanvasController: "class/mvc/CanvasController",
     CanvasModel: "class/mvc/CanvasModel",
     CanvasView: "class/mvc/CanvasView",
+    // BuildFacilityController: "class/mvc/BuildFacilityController",
+    // BuildFacilityModel: "class/mvc/BuildFacilityModel",
+    // BuildFacilityView: "class/mvc/BuildFacilityView",
+
+    // HTML Templates
+    // FacilityBuildDialog: "template/FacilityBuildTmplt",
+    FacilitySelectTmplt: "template/FacilitySelectTmplt",
+    // FacilityViewTmplt: "template/FacilityViewTmplt",
+    // GeneratorBuildDialog: "template/GeneratorBuildTmplt",
 
     // Javascript classes
     Biome: "class/Biome",
@@ -28,6 +37,7 @@ requirejs.config({
     EventEmitter: "class/EventEmitter",
     Facility: "class/Facility",
     FacilityLayer: "class/FacilityLayer",
+    FacilitySelectDialog: "class/FacilitySelectDialog",
     Game: "class/Game",
     ResourceLoader: "class/ResourceLoader",
     TerrainMap: "class/TerrainMap",

@@ -141,7 +141,7 @@ define([
         let originY = Math.floor(tileGrid.length / 2);
         let originX = Math.floor(tileGrid[0].length / 2);
         let terrainFound = false;
-        console.log("originY : originX = ", originY + " : " + originX);
+        // console.log("originY : originX = ", originY + " : " + originX);
         // Check for prohibited terrains
         for (let tileRange in tileChecks.prohibited) {
           let iTileRange = parseInt(tileRange);
@@ -149,21 +149,19 @@ define([
             for (let x = originX - iTileRange; x <= originX + iTileRange; x++) {
               // console.log("y : x : tileGrid[y][x] = ", y + " : " + x + " : ", tileGrid[y][x]);
               if (tileChecks.prohibited[tileRange].find(tileName => tileName == tileGrid[y][x].name)) {
-                console.log("prohibitied tile found...");
+                // console.log("prohibitied tile found...");
                 return false;
               }
             }
           }
         }
 
-        console.log("looks good so far...");
-        console.log("tileGrid = ", tileGrid)
+        // Check for allowed terrains
         for (let tileRange in tileChecks.allowed) {
           let iTileRange = parseInt(tileRange);
           for (let y = originY - iTileRange; y <= originY + iTileRange; y++) {
             for (let x = originX - iTileRange; x <= originX + iTileRange; x++) {
               if (tileChecks.allowed[tileRange].find(tileName => tileName == tileGrid[y][x].name)) {
-                console.log("allowed tile found...");
                 return true;
               }
             }
@@ -171,36 +169,6 @@ define([
         }
         return false;
       }
-
-      // // Check column boundaries for terrain type
-      // for (let y = 0; y < tileGrid.length; y++) {
-      //   console.log("y Tiles = ", tileGrid[y][0].name, " : ", tileGrid[y][tileGrid[0].length - 1].name);
-      //   console.log("tileName = " + tileName);
-      //   if ((tileName == tileGrid[y][0].name) || (tileName == tileGrid[y][tileGrid[0].length - 1].name)) {
-      //     return true;
-      //   }
-      // }
-      // // checking row boundaries for terrain type
-      // for (let x = 0; x < tileGrid[0].length; x++) {
-      //   console.log("x Tiles = ", tileGrid[0][x].name, " : ", tileGrid[tileGrid.length - 1][x].name);
-      //   console.log("tileName = " + tileName);
-      //   if ((tileName == tileGrid[0][x].name) || (tileName == tileGrid[tileGrid.length - 1][x].name)) {
-      //     return true;
-      //   }
-      // }
-
-
-      // let originY = Math.floor(tileGrid.length / 2);
-      // let originX = Math.floor(tileGrid[0].length / 2);
-      // console.log("Tile = ", tileGrid[originY][originX].name);
-      // console.log("tileName = " + tileName);
-      // if (tileName == tileGrid[originY][originX].name) {
-      //   return true;
-      // }
-
-      // // Terrain type not found in range.
-      // return false;
-
 
       checkForTileAt(tileName, tileGrid, locationXY) {
         return tileName == tileGrid[locationXY.x][locationXY.y] ? true : false;

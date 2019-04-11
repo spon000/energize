@@ -32,7 +32,18 @@ define([
     "playerFacilities": {
       name: "playerFacilities",
       path: "/facilityplayer/"
+    },
+    "facilityTypesTable": {
+      name: "facilityTypesTable",
+      path: "/facilitytypes"
+    },
+    "generatorTypesTable": {
+      name: "generatorTypesTable",
+      path: "/generatortypes"
+    },
+    "powerTypesTable": {
+      name: "powerTypesTable",
+      path: "/powertypes"
     }
-
   });
 });				

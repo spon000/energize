@@ -29,7 +29,9 @@ def main():
   # Uncomment to populate supply type tables
   for facility_type in facility_types:
     ft = FacilityType(
-      label = facility_type['label'],
+      maintype = facility_type['maintype'],
+      subtype = facility_type['subtype'],
+      name = facility_type['name'],
       build_time = facility_type['build_time'],
       minimum_area = facility_type['minimum_area'],
       fixed_cost_build = facility_type['fixed_cost_build'],
@@ -57,7 +59,7 @@ def main():
   #
   for power_type in power_types:
     pt = PowerType(
-      label = power_type['label'],
+      maintype = power_type['maintype'],
       description = power_type['description']
     )
     db.session.add(pt)

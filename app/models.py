@@ -86,7 +86,9 @@ class City(db.Model):
 # Supply Type Tables. Not modified during a game.
 class FacilityType(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  label = db.Column(db.String(25), nullable=False)
+  maintype = db.Column(db.String(15), nullable=False)
+  subtype = db.Column(db.String(10))
+  name = db.Column(db.String(25))
   build_time = db.Column(db.Integer)
   minimum_area = db.Column(db.Float) 
   fixed_cost_build = db.Column(db.Float)
@@ -113,7 +115,7 @@ class GeneratorType(db.Model):
 
 class PowerType(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  label = db.Column(db.String(20))
+  maintype = db.Column(db.String(20))
   description = db.Column(db.Text)
 
 class ResourceType(db.Model):

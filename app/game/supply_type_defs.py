@@ -1,12 +1,12 @@
 facility_types = [
-  {'label': "Nuclear", 'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},
-  {'label': "Nuclear SMR", 'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},
-  {'label': "Wind", 'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},
-  {'label': "Solar", 'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},  
-  {'label': "Natural Gas Peaker", 'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},  
-  {'label': "Natural Gas", 'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},
-  {'label': "Coal", 'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},
-  {'label': "Hydro", 'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""}
+  {'maintype': "nuclear",     'subtype': "",       'name': "Nuclear",            'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},
+  {'maintype': "nuclear",     'subtype': "SMR",    'name': "Nuclear SMR",        'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},
+  {'maintype': "wind",        'subtype': "",       'name': "Wind",               'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},
+  {'maintype': "solar",       'subtype': "",       'name': "Solar",              'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},  
+  {'maintype': "natural gas", 'subtype': "peaker", 'name': "Natural Gas Peaker", 'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},  
+  {'maintype': "natural gas", 'subtype': "",       'name': "Natural Gas",        'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},
+  {'maintype': "coal",        'subtype': "",       'name': "Coal",               'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""},
+  {'maintype': "hydro",       'subtype': "",       'name': "Hydro",              'build_time': 10, 'minimum_area': 100, 'fixed_cost_build': 100, 'fixed_cost_operate': 100, 'marginal_cost_build': 100, 'marginal_cost_operate': 100, 'description': ""}
 ]
 
 generator_types = [
@@ -40,15 +40,15 @@ generator_types = [
 ]
 
 power_types = [
-  {'label': "BWR", 'description': ""},
-  {'label': "PWR", 'description': ""},
-  {'label': "SMR", 'description': ""},
-  {'label': "Large", 'description': ""},
-  {'label': "Peaker", 'description': ""},
-  {'label': "Coal", 'description': ""},
-  {'label': "Wind", 'description': ""},
-  {'label': "Hydro", 'description': ""},
-  {'label': "Solar", 'description': ""}
+  {'maintype': "BWR", 'description': ""},
+  {'maintype': "PWR", 'description': ""},
+  {'maintype': "SMR", 'description': ""},
+  {'maintype': "Large", 'description': ""},
+  {'maintype': "Peaker", 'description': ""},
+  {'maintype': "Coal", 'description': ""},
+  {'maintype': "Wind", 'description': ""},
+  {'maintype': "Hydro", 'description': ""},
+  {'maintype': "Solar", 'description': ""}
 ]
 
 resource_types = [
