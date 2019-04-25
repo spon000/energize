@@ -4,6 +4,7 @@ define([
   "EventEmitter",
   "facilityTileDefs",
   "FacilitySelectDialog",
+  "FacilityViewDialog"
 
 ], function (
   canvasData,
@@ -11,7 +12,8 @@ define([
   EventEmitter,
   facilityTileDefs,
   FacilitySelectDialog,
-  ) {
+  FacilityViewDialog
+) {
 
     return (
       class CanvasController extends EventEmitter {
@@ -20,6 +22,7 @@ define([
           this._canvasModel = canvasModel;
           this._canvasView = canvasView;
           this._terrainClicked = false;
+          this._facilityClicked = false;
           this._dragging = false;
           this._leftMouseDown = false;
         }
@@ -152,6 +155,7 @@ define([
         }
 
         // This uses easeljs event handler which specifies different listener function prototype
+        // That's why there's no need for a scope variable
         _onCityEvent(evt, data) {
           // console.log("CanvasController._onCityEvent", evt, data);
           const tile = data;
@@ -173,22 +177,27 @@ define([
         }
 
         // This uses easeljs event handler which specifies different listener function prototype
+        // That's why there's no need for a scope variable
         _onFacilityEvent(evt, data) {
           //console.log("CanvasController._onFacilityEvent", evt, data);
           const tile = data;
           switch (evt.type) {
             case "click":
               this._terrainClicked = false;
+              this._facilityClicked = true;
+              this._viewFacility(tile.id);
               break;
             case "rollover":
-              if (!this._dragging) {
+              if (!this._dragging && !this._facilityClicked) {
                 this._canvasModel.getFacilityInformationHTML(tile.id).then((html) => {
                   this._canvasView.displayRolloverInfo(evt, html)
                 });
               }
               break;
             case "rollout":
-              this._canvasView.displayRolloverInfo(evt, null);
+              if (!this._facilityClicked) {
+                this._canvasView.displayRolloverInfo(evt, null);
+              }
               break;
           }
         }
@@ -241,18 +250,42 @@ define([
         }
 
         _buildFacility(dialogElementId, facilityIdList) {
-          this._canvasModel.getFacilityTypes().then(data => {
-            let facilityData = data.facilityTypesTable.data;
-            let facilitySelectDialog = new FacilitySelectDialog(facilityData.facility_types, facilityIdList);
 
-            facilitySelectDialog.openDialog().then(facilityId => {
-              this._addGenerators(facilityData, facilityId);
-            });
-          });
+          // this._canvasModel.getFacilityTypes().then(data => {
+          //   let facilityData = {
+          //     powerTypes: data.powerTypesTable.data.power_types,
+          //     generatorTypes: data.generatorTypesTable.data.generator_types,
+          //     facilityTypes: data.facilityTypesTable.data.facility_types,
+          //   }
+          //   let facilitySelectDialog = new FacilitySelectDialog(facilityData.facilityTypes, facilityIdList);
+
+          //   facilitySelectDialog.openDialog().then(facilityTypeId => {
+          //     this._addGenerators(facilityData, facilityTypeId, 0);
+          //   });
+          // });
         }
 
-        _addGenerators(facilityData, facilityId) {
+        _viewNewFacility(facilityData, facilityTypeId) {
           console.log("_addGenerators() facilityData = ", facilityData);
+        }
+
+        _viewFacility(facilityId) {
+          this._canvasModel.getAllTypes().then(data => {
+            let facilityData = {
+              powerTypes: data.powerTypesTable.data.power_types,
+              generatorTypes: data.generatorTypesTable.data.generator_types,
+              facilityTypes: data.facilityTypesTable.data.facility_types
+            }
+            console.log("_viewFacility() => facilityData = ", facilityData);
+
+            this._canvasModel.getPlayerFacility(facilityId).then((facility) => {
+              let fac = facility.facility[0];
+              console.log("_viewFacility() => fac = ", fac);
+              let facilityViewDialog = new FacilityViewDialog(facilityData.facilityTypes[fac.facility_type], facilityData.generatorTypes, fac);
+              facilityViewDialog.openDialog();
+              this._facilityClicked = false;
+            });
+          });
         }
       });
   });

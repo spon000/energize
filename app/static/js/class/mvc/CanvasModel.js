@@ -15,6 +15,9 @@ define([
         super();
         this._facilityLayer = null;
         this._cityLayer = null;
+        this._facility_types = null;
+        this._generator_types = null;
+        this._resource_types = null;
       }
 
       // Getters...
@@ -26,7 +29,11 @@ define([
         return this._cityLayer;
       }
 
-      getFacilityTypes() {
+      // Public methods
+      getFacilityTypes(refresh = false) {
+        if (this._facility_types && !refresh) {
+        }
+
         return new Promise(resolve => {
           const loaded = ResourceLoader.loadResources([
             { name: networkCallMap.facilityTypesTable.name, type: "ajax", path: networkCallMap.facilityTypesTable.path },
@@ -39,6 +46,58 @@ define([
             resolve(resources);
           });
         });
+      }
+
+      getGeneratorTypes(refresh = false) {
+        if (this._generator_types && !refresh) {
+        }
+      }
+
+      getResourceTypes(refresh = false) {
+        if (this._resource_types && !refresh) {
+        }
+
+      }
+
+      getAllTypes(refresh = false) {
+        return new Promise(resolve => {
+          const loaded = ResourceLoader.loadResources([
+            { name: networkCallMap.facilityTypesTable.name, type: "ajax", path: networkCallMap.facilityTypesTable.path },
+            { name: networkCallMap.generatorTypesTable.name, type: "ajax", path: networkCallMap.generatorTypesTable.path },
+            { name: networkCallMap.powerTypesTable.name, type: "ajax", path: networkCallMap.powerTypesTable.path }
+          ]);
+
+          loaded.then((results) => {
+            let resources = ResourceLoader.resourcesToObject(results);
+            resolve(resources);
+          });
+        });
+      }
+
+      getPlayerFacility(facilityId) {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.playerFacility.path + facilityId)
+          loaded.then((results) => {
+            // console.log("results = ", results)
+            resolve(results);
+          });
+
+          // const loaded = ResourceLoader.loadResources([
+          //   { name: networkCallMap.playerFacility.name, type: "ajax", path: networkCallMap.playerFacility.path + facilityId }
+          // ]);
+
+          // loaded.then((results) => {
+          //   console.log("results = ", results)
+          // });
+        });
+      }
+
+      savePlayerFacility(facilityData) {
+
+      }
+
+      getPlayerFacilities(companyId) {
+
       }
 
       createTerrainTileMap() {

@@ -4,10 +4,11 @@ define([
   "CanvasModel",
   "CanvasView",
   "EventEmitter",
-  "TopMenu"
-], function ($, CanvasController, CanvasModel, CanvasView, EventEmitter, TopMenu) {
+  "TopMenu",
+  "socketio"
+], function ($, CanvasController, CanvasModel, CanvasView, EventEmitter, TopMenu, socketio) {
   return (
-    class Game extends EventEmitter {
+    class NewGame extends EventEmitter {
       constructor() {
         super();
         this._canvasModel = new CanvasModel();
@@ -15,6 +16,9 @@ define([
         this._canvasController = new CanvasController(this._canvasModel, this._canvasView);
         this._canvasController.initialize();
         this._topMenu = new TopMenu();
+        this._gameSocket = this._initSocketIO();
+        this._playerNumber = 0;
+        this._gameNumber = 0;
 
         this._setWindowEvents();
         this._setEventEmitters();
@@ -36,7 +40,9 @@ define([
             // console.log("keydown...");
             const emitter = scope._getKeyEmitter(evt)
             // console.log("emitter = ", emitter);
-            scope.emit(emitter.text, emitter.data);
+            if (emitter) {
+              scope.emit(emitter.text, emitter.data);
+            }
             break;
         }
       }
@@ -126,5 +132,26 @@ define([
         }
       }
 
+
+
+      _initSocketIO() {
+        let socket = socketio.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', () => {
+          socket.send('player_connect')
+          console.log("Player connected.");
+        });
+
+        socket.on('game_connect', (data) => {
+          console.log("game_connect: data = ", data)
+          this._playerNumber = data.p_num;
+          this._gameNumber = data.g_num;
+        });
+
+        socket.on('test_disconnect', () => {
+          console.log("Player is not disconnected.");
+        });
+
+      }
     });
 });

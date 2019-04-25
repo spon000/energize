@@ -16,19 +16,22 @@ define([
         // Dialog 
         this._dialog = null;
 
-        // Parameters
+        // JQueryUI Dialog Parameters
         this._width = 750;
         this._height = 600;
+        this._isModel = true;
+        this._position = {};
         this._title = "Select Facility To Build";
 
         // Element Ids
-        this._elementIdAnchor = "selectfacilitydialog";
+        this._elementIdAnchor = "infodialogbox";
         this._elementIdDialog = "select-facility-dialog";
         this._elementIdButtons = "sfd-facility-buttons";
         this._elementIdDetails = "sfd-facility-details";
         this._elementIdWindow = "sfd-facility-detail-window-";
         this._elementClassWindow = "sfd-facility-detail-window";
 
+        // Add extra properties to the each facility type object
         this._facilityTypes = facilityTypes.map(obj => (
           {
             ...obj,
@@ -36,6 +39,7 @@ define([
           }
         ));
 
+        // Add extra properties for each facility type button
         this._facilityButtons = this._removeDuplicates(facilityTypes, "maintype").map(obj => (
           {
             ...obj,
@@ -43,9 +47,6 @@ define([
             enabled: allowedFacilities.find(id => "" + obj.id === id) ? true : false,
           }
         ));
-
-        this._isModel = true;
-        this._position = {};
 
         // Event listener classes
         this._facilityTypeButtonClass = "sfd-facility-btn";

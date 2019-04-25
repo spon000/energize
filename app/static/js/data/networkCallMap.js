@@ -29,9 +29,13 @@ define([
       name: "viewFaciltiy",
       path: "/viewfacility/"
     },
+    "playerFacility": {
+      name: "playerFacility",
+      path: "/playerfacility/"
+    },
     "playerFacilities": {
       name: "playerFacilities",
-      path: "/facilityplayer/"
+      path: "/playerfacilities/"
     },
     "facilityTypesTable": {
       name: "facilityTypesTable",

@@ -14,13 +14,13 @@ define([
     },
     "terrainImageConfig": {
       "name": "terrainBitmap",
-      "path": "static/img/world-map-240x120c.png",
+      "path": "/static/img/world-map-240x120c.png",
       "width": 240,
       "height": 120,
     },
     "terrainSpriteConfig": {
       "name": "terrainSprite",
-      "path": "static/img/tiles/terrain-tiles.png",
+      "path": "/static/img/tiles/terrain-tiles.png",
       "width": 25,
       "height": 25,
       "frameCols": 20,
@@ -31,7 +31,7 @@ define([
     },
     "citySpriteConfig": {
       "name": "citySprites",
-      "path": "static/img/tiles/tech-tilesd.png",
+      "path": "/static/img/tiles/tech-tilesd.png",
       "width": 50,
       "height": 50,
       "sprites": [
@@ -59,7 +59,7 @@ define([
     // },
     "facilitySpriteConfig": {
       "name": "facilitySprites",
-      "path": "static/img/tiles/facility_icons_1200x100.png",
+      "path": "/static/img/tiles/facility_icons_1200x100.png",
       "width": 100,
       "height": 100,
       "sprites": [

@@ -1,6 +1,6 @@
 requirejs.config({
   //By default load any module IDs from js
-  baseUrl: "static/js",
+  baseUrl: "/static/js",
   //except, if the module ID starts with "app",
   //load it from the js/app directory. paths
   //config is relative to the baseUrl, and
@@ -14,6 +14,7 @@ requirejs.config({
     "jq.bootstrap": "lib/bootstrap/bootstrap.bundle.4.1.1.min",
     easeljs: "lib/easeljs/easeljs.1.0.0.min",
     Handlebars: "lib/handlebars/handlebars-v4.0.12",
+    socketio: "lib/socketio/socket.io",
 
     // MVC classes
     CanvasController: "class/mvc/CanvasController",
@@ -26,8 +27,7 @@ requirejs.config({
     // HTML Templates
     // FacilityBuildDialog: "template/FacilityBuildTmplt",
     FacilitySelectTmplt: "template/FacilitySelectTmplt",
-    // FacilityViewTmplt: "template/FacilityViewTmplt",
-    // GeneratorBuildDialog: "template/GeneratorBuildTmplt",
+    FacilityViewTmplt: "template/FacilityViewTmplt",
 
     // Javascript classes
     Biome: "class/Biome",
@@ -38,7 +38,9 @@ requirejs.config({
     Facility: "class/Facility",
     FacilityLayer: "class/FacilityLayer",
     FacilitySelectDialog: "class/FacilitySelectDialog",
-    Game: "class/Game",
+    FacilityViewDialog: "class/FacilityViewDialog",
+    Generator: "class/Generator",
+    NewGame: "class/NewGame",
     ResourceLoader: "class/ResourceLoader",
     TerrainMap: "class/TerrainMap",
     Tile: "class/Tile",
@@ -68,17 +70,21 @@ requirejs.config({
     },
     Handlebars: {
       exports: "handlebars"
+    },
+    socketio: {
+      exports: "socketio"
     }
+
   }
 });
 
 //////////////////////////////////////////////////////////////////////////
 // Main.js starts here...
 require([
-  "Game",
+  "NewGame"
 ], function (
-  Game
+  NewGame
 ) {
     console.log("JS: main.js starting...");
-    game = new Game();
+    game = new NewGame();
   });

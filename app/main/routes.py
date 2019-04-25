@@ -1,45 +1,53 @@
-import random
+import random, json
 
 from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app
 from flask_login import current_user, login_required
 from app import db 
 from app.models import User, Game, Company
-from app.main.forms import CreateGameForm, JoinGameForm
+from app.main.forms import CreateGameForm, JoinGameForm, RejoinGameForm
 from app.main.utils import get_random_player
 
 main = Blueprint('main', __name__)
 
+################################################################################  
+#
+# ##############################################################################
 @main.route("/")
 @main.route("/home")
 def home():
   return render_template("title.html")
 
+################################################################################  
+#
+# ##############################################################################
 @main.route("/creategame", methods=["GET", "POST"])
 @login_required
 def creategame():
   form = CreateGameForm()
+
+  # ************ After submission *************
   if form.validate_on_submit():
     num_companies = Company.query.filter_by(id_user=current_user.id).count()
-    # print("num_companies = ", num_companies)
-    # print("current_user.companies_max = ", current_user.companies_max)
     if num_companies < current_user.companies_max:
-
       game = Game(name=form.gamename.data)
       db.session.add(game)
       db.session.commit()
       player_number = get_random_player(game)
-      company = Company(name=form.companyname.data, id_game=game.id, id_user=current_user.id, player_number=player_number)
+      company = Company(name=form.companyname.data, id_game=game.id, id_user=current_user.id, player_number=player_number, connected_to_game=0)
       db.session.add(company)
       db.session.commit()
       current_user.current_company = company.id
       db.session.commit()
-      return redirect(url_for('game.newgame'))
-      # return render_template("game.html", company=company, game=game)
+      return redirect(url_for('game.startgame'))
     else:
-      flash(f'You are already playing multiple games. Try rejoining one in progress','danger')
+      flash(f'You are already playing too many concurrent games. Try rejoining one in progress','danger')
       return render_template("title.html")
+
   return render_template("creategame.html", form=form)
 
+################################################################################  
+#
+# ##############################################################################
 @main.route("/joingame", methods=["GET", "POST"])
 @login_required
 def joingame():
@@ -48,7 +56,7 @@ def joingame():
   available_games = list()
   if games:
     for game in games:
-      companies = Company.query.filter(game.id == Company.id_game and game.game_state == 'new').all()
+      companies = Company.query.filter(game.id == Company.id_game, game.game_state == 'new').all()
       if len(companies) < game.companies_max:
         user_company = list(filter(lambda company: company.id_user == current_user.id, companies))
         if not user_company:
@@ -69,13 +77,12 @@ def joingame():
       game_companies = Company.query.filter_by(id_game=form.availablegames.data)
       if game_companies.count() < joining_game.companies_max:
         player_number = get_random_player(joining_game)
-        company = Company(name=form.companyname.data, id_game=joining_game.id, id_user=current_user.id, player_number=player_number)
+        company = Company(name=form.companyname.data, id_game=joining_game.id, id_user=current_user.id, connected_to_game=0)
         db.session.add(company)
-        db.session.commit() 
+        db.session.commit()
         current_user.current_company = company.id
         db.session.commit()
-        return redirect(url_for('game.newgame'))
-        # return render_template("game.html", company=company, game=joining_game)
+        return redirect(url_for('game.startgame'))
       else:
         flash(f'This game is full. Choose another game to join or create one.', 'danger')
         return render_template("joingame.html", form=form)
@@ -84,6 +91,30 @@ def joingame():
       return render_template("title.html")
 
   return render_template("joingame.html", form=form)
+
+################################################################################  
+#
+# ##############################################################################
+@main.route("/rejoingame", methods=["GET", "POST"])
+@login_required
+def rejoingame():
+  form = RejoinGameForm()
+  company = Company.query.filter_by(id=current_user.current_company).first()
+  game = Game.query.filter_by(id=company.id_game).first()
+  if company.connected_to_game > 0:
+    flash(f'You are already joined in this game. Perhaps in another browser window?', 'danger')
+    return render_template("title.html")
+
+  form.availablegames.data = game.name
+  form.companyname.data = company.name
+
+  # ************ After submission *************
+  if form.validate_on_submit():
+    return redirect(url_for('game.startgame',status='join'))
+
+  # # print(available_companies)
+  return render_template("rejoingame.html", form=form)
+  
 
 
 

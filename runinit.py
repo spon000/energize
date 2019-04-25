@@ -13,7 +13,7 @@ def main():
   ctx.push()
 
   # Recreate fresh tables. 
-  init_table(User, db)
+  # init_table(User, db)
   init_table(City, db)
   init_table(Game, db)
   init_table(Company, db)

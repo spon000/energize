@@ -33,7 +33,7 @@
     <a class="market-btn push-up" href="#"> World Market</a>
     <a class="social-btn" href="#"> Social</a>
     <a class="q-report-btn push-up" href="#"> Quarterly Report</a>
-    <a class="turn-btn push-up" href="#"> Q{{ game.current_quarter }} {{ game.current_year }} Turn: {{ game.turn_number }}</a>
+    <a class="turn-btn push-up" href="#"> Q{{ cgd.current_quarter }} {{ cgd.current_year }} Turn: {{ game.turn_number }}</a>
     <a class="top-game-menu no-hover stop" href="#" id="next-btn">Next</a>
     <div><!-- Grid Column place holder --></div>
     <a class="build-btn push-up" id="facility-btn" href="#">Build Facility</a>
@@ -55,6 +55,9 @@
           {% endfor %}
         {% endif %}
       {% endwith %}  
+    </div>
+    <div class="send-component">
+       <ul id="messages"></ul>      
     </div>
 	</div>
 </body>
