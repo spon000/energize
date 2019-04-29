@@ -36,18 +36,21 @@ class Company(db.Model):
   name = db.Column(db.String(30), nullable=False, default='Company #')
   score = db.Column(db.Integer, nullable=False, default=0)
   budget = db.Column(db.Float, nullable=False, default=10000)
+  quarter_net = db.Column(db.Float, default=0)
   state = db.Column(db.Enum("new", "view", "build", "turn", "ready"), default="view")
   cost_operational = db.Column(db.Float)
   connected_to_game = db.Column(db.Integer, nullable=False, default=0)
+  game_link = db.relationship('Game')
+  user_link = db.relationship('User')
 
   def __repr__(self):
     return f"Company( \
-      'company name: {self.name}', \
-      'score: {self.score}', \
-      'company id: {self.id}', \
-      'game id: {self.id_game}', \
-      'user id: {self.id_user}', \
-      'connected: {self.connected_to_game}, \
+      'company name: {self.name}\n', \
+      'score: {self.score}\n', \
+      'company id: {self.id}\n', \
+      'game id: {self.id_game}\n', \
+      'user id: {self.id_user}\n', \
+      'connected: {self.connected_to_game}\n', \
     )"
 
 class Facility(db.Model):
@@ -66,6 +69,8 @@ class Facility(db.Model):
   layer = db.Column(db.Integer, default=2)
   area = db.Column(db.Float)
   generators = db.relationship('Generator', backref='facility', lazy=True)
+  company_link = db.relationship('Company')
+  facility_type_link = db.relationship('FacilityType')
 
   # def __repr__(self):
   #   return f"Facility('{self.name}', '{self.id_type}', '{self.player_number}', '{self.state}')"
@@ -80,6 +85,8 @@ class Generator(db.Model):
   start_build_date = db.Column(db.String(20))
   start_prod_date = db.Column(db.String(20))
   extension = db.Column(db.Float, default=0)
+  generator_type_link = db.relationship('GeneratorType')
+  facility_link = db.relationship('Facility')
 
   def __repr__(self):
     return f"Generator('{self.id_type}', '{self.id_facility}', '{self.state}')"
@@ -125,6 +132,18 @@ class GeneratorType(db.Model):
   efficiency = db.Column(db.Float)
   continuous = db.Column(db.Boolean, default=True)  
   lifespan = db.Column(db.Integer)
+
+  def __repr__(self):
+    # return f"GeneratorType('{self.id}', '{self.id_facility_type}', '{self.id_power_type}', '{self.power_type}')"
+
+    return ( 
+      f"GeneratorType -->\n" +
+      f"ID: {self.id}\n" +
+      f"Facility Type Id: {self.id_facility_type}\n" +
+      f"Power Type Id: {self.id_power_type}\n" +
+      f"Power Type : {self.power_type.maintype}\n" +
+      f"Resource Type: {self.id_resource_type}"
+    )
 
 class PowerType(db.Model):
   id = db.Column(db.Integer, primary_key=True)

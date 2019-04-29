@@ -28,18 +28,18 @@
 
 <body id="game">
   <div id="game-top-menu" class="top-menu">
-    <a class="company-btn" href="#">{{ company.name }}</a>
-    <a class="budget-btn push-up" href="#">Budget: {{ budget }}</a>
+    <a class="company-btn push-up" href="#">{{ company.name }} (portfolio) </a>
+    <a class="budget-btn no-hover" href="#"></a>
+    <!-- <a class="budget-btn push-up" href="#">Budget: {{ budget }}</a> -->
     <a class="market-btn push-up" href="#"> World Market</a>
     <a class="social-btn" href="#"> Social</a>
     <a class="q-report-btn push-up" href="#"> Quarterly Report</a>
     <a class="turn-btn push-up" href="#"> Q{{ cgd.current_quarter }} {{ cgd.current_year }} Turn: {{ game.turn_number }}</a>
-    <a class="top-game-menu no-hover stop" href="#" id="next-btn">Next</a>
+    <a class="next-turn-btn push-up no-hover stop" href="#" id="next-btn">Next Turn</a>
     <div><!-- Grid Column place holder --></div>
     <a class="build-btn push-up" id="facility-btn" href="#">Build Facility</a>
     <a class="help-btn" href="#">Help</a>
     <a class="options-btn" href="#">Options</a>
-    <a class="next-btn no-hover stop" href="#" id="next-btn">Next >></a>
   </div> 
 
   <div>

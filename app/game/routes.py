@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, render_template, request, jsonify
+from flask import Blueprint, flash, url_for, redirect, render_template, request, jsonify
 from flask_login import login_required, current_user
 from flask_socketio import send
 from app import sio 
@@ -7,7 +7,7 @@ from app.models import User, Game, Company, Facility, Generator, City, FacilityT
 from app.models import FacilitySchema, GeneratorSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema, GeneratorTypeSchema, PowerTypeSchema
 from app.game.initgame import initgame
 from app.game.utils import get_current_game_date
-from app.game.runturn import run_turn
+from app.game.run_turn import calculate_quarter
 # from app.game.runturn import runturn
 
 game = Blueprint('game', __name__)
@@ -92,8 +92,8 @@ def company():
     db.session.commit()
     if company.state == "turn":
       companies_ready = Company.query.filter_by(id_game=game.id, state="turn").count()
-      if companies_ready == 2: 
-        return "Running Quarterly Turn"
+      if companies_ready == 1:
+        return redirect(url_for('game.runturn'))
       else:
         return "Waiting For Players"
     else:
@@ -215,10 +215,14 @@ def viewcity(city_id):
 # ###############################################################################  
 #
 # ###############################################################################
-@game.route("/readyturn", methods=["GET", "POST"])
+@game.route("/runturn", methods=["GET", "POST"])
 @login_required
-def readyturn():
-  run_turn()
+def runturn():
+  gens = Generator.query.all()
+  cities = City.query.all()
+  calculate_quarter(gens, cities)
+
+  return "Done running turn."
   
 
 
