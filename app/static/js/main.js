@@ -15,6 +15,8 @@ requirejs.config({
     easeljs: "lib/easeljs/easeljs.1.0.0.min",
     Handlebars: "lib/handlebars/handlebars-v4.0.12",
     socketio: "lib/socketio/socket.io",
+    Vue: "https://cdn.jsdelivr.net/npm/vue/dist/vue",
+    Vuex: "https://unpkg.com/vuex",
 
     // MVC classes
     CanvasController: "class/mvc/CanvasController",
@@ -28,6 +30,7 @@ requirejs.config({
     // FacilityBuildDialog: "template/FacilityBuildTmplt",
     FacilitySelectTmplt: "template/FacilitySelectTmplt",
     FacilityViewTmplt: "template/FacilityViewTmplt",
+    CityViewTmplt: "template/CityViewTmplt",
 
     // Javascript classes
     Biome: "class/Biome",
@@ -40,13 +43,18 @@ requirejs.config({
     FacilitySelectDialog: "class/FacilitySelectDialog",
     FacilityViewDialog: "class/FacilityViewDialog",
     Generator: "class/Generator",
+    ModelData: "class/ModelData",
     NewGame: "class/NewGame",
     ResourceLoader: "class/ResourceLoader",
+    SocketIOCalls: "class/SocketIOCalls",
     TerrainMap: "class/TerrainMap",
     Tile: "class/Tile",
     TileMap: "class/TileMap",
     TopMenu: "class/TopMenu",
     Vector2: "class/Vector2",
+
+    // Vue Components
+    CityView: "components/CiyView",
 
     // Data objects
     canvasData: "data/canvasData",
@@ -55,7 +63,8 @@ requirejs.config({
     networkCallMap: "data/networkCallMap",
 
     // Misc objects
-    terrainLayer: "misc/terrainLayer",
+    terrainLayer: "misc/terrainLayer"
+
   },
 
   // Allows you to use non AMD (Asynchronus Module Definition)
@@ -73,8 +82,13 @@ requirejs.config({
     },
     socketio: {
       exports: "socketio"
+    },
+    Vue: {
+      exports: "Vue"
+    },
+    Vuex: {
+      exports: "Vuex"
     }
-
   }
 });
 
@@ -86,5 +100,6 @@ require([
   NewGame
 ) {
     console.log("JS: main.js starting...");
+    console.log("global game id = ", globalGameId);
     game = new NewGame();
   });

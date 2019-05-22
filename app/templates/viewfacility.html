@@ -30,7 +30,8 @@
         <label> Available Capacity: </label>
       </div>
       <div class="col-md">
-        <label> {{ (facility.generators|length * generator_type.nameplate_capacity) }} KW</label>
+        {# <label> {{ (facility.generators|length * generator_type.nameplate_capacity) }} KW</label> #}
+        <label> {{ faccap }} MW</label>
       </div>
     </div>
     <div class="row">
@@ -51,10 +52,10 @@
     </div>
     <div class="row">
       <div class="col-lg">
-        <label> Generator Type: </label>
+        <label> Power Type: </label>
       </div>
       <div class="col-md">
-        <label> {{ generator_type.power_type.maintype }} </label>
+        <label> {{ generator_type.power_type.name }} </label>
       </div>
     </div>
   </div>

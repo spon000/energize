@@ -92,6 +92,15 @@ define([
         });
       }
 
+      getFacilityGenerators(facilityId) {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.facilityGenerators.path + facilityId)
+          loaded.then((results) => {
+            resolve(results)
+          });
+        });
+      }
+
       savePlayerFacility(facilityData) {
 
       }
@@ -180,7 +189,7 @@ define([
 
       getCityInformationHTML(id) {
         return new Promise(resolve => {
-          const loaded = $.get(networkCallMap.viewCity.path + id)
+          const loaded = $.get(networkCallMap.viewCity.path + "cid=" + id)
           loaded.then((results) => {
             resolve(results);
           });
@@ -189,7 +198,7 @@ define([
 
       getFacilityInformationHTML(id) {
         return new Promise(resolve => {
-          const loaded = $.get(networkCallMap.viewFacility.path + id)
+          const loaded = $.get(networkCallMap.viewFacility.path + "fid=" + id)
           loaded.then((results) => {
             resolve(results);
           });

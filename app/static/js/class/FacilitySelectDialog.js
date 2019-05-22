@@ -24,7 +24,7 @@ define([
         this._title = "Select Facility To Build";
 
         // Element Ids
-        this._elementIdAnchor = "infodialogbox";
+        this._elementIdAnchor = "facility-dialog";
         this._elementIdDialog = "select-facility-dialog";
         this._elementIdButtons = "sfd-facility-buttons";
         this._elementIdDetails = "sfd-facility-details";
@@ -202,7 +202,6 @@ define([
             this._dialog.off("dialogclose");
             resolve(this._selectedFacility);
           });
-
         })
       }
 

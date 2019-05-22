@@ -13,12 +13,11 @@ def init_facilities(game_id):
   
   # Facility.__table__.create(db.engine)
   print("init facilities")
-  num_facilities = Facility.query.filter_by(id_game=game_id).count()
+  num_facilities = Facility.query.count()
   if num_facilities == 0:
     for index, facility in enumerate(start_facilities):
       newfacility = Facility(
         id_type = facility['id_type'],
-        id_game = game_id,
         name = "Facility #" + str(index),
         state = facility['state'],
         player_number = facility['player'],
@@ -36,12 +35,11 @@ def init_facilities(game_id):
     
     # Generator.__table__.create(db.engine)
   print("init generators")
-  num_generators = Generator.query.filter_by(id_game=game_id).count()
+  num_generators = Generator.query.count()
   if num_generators == 0:
     for generator in start_generators:
       newgenerator = Generator(
         id_type = generator['id_type'],
-        id_game = game_id,
         id_facility = generator['id_facility'],
         state = generator['state'],
         start_build_date = generator['start_build_date'],

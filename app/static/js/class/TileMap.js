@@ -15,6 +15,7 @@ define([
 
         this._scaleX = 1;
         this._scaleY = 1;
+        this._scaleToLayer = true;
         this._scrollable = false;
         this._tileMapTiles = {};
 
@@ -56,8 +57,17 @@ define([
         return this._scaleY;
       }
 
+      get scaleToLayer() {
+        return this._scaleToLayer;
+      }
+
       get tileMapTiles() {
         return this._tileMapTiles;
+      }
+
+      // Setters 
+      set scaleToLayer(sTL) {
+        this._scaleToLayer = sTL;
       }
 
       // Private Methods
@@ -121,6 +131,7 @@ define([
       setScale(scaleX, scaleY) {
         this._container.scaleX = this._scaleX = scaleX;
         this._container.scaleY = this._scaleY = scaleY;
+        console.log("setScale() tilemap = ", this);
       }
 
       moveTileMap(deltaX, deltaY, canvasWidth, canvasHeight) {

@@ -11,15 +11,16 @@ define([
     class NewGame extends EventEmitter {
       constructor() {
         super();
-        this._canvasModel = new CanvasModel();
-        this._canvasView = new CanvasView("gamecanvas", this._canvasModel);
-        this._canvasController = new CanvasController(this._canvasModel, this._canvasView);
-        this._canvasController.initialize();
+        this._playerSocket = null;
+        this._gameSocket = null;
+        this._gameNamespace = '/game' + globalGameId;
+        this._canvasModel = null;
+        this._canvasView = null;
+        this._canvasController = null;
         this._topMenu = new TopMenu();
-        this._gameSocket = this._initSocketIO();
-        this._playerNumber = 0;
-        this._gameNumber = 0;
+        this._elementIdCanvas = "gamecanvas"
 
+        this._initialize();
         this._setWindowEvents();
         this._setEventEmitters();
       }
@@ -72,7 +73,6 @@ define([
           this._canvasView._moveMap(-100, 0);
         });
       }
-
 
       _getKeyEmitter(evt) {
         switch (evt.originalEvent.code) {
@@ -132,26 +132,45 @@ define([
         }
       }
 
+      _initialize() {
+        this._playerSocket = socketio.connect('http://' + document.domain + ':' + location.port);
+        // this._gameSocket = this._playerSocket.of(this._gameNamespace);
 
-
-      _initSocketIO() {
-        let socket = socketio.connect('http://' + document.domain + ':' + location.port);
-
-        socket.on('connect', () => {
-          socket.send('player_connect')
-          console.log("Player connected.");
-        });
-
-        socket.on('game_connect', (data) => {
-          console.log("game_connect: data = ", data)
-          this._playerNumber = data.p_num;
-          this._gameNumber = data.g_num;
-        });
-
-        socket.on('test_disconnect', () => {
-          console.log("Player is not disconnected.");
-        });
-
+        console.log("playerSocket = ", this._playerSocket);
+        this._initCanvas();
+        this._initSocketCallsReceived()
       }
+
+      _initSocketCallsReceived() {
+
+        this._gameSocket.on('new_facility', (data) => {
+          console.log("on('new_facility') data = ", data);
+        });
+      }
+
+      _initCanvas() {
+        this._canvasModel = new CanvasModel();
+        this._canvasView = new CanvasView(this._elementIdCanvas, this._canvasModel);
+        this._canvasController = new CanvasController(this._canvasModel, this._canvasView, this._playerSocket);
+        this._canvasController.initialize();
+      }
+
+      // this._playerSocket 
+
+      // this._playerSocket.on('connect', () => {
+      //   this._playerSocket.send('player_connect')
+      //   console.log("Player connected.");
+      // });
+
+      // this._playerSocket.on('game_connect', (data) => {
+      //   console.log("game_connect: data = ", data)
+      //   // this._playerNumber = data.p_num;
+      //   // this._gameNumber = data.g_num;
+      // });
+
+      // this._playerSocket.on('test_disconnect', () => {
+      //   console.log("Player is not disconnected.");
+      // });
+
     });
 });

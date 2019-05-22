@@ -1,5 +1,5 @@
 from app import create_app
-from app import db
+from app import db, bcrypt
 from app.models import Game, Company, Facility, Generator, City, User
 from app.models import FacilityType, GeneratorType, PowerType, ResourceType
 from app.game.supply_type_defs import facility_types, generator_types, power_types, resource_types
@@ -12,19 +12,42 @@ def main():
   ctx = app.app_context()
   ctx.push()
 
-  # Recreate fresh tables. 
-  # init_table(User, db)
-  init_table(City, db)
+  db.drop_all()
+
+  # Recreate fresh tables.
+  init_table(User, db)
   init_table(Game, db)
   init_table(Company, db)
+  init_table(City, db)
+  init_table(PowerType, db)
+  init_table(ResourceType, db)
+  init_table(FacilityType, db)
+  init_table(GeneratorType, db)
   init_table(Facility, db)
   init_table(Generator, db)
 
-  # Uncomment to recreate supply type tables
-  init_table(FacilityType, db)
-  init_table(GeneratorType, db)
-  init_table(PowerType, db)
-  init_table(ResourceType, db)
+  # Create dummy user.
+  u1 = User(
+    password = bcrypt.generate_password_hash("122130124032").decode('utf-8'),
+    companies_max = 5
+  )
+
+  u2 = User(
+    username = 'Patrick',
+    email = 'pat@g.clemson.edu',
+    companies_max = 5,
+    password = bcrypt.generate_password_hash("test").decode('utf-8')
+  )
+  db.session.add(u1)
+  db.session.add(u2)
+
+  # game = Game(
+  #   name = 'Dummy Game',
+  #   companies_max = 1000,
+  #   game_state = 'finished'
+  # )
+
+  # db.session.add(game)
 
   # Uncomment to populate supply type tables
   for facility_type in facility_types:
@@ -38,6 +61,7 @@ def main():
       fixed_cost_operate = facility_type['fixed_cost_operate'],
       marginal_cost_build = facility_type['marginal_cost_build'],
       marginal_cost_operate = facility_type['marginal_cost_build'],
+      decomission_cost = facility_type['decomission_cost'],
       description = facility_type['description']
     )
     db.session.add(ft)
@@ -52,14 +76,18 @@ def main():
       nameplate_capacity = generator_type['nameplate_capacity'],
       efficiency = generator_type['efficiency'],
       continuous = generator_type['continuous'],
-      lifespan = generator_type['lifespan']
+      lifespan = generator_type['lifespan'],
+      fixed_cost_build = generator_type['fixed_cost_build'],
+      fixed_cost_operate = generator_type['fixed_cost_operate'],
+      variable_cost_operate = generator_type['variable_cost_operate'],
+      decomission_cost = generator_type['decomission_cost']
     )
     db.session.add(gt)
 
   #
   for power_type in power_types:
     pt = PowerType(
-      maintype = power_type['maintype'],
+      name = power_type['maintype'],
       description = power_type['description']
     )
     db.session.add(pt)
@@ -67,7 +95,11 @@ def main():
   #
   for resource_type in resource_types:
     rt = ResourceType(
-      name = resource_type['name']
+      name = resource_type['name'],
+      unit = resource_type['unit'],
+      available = resource_type['available'],
+      average_price = resource_type['average_price'],
+      energy_content = resource_type['energy_content']
     )
     db.session.add(rt)
 

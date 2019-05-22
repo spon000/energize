@@ -5,7 +5,7 @@ define([
 ], function (Dim2) {
   return ({
     "canvasConfig": {
-      "scaleMap": [new Dim2(.2, .2), new Dim2(.4, .4), new Dim2(1, 1), new Dim2(2, 2)],
+      "scaleMap": [new Dim2(.2, .2), new Dim2(.4, .4), new Dim2(1, 1)],
       "initialZoomLevel": 0,
       "initialOriginX": 0,
       "initialOriginY": 0,

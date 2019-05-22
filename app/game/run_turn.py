@@ -11,8 +11,10 @@ from app.models import Facility, Generator, City, Company, Game
 from app.models import FacilityType, GeneratorType
 
 def init_modifiers(cities):
-  t  = np.linspace(0,1*90,1*90*24)
-  cc = cloud_cover(1*90*24)
+  #t  = np.linspace(0,1*90,1*90*24)
+  t  = np.linspace(0,1,1*24)
+  # cc = cloud_cover(1*90*24)
+  cc = cloud_cover(1*24)
   ri = rain_intensity(cc)
   su = sun_up(t)
   sp = solar_potential(cc,su)
@@ -123,6 +125,9 @@ def energy_demand(t,pg,cc):
   ed=[]
   for cityPop in pg:
     ed += [1e-3*np.multiply(cityPop,(4+np.sin((t*24-6)*np.pi/12.0)+1.5*(1-cc)))]
+
+  print ("*"*80)
+  print (ed)
   return ed
 
 
@@ -143,34 +148,48 @@ def iso(gens, mods, i):
   demand = np.sum(np.array(mods['ed'])[:,i])
   avail = []
   costF = []
+  fuel_costs = []
 
   for j in range(len(gens)):
-    fType = gens[j].facility_link.facility_type_link.maintype
-    fCostOn = gens[j].facility_link.facility_type_link.fixed_cost_operate
-    gCapacity = gens[j].generator_type_link.nameplate_capacity
+    fType = gens[j].facility.facility_type.maintype
+    fCostOn = gens[j].generator_type.fixed_cost_operate / 8760.0   # 8,760 converts kw/y to kw/h
+    gCapacity = gens[j].generator_type.nameplate_capacity * 1000.0  # convert to KW
+    
 
     if fType == 'nuclear':
-      costF += [fCostOn + mods['fp'][0][i]]
+      # fixed cost + (fuel price / (energy content * efficiency))
+      fuel_costs += [mods['fp'][0][i] / (gens[j].generator_type.resource_type.energy_content * 1)]
+      costF += [fCostOn + (mods['fp'][0][i] / (gens[j].generator_type.resource_type.energy_content * 1))] 
       avail += [gCapacity]
     elif fType == 'coal':
-      costF += [fCostOn + mods['fp'][1][i]]
+      fuel_costs += [mods['fp'][0][i] / (gens[j].generator_type.resource_type.energy_content * 1)]
+      costF += [fCostOn + (mods['fp'][1][i] / (gens[j].generator_type.resource_type.energy_content * 1))]
       avail += [gCapacity]
     elif fType == 'natural gas':
-      costF += [fCostOn +  mods['fp'][2][i]]
+      fuel_costs += [mods['fp'][0][i] / (gens[j].generator_type.resource_type.energy_content * 1)]
+      costF += [fCostOn + (mods['fp'][2][i] / (gens[j].generator_type.resource_type.energy_content * 1))]
       avail += [gCapacity]
     elif fType == 'solar':
+      fuel_costs += [0]
       costF += [fCostOn]
       avail += [mods['sp'][i]*gCapacity]
     elif fType == 'wind':
+      fuel_costs += [0]
       costF += [fCostOn]
       avail += [gCapacity]
     elif fType == 'hydro':
+      fuel_costs += [0]
       costF += [fCostOn]
       avail += [gCapacity]
 
   jj     = np.argsort(costF)
   supply = 0
   price  = 0
+
+  # print("-"*80)
+  # print("costF = ", costF)
+  # print("-"*80)
+  # print(jj)
 
   for j in jj:
     if supply < demand:
@@ -188,23 +207,23 @@ def iso(gens, mods, i):
   }
 
   for j in range(len(gens)):
-    player_num = str(gens[j].facility_link.player_number)
-    fCostOn = gens[j].facility_link.facility_type_link.fixed_cost_operate
-    fCostOff = fCostOn * 0.5
+    player_num = str(gens[j].facility.player_number)
+    fCostOn = gens[j].generator_type.fixed_cost_operate / 8760.0
+    #fCostOff = fCostOn * 1.0
     if costF[j] < price: 
-      player_profit[player_num] += [(price - fCostOn) * avail[j] * 1e3]
+      player_profit[player_num] += [(price - fCostOn - fuel_costs[j]) * (avail[j] * 1e3)] 
     else: 
-      player_profit[player_num] += [(-fCostOff) * avail[j] * 1e3]
+      player_profit[player_num] += [(-fCostOn) * (avail[j] * 1e3)]
 
   print("Iteration: " + str(i))
-  column_headings = ["playnum", "price", "demand", "price*demand", "sum", "min", "max"]
-  print(" {: <10} {: <20} {: <20} {: <20} {: <20} {: <20} {: <20}".format(*column_headings))
+  column_headings = ["playnum", "price", "demand", "price*demand", "sum", "min", "max", "sumAvail"]
+  print(" {: <10} {: <20} {: <20} {: <20} {: <20}  {: <20} {: <20} {: <20}".format(*column_headings))
 
   for pn in player_profit:
-    row_data = [pn, str(price), str(demand), str(price*demand), str(np.sum(player_profit[pn])), str(np.min(player_profit[pn])), str(np.max(player_profit[pn]))]
-    print(" {: <10} {: <20} {: <20} {: <20} {: <20} {: <20} {: <20}".format(*row_data))
+    row_data = [pn, str(price), str(demand), str(price*demand), str(np.sum(player_profit[pn])), str(np.min(player_profit[pn])), str(np.max(player_profit[pn])), str(np.sum(avail))]
+    print(" {: <10} {: <20} {: <20} {: <20} {: <20} {: <20} {: <20} {: <20}".format(*row_data))
 
-  print()  
+  # print(player_profit)  
   return None
 
 ##################################################################################
@@ -236,7 +255,7 @@ def iso(gens, mods, i):
 # [cc,ri,su,sp,fp,pg,ed] = start_game()
 # turn(gens,caps,costOn,costOff,fp,ed,sp)
 
-def calculate_quarter(genertors, cities):
+def calculate_quarter(generators, cities):
   modifiers = init_modifiers(cities)
   print("pg = ", modifiers["pg"][0][-1])
   print("ed = ", modifiers["ed"][0][-1])
@@ -248,7 +267,8 @@ def calculate_quarter(genertors, cities):
   # db.session.commit()
   # print("len of pg =", len(pg))
   
-  turn(genertors, modifiers)
+  turn(generators, modifiers)
+  facility_turn(facilities)
 
   return None
 

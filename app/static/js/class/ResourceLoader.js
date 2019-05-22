@@ -30,7 +30,6 @@ define([
       return resourcesObject;
     }
 
-
     _loadImageResource(resource) {
       return (new Promise(resolve => {
         const img = new Image();

@@ -13,7 +13,7 @@ define([
         super();
         this._canvasElementId = canvasElementId;
         this._canvasModel = model;
-        this._infoDialogElementId = "infodialogbox";
+        this._infoDialogElementId = "info-dialog";
         this._stage = new createjs.Stage(canvasElementId);
         this._stage.enableMouseOver();
         this._width = canvasData.canvasConfig.width

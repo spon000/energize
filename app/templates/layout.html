@@ -28,9 +28,9 @@
 
 <body id="game">
   <div id="game-top-menu" class="top-menu">
-    <a class="company-btn push-up" href="#">{{ company.name }} (portfolio) </a>
-    <a class="budget-btn no-hover" href="#"></a>
-    <!-- <a class="budget-btn push-up" href="#">Budget: {{ budget }}</a> -->
+    <a class="company-btn push-up" href="#">{{ company.name }}<br/>(portfolio) </a>
+    {# <a class="budget-btn no-hover" href="#"></a> #}
+    <a class="budget-btn push-up" href="#">Budget: {{ budget }}</a> 
     <a class="market-btn push-up" href="#"> World Market</a>
     <a class="social-btn" href="#"> Social</a>
     <a class="q-report-btn push-up" href="#"> Quarterly Report</a>
@@ -42,6 +42,7 @@
     <a class="options-btn" href="#">Options</a>
   </div> 
 
+  <div id="info-dialog"></div>
   <div>
   {% block middle_content %} {% endblock middle_content %}
   </div>

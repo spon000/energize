@@ -31,7 +31,7 @@ define([
 
       _setNextBtnEvent() {
         $('#' + this._nextTurnButtonId).click(this, (evt) => {
-          $.post("/company?pcstate=turn", (data) => { console.log("successful POST", data) });
+          $.post(networkCallMap.companyTable.path + "pcstate=turn", (data) => { console.log("successful POST", data) });
         });
       }
 
@@ -50,12 +50,12 @@ define([
       _setBuildBtnStatus(state = "view") {
         if (state === "view") {
           $('#' + this._facilityButtonId).removeClass(["building", "no-hover"]);
-          $.post("/company?pcstate=" + state, (data) => { console.log("successful POST", data) });
+          $.post(networkCallMap.companyTable.path + "pcstate=" + state, (data) => { console.log("successful POST", data) });
           this._buildStatus = "view";
         }
         else if (state === "build") {
           $('#' + this._facilityButtonId).addClass(["building", "no-hover"]);
-          $.post("/company?pcstate=" + state, (data) => { console.log("successful POST", data) });
+          $.post(networkCallMap.companyTable.path + "pcstate=" + state, (data) => { console.log("successful POST", data) });
           this._buildStatus = "build";
         }
         else if (state === "turn") {

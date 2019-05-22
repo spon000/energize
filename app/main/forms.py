@@ -16,10 +16,17 @@ class JoinGameForm(FlaskForm):
   companyname = StringField('Company Name', validators=[DataRequired(), Length(min=2, max=20)])
   submit = SubmitField('Join Game')
 
+
 class RejoinGameForm(FlaskForm):
-  availablegames = StringField('Current Game', render_kw={"disabled": ""}) 
-  companyname = StringField('Company Name', render_kw={"disabled": ""})
+  jg = SelectField('Available Games', choices=[], coerce=int)
+  cn = StringField('Company Name', validators=[DataRequired(), Length(min=2, max=20)])
   submit = SubmitField('Join Game')
+
+
+# class RejoinGameForm(FlaskForm):
+#   joinablegames = SelectField(u'Available Games', choices=[], coerce=int)
+#   companynames = SelectField(u'Company Name', choices=[], coerce=int)
+#   submit = SubmitField('Re-Join Game')
   
 
 

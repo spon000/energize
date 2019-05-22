@@ -2,40 +2,40 @@ define([
   // Libs
   // Classes
 ], function () {
+  let gid = "?gid=" + globalGameId + "&";
   return ({
+    // The variable globalGameId resides in app/templates/game.html
     "server": {
-
     },
     "gameTable": {
-
     },
     "companyTable": {
       name: "companyTable",
-      path: "/company"
+      path: "/company" + gid
     },
     "cityTable": {
       name: "cityTable",
-      path: "/cities"
+      path: "/cities" + gid
     },
     "facilityTable": {
       name: "facilityTable",
-      path: "/facilities"
+      path: "/facilities" + gid
     },
     "viewCity": {
       name: "singleCity",
-      path: "/viewcity/"
+      path: "/viewcity" + gid
     },
     "viewFacility": {
       name: "viewFaciltiy",
-      path: "/viewfacility/"
+      path: "/viewfacility" + gid
     },
     "playerFacility": {
       name: "playerFacility",
-      path: "/playerfacility/"
+      path: "/playerfacility" + gid
     },
     "playerFacilities": {
       name: "playerFacilities",
-      path: "/playerfacilities/"
+      path: "/playerfacilities" + gid
     },
     "facilityTypesTable": {
       name: "facilityTypesTable",

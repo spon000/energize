@@ -15,28 +15,43 @@
         {{ form.hidden_tag() }}
           <fieldset class="form-group">
             <div class="form-group">
-              {{ form.availablegames.label(class="form-control-label") }}
-              {{ form.availablegames(class="form-control form-control-lg") }}
+              {{ form.jg.label(class="form-control-label") }}
+              {% if form.jg.errors %}
+                {{ form.jg(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.jg.errors %}
+                    <span> {{ error }} </span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {{ form.jg(class="form-control form-control-lg") }}
+              {% endif %}
             </div>
 
             <div class="form-group">
-              {{ form.companyname.label(class="form-control-label") }}
-              {{ form.companyname(class="form-control form-control-lg") }}
-					    <!-- 
-              <script>
-                // let companies = JSON.parse($('#companyname')[0].getAttribute("companies"));
-                // let company_name = companies[$('#availablegames').find(":selected").val()].name
-                // let company_id = companies[$('#availablegames').find(":selected").val()].id
-                // $('#companyname').val(company_name);
-                // $('#companyname').attr("cid", company_id);
-                // $('#availablegames').on("change", (evt) => {
-                //  $('#companyname').val(companies[evt.currentTarget.value].name);
-                //  $('#companyname').attr("cid", companies[evt.currentTarget.value].id);
-                // });
-              </script>              
-              -->
+              {{ form.cn.label(class="form-control-label") }}
+              {% if form.cn.errors %}
+                {{ form.cn(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form.cn.errors %}
+                    <span> {{ error }} </span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {{ form.cn(class="form-control form-control-lg") }}
+              {% endif %}
             </div> 
           </fieldset>
+          <script>
+            // single quotes within the string need to be replaced with double quotes for JSON.parse() 
+            // to work.
+            let companies = JSON.parse($('#cn')[0].getAttribute("cn").replace(/'/g, '"'));
+            let company_name = companies[$('#jg').find(":selected").val()];
+            $('#cn').val(company_name);
+            $('#jg').on("change", (evt) => {
+              $('#cn').val(companies[evt.currentTarget.value]);
+            });
+          </script>                    
           <div class="form-group">
             {{ form.submit(class="btn btn-outline-info") }}
           </div>

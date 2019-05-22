@@ -2,29 +2,34 @@ define([
   "canvasData",
   "Dim2",
   "EventEmitter",
+  "Facility",
   "facilityTileDefs",
   "FacilitySelectDialog",
-  "FacilityViewDialog"
+  "FacilityViewDialog",
+  "SocketIOCalls"
 
 ], function (
   canvasData,
   Dim2,
   EventEmitter,
+  Facility,
   facilityTileDefs,
   FacilitySelectDialog,
-  FacilityViewDialog
+  FacilityViewDialog,
+  SocketIOCalls
 ) {
 
     return (
       class CanvasController extends EventEmitter {
-        constructor(canvasModel, canvasView) {
+        constructor(canvasModel, canvasView, playerSocket) {
           super();
           this._canvasModel = canvasModel;
           this._canvasView = canvasView;
+          this._playerSocket = playerSocket;
           this._terrainClicked = false;
-          this._facilityClicked = false;
           this._dragging = false;
           this._leftMouseDown = false;
+          this._dialogStatus = "popup" // possible values: "popup", "view", "build", "portfolio", "quarterly"
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -34,7 +39,7 @@ define([
           this._getTerrainLayer();
           this._getCityLayer();
           this._getFacilityLayer();
-          this._setGeneralWindow
+          // this._setGeneralWindow
           this._canvasView.startCanvasTimer();
         }
 
@@ -60,6 +65,7 @@ define([
         // Generate facility tilemap
         _getFacilityLayer() {
           this._canvasModel.createFacilityTileMap().then(tileMap => {
+            console.log("tileMap = ", tileMap);
             this._canvasView.addTileMap(tileMap);
             this._setFacilityEvents(tileMap);
           });
@@ -156,7 +162,7 @@ define([
 
         // This uses easeljs event handler which specifies different listener function prototype
         // That's why there's no need for a scope variable
-        _onCityEvent(evt, data) {
+        _onCityEvent(evt, data = null) {
           // console.log("CanvasController._onCityEvent", evt, data);
           const tile = data;
           switch (evt.type) {
@@ -164,7 +170,7 @@ define([
               this._terrainClicked = false;
               break;
             case "rollover":
-              if (!this._dragging) {
+              if (!this._dragging && this._dialogStatus == "popup") {
                 this._canvasModel.getCityInformationHTML(tile.id).then((html) => {
                   this._canvasView.displayRolloverInfo(evt, html)
                 });
@@ -178,26 +184,25 @@ define([
 
         // This uses easeljs event handler which specifies different listener function prototype
         // That's why there's no need for a scope variable
-        _onFacilityEvent(evt, data) {
+        _onFacilityEvent(evt, data = null) {
           //console.log("CanvasController._onFacilityEvent", evt, data);
           const tile = data;
           switch (evt.type) {
             case "click":
               this._terrainClicked = false;
-              this._facilityClicked = true;
+              this._dialogStatus = "view";
+              this._canvasView.displayRolloverInfo({ "type": "rollout" }, null);
               this._viewFacility(tile.id);
               break;
             case "rollover":
-              if (!this._dragging && !this._facilityClicked) {
+              if (!this._dragging && this._dialogStatus == "popup") {
                 this._canvasModel.getFacilityInformationHTML(tile.id).then((html) => {
                   this._canvasView.displayRolloverInfo(evt, html)
                 });
               }
               break;
             case "rollout":
-              if (!this._facilityClicked) {
-                this._canvasView.displayRolloverInfo(evt, null);
-              }
+              this._canvasView.displayRolloverInfo(evt, null);
               break;
           }
         }
@@ -251,41 +256,70 @@ define([
 
         _buildFacility(dialogElementId, facilityIdList) {
 
-          // this._canvasModel.getFacilityTypes().then(data => {
-          //   let facilityData = {
-          //     powerTypes: data.powerTypesTable.data.power_types,
-          //     generatorTypes: data.generatorTypesTable.data.generator_types,
-          //     facilityTypes: data.facilityTypesTable.data.facility_types,
-          //   }
-          //   let facilitySelectDialog = new FacilitySelectDialog(facilityData.facilityTypes, facilityIdList);
+          let socketCalls = new SocketIOCalls(this._playerSocket);
+          facilityData = socketCalls.newFacility(globalGameId, 10, 10);
+          console.log("facilityData = ", facilityData);
 
-          //   facilitySelectDialog.openDialog().then(facilityTypeId => {
-          //     this._addGenerators(facilityData, facilityTypeId, 0);
-          //   });
-          // });
-        }
-
-        _viewNewFacility(facilityData, facilityTypeId) {
-          console.log("_addGenerators() facilityData = ", facilityData);
-        }
-
-        _viewFacility(facilityId) {
-          this._canvasModel.getAllTypes().then(data => {
+          this._canvasModel.getFacilityTypes().then(data => {
             let facilityData = {
               powerTypes: data.powerTypesTable.data.power_types,
               generatorTypes: data.generatorTypesTable.data.generator_types,
-              facilityTypes: data.facilityTypesTable.data.facility_types
+              facilityTypes: data.facilityTypesTable.data.facility_types,
             }
-            console.log("_viewFacility() => facilityData = ", facilityData);
+            let facilitySelectDialog = new FacilitySelectDialog(facilityData.facilityTypes, facilityIdList);
 
-            this._canvasModel.getPlayerFacility(facilityId).then((facility) => {
-              let fac = facility.facility[0];
-              console.log("_viewFacility() => fac = ", fac);
-              let facilityViewDialog = new FacilityViewDialog(facilityData.facilityTypes[fac.facility_type], facilityData.generatorTypes, fac);
-              facilityViewDialog.openDialog();
-              this._facilityClicked = false;
+            facilitySelectDialog.openDialog().then(facilityTypeId => {
+              socketCalls.selectFacility(globalGameId, facilityTypeId)
+
+              this._addGenerators(facilityData, facilityTypeId, 0);
             });
           });
+        }
+
+        _viewNewFacility(facilityTypeId) {
+          console.log("createFacility", facilityTypeId);
+        }
+
+        _viewFacility(facilityId, facilityTpyeId = null) {
+          console.log("viewFacility", facilityId);
+          // let facilityViewDialog = new FacilityViewDialog(facilityId).then((result) => {
+          //   console.log("dialog closed");
+          // });
+          let facilityViewDialog = new FacilityViewDialog(facilityId, facilityTpyeId);
+
+          // this._canvasModel.getAllTypes().then(data => {
+          //   let facilityData = {
+          //     powerTypes: data.powerTypesTable.data.power_types,
+          //     generatorTypes: data.generatorTypesTable.data.generator_types,
+          //     facilityTypes: data.facilityTypesTable.data.facility_types
+          //   }
+
+          //   this._canvasModel.getCompanyData().then(company => {
+          //     facilityData["company"] = company;
+          //     return facilityData;
+
+          //   }).then(facilityData => {
+          //     this._canvasModel.getPlayerFacility(facilityId).then(facility => {
+          //       facilityData["facility"] = facility.facility[0];
+          //       facilityData["generators"] = facility.generators;
+          //       return facilityData;
+
+          //     }).then(facilityData => {
+          //       console.log("_viewFacility() => facilityData = ", facilityData);
+          //       let facilityViewDialog = new FacilityViewDialog({
+          //         "facilityType": facilityData.facilityTypes.find(ft => ft.id === facilityData.facility.facility_type),
+          //         "facility": facilityData.facility,
+          //         "generators": facilityData.generators,
+          //         "powerTypes": facilityData.powerTypes,
+          //         "generatorTypes": facilityData.generatorTypes.filter(gt => gt.facility_type === facilityData.facility.facility_type)
+          //       });
+
+          //       facilityViewDialog.openDialog().then(() => {
+          //         this._dialogStatus = "popup";
+          //       });
+          //     });
+          //   });
+          // });
         }
       });
   });
