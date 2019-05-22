@@ -78,9 +78,10 @@ define([], function () {
             <tr>
               <th> Action </th>
               <th class="generator-add-button"> <button type='button'> (+) </button></th>
-              <th> Generator Type </th>
-              <th> Nameplate Capacity </th>
+              <th> Gen Type </th>
+              <th> NP Capacity (MWh)</th>
               <th> State </th>
+              <th> Age </th>
               <th> Bid Policy </th>
               <th> Bid Value </th>
             </tr>
@@ -97,8 +98,9 @@ define([], function () {
                 </td>
                 <td> #{{@index}} </td>
                 <td>{{ gentype_details.pt.name }}</td>
-                <td>{{ gentype_details.nameplate_capacity }} MWh </td>
+                <td>{{ gentype_details.nameplate_capacity }}</td>
                 <td>{{ state }}</td>
+                <td> ?? Years </td>
                 <td> {{ local_bid_policy }}</td>
                 <td> $ {{formatCurrency bid_policy_value }}</td>
               </tr>

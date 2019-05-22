@@ -129,9 +129,11 @@ define([
       }
 
       setScale(scaleX, scaleY) {
-        this._container.scaleX = this._scaleX = scaleX;
-        this._container.scaleY = this._scaleY = scaleY;
-        console.log("setScale() tilemap = ", this);
+        if (this._scaleToLayer) {
+          this._container.scaleX = this._scaleX = scaleX;
+          this._container.scaleY = this._scaleY = scaleY;
+          console.log("setScale() tilemap = ", this);
+        }
       }
 
       moveTileMap(deltaX, deltaY, canvasWidth, canvasHeight) {

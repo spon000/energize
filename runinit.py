@@ -3,6 +3,7 @@ from app import db, bcrypt
 from app.models import Game, Company, Facility, Generator, City, User
 from app.models import FacilityType, GeneratorType, PowerType, ResourceType
 from app.game.supply_type_defs import facility_types, generator_types, power_types, resource_types
+from app.config import Config
 
 ##############################################################################
 def main():
