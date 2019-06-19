@@ -23,8 +23,13 @@
   text-decoration: none;
 }
 
-.top-menu .company-btn {
+.top-menu .company-btn  label {
   font-size: 12px;  
+}
+
+.top-menu .budget-btn label {
+  font-size: 12px;
+  margin-left: -10px;
 }
 
 .top-menu .push-up {

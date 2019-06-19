@@ -9,6 +9,7 @@ define([
 				this._name = name;
 				this._id = id;
 				this._sprite = sprite;
+				this._bitmap = null;
 				this._width = width;
 				this._height = height;
 				this._originX = 0;
@@ -30,6 +31,10 @@ define([
 
 			get sprite() {
 				return this._sprite;
+			}
+
+			get bitmap() {
+				return this._bitmap;
 			}
 
 			get width() {
@@ -70,6 +75,10 @@ define([
 				this._sprite.tickEnabled = false;
 			}
 
+			set bitmap(bitmap) {
+				this._bitmap = bitmap;
+			}
+
 			set width(width) {
 				this._width = width;
 			}
@@ -89,11 +98,13 @@ define([
 			set scaleX(scaleX) {
 				this._scaleX = scaleX;
 				this._sprite.scaleX = scaleX;
+				if (this._bitmap) this._bitmap.scaleX = scaleX;
 			}
 
 			set scaleY(scaleY) {
 				this._scaleY = scaleY;
 				this._sprite.scaleY = scaleY;
+				if (this._bitmap) this._bitmap.scaleY = scaleY;
 			}
 
 			set scaleToMap(scaleToMap) {
@@ -106,6 +117,10 @@ define([
 				this._scaleY = scaleY;
 				this._sprite.scaleX = scaleX;
 				this._sprite.scaleY = scaleY;
+				if (this._bitmap) {
+					this._bitmap.scaleX = scaleX;
+					this._bitmap.scaleY = scaleY;
+				}
 				this._width = this._width * scaleX;
 				this._height = this._height * scaleY;
 			}

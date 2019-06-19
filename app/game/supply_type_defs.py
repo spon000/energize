@@ -52,4 +52,20 @@ resource_types = [
   {'name': "sun",                   'unit': "na",   'available': True, 'average_price': 0,      'energy_content': 1}
 ]
 
+modification_types = [
+  {'id_facility_type':  1, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  2, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  3, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  4, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  5, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  6, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  7, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  8, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  9, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},            
+]
+
+
+prompt_type = [
+  {'title': 'Blizzard', 'description': 'Blizzard is coming!'}
+]
 

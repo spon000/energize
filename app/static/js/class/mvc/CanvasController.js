@@ -6,7 +6,9 @@ define([
   "facilityTileDefs",
   "FacilitySelectDialog",
   "FacilityViewDialog",
-  "SocketIOCalls"
+  "ModelData",
+  "SocketIOCalls",
+  "evtEmitter",
 
 ], function (
   canvasData,
@@ -16,7 +18,10 @@ define([
   facilityTileDefs,
   FacilitySelectDialog,
   FacilityViewDialog,
-  SocketIOCalls
+  ModelData,
+  SocketIOCalls,
+  evtEmitter
+
 ) {
 
     return (
@@ -41,10 +46,19 @@ define([
           this._getFacilityLayer();
           // this._setGeneralWindow
           this._canvasView.startCanvasTimer();
+          this._setEventEmittersReceived();
         }
 
         ///////////////////////////////////////////////////////////////////////////
         // Private methods.
+
+        _setEventEmittersReceived() {
+
+          evtEmitter.on("testing", (data = null) => {
+            console.log("Events Testing Successful for CanvasController! data = ", data);
+          })
+
+        }
 
         // Generate terrain tilemap
         _getTerrainLayer() {
@@ -113,7 +127,7 @@ define([
                   if (companyData.state === "build") {
                     let facilityListObj = scope._buildFacilityEvent(colRow);
                     if (facilityListObj.facilityList) {
-                      scope._buildFacility("infodialogbox", facilityListObj.facilityList);
+                      scope._buildFacility("facility-dialog", facilityListObj.facilityList, colRow);
                     }
                     else {
                       console.log("can't build: " + facilityListObj.message);
@@ -254,12 +268,16 @@ define([
           }
         }
 
-        _buildFacility(dialogElementId, facilityIdList) {
+        _buildFacility(dialogElementId, facilityIdList, colRow) {
+          let modelData = new ModelData();
+          // colRow needs to be swapped !!!
+          modelData.addFacility(colRow.x, colRow.y).then((facility) => {
+            console.log("new facility added...", facility);
+            this._canvasModel._facilityLayer.createFacilityTile(facility, this._canvasView.zoomLevel);
+          });
+        }
 
-          let socketCalls = new SocketIOCalls(this._playerSocket);
-          facilityData = socketCalls.newFacility(globalGameId, 10, 10);
-          console.log("facilityData = ", facilityData);
-
+        _selectFacilityType() {
           this._canvasModel.getFacilityTypes().then(data => {
             let facilityData = {
               powerTypes: data.powerTypesTable.data.power_types,
@@ -269,22 +287,38 @@ define([
             let facilitySelectDialog = new FacilitySelectDialog(facilityData.facilityTypes, facilityIdList);
 
             facilitySelectDialog.openDialog().then(facilityTypeId => {
-              socketCalls.selectFacility(globalGameId, facilityTypeId)
+              // socketCalls.selectFacility(globalGameId, facilityTypeId)
 
-              this._addGenerators(facilityData, facilityTypeId, 0);
+              // this._addGenerators(facilityData, facilityTypeId, 0);
             });
           });
         }
 
-        _viewNewFacility(facilityTypeId) {
-          console.log("createFacility", facilityTypeId);
-        }
+        // this._canvasModel.getFacilityTypes().then(data => {
+        //   let facilityData = {
+        //     powerTypes: data.powerTypesTable.data.power_types,
+        //     generatorTypes: data.generatorTypesTable.data.generator_types,
+        //     facilityTypes: data.facilityTypesTable.data.facility_types,
+        //   }
+        //   let facilitySelectDialog = new FacilitySelectDialog(facilityData.facilityTypes, facilityIdList);
+
+        //   facilitySelectDialog.openDialog().then(facilityTypeId => {
+        //     socketCalls.selectFacility(globalGameId, facilityTypeId)
+
+        //     this._addGenerators(facilityData, facilityTypeId, 0);
+        //   });
+        // });
+
+
 
         _viewFacility(facilityId, facilityTpyeId = null) {
           console.log("viewFacility", facilityId);
           // let facilityViewDialog = new FacilityViewDialog(facilityId).then((result) => {
           //   console.log("dialog closed");
           // });
+          evtEmitter.emit("testing");
+
+          evtEmitter.emit("testing", { msg: "hello observer!" });
           let facilityViewDialog = new FacilityViewDialog(facilityId, facilityTpyeId);
 
           // this._canvasModel.getAllTypes().then(data => {

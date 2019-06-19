@@ -14,7 +14,9 @@ requirejs.config({
     "jq.bootstrap": "lib/bootstrap/bootstrap.bundle.4.1.1.min",
     easeljs: "lib/easeljs/easeljs.1.0.0.min",
     Handlebars: "lib/handlebars/handlebars-v4.0.12",
+    phaser3: "lib/phaser3/phaser.min",
     socketio: "lib/socketio/socket.io",
+    Tabulator: "lib/tabulator/tabulator.min",
     Vue: "https://cdn.jsdelivr.net/npm/vue/dist/vue",
     Vuex: "https://unpkg.com/vuex",
 
@@ -36,35 +38,51 @@ requirejs.config({
     Biome: "class/Biome",
     City: "class/City",
     CityLayer: "class/CityLayer",
+    Component: "class/Compnent",
     Dim2: "class/Dim2",
     EventEmitter: "class/EventEmitter",
     Facility: "class/Facility",
     FacilityLayer: "class/FacilityLayer",
     FacilitySelectDialog: "class/FacilitySelectDialog",
     FacilityViewDialog: "class/FacilityViewDialog",
+    Game: "class/Game",
     Generator: "class/Generator",
+    Layer: "class/Layer",
+    LayerItem: "class/LayerItem",
     ModelData: "class/ModelData",
-    NewGame: "class/NewGame",
+    PortfolioViewDialog: "class/PortfolioViewDialog",
+    PubSub: "class/PubSub",
     ResourceLoader: "class/ResourceLoader",
     SocketIOCalls: "class/SocketIOCalls",
+    Store: "class/Store",
     TerrainMap: "class/TerrainMap",
     Tile: "class/Tile",
     TileMap: "class/TileMap",
     TopMenu: "class/TopMenu",
     Vector2: "class/Vector2",
+    View: "class/View",
 
-    // Vue Components
+    //Components
     CityView: "components/CiyView",
+
+    //Central store files
+    state: "store/state",
+    cityActions: "store/cityActions",
+    cityMutants: "store/cityMutants",
 
     // Data objects
     canvasData: "data/canvasData",
     facilityTileDefs: "data/facilityTileDefs",
     grassTileDefs: "data/grassTileDefs",
     networkCallMap: "data/networkCallMap",
+    tileMapArray: "data/tileMapArray",
+    tileTypeArray: "data/tileTypeArray",
 
     // Misc objects
-    terrainLayer: "misc/terrainLayer"
-
+    dateUtils: "misc/dateUtils",
+    evtEmitter: "misc/evtEmitter",
+    gameStore: "misc/gameStore",
+    terrainLayer: "misc/terrainLayer",
   },
 
   // Allows you to use non AMD (Asynchronus Module Definition)
@@ -77,17 +95,20 @@ requirejs.config({
     easeljs: {
       exports: "createjs"
     },
+    evtEmitter: {
+      exports: "evtEmitter"
+    },
+    gameStore: {
+      exports: "gameStore"
+    },
     Handlebars: {
       exports: "handlebars"
     },
     socketio: {
       exports: "socketio"
     },
-    Vue: {
-      exports: "Vue"
-    },
-    Vuex: {
-      exports: "Vuex"
+    tabulator: {
+      exports: "Tabulator"
     }
   }
 });
@@ -95,11 +116,9 @@ requirejs.config({
 //////////////////////////////////////////////////////////////////////////
 // Main.js starts here...
 require([
-  "NewGame"
-], function (
-  NewGame
-) {
-    console.log("JS: main.js starting...");
-    console.log("global game id = ", globalGameId);
-    game = new NewGame();
-  });
+  "Game",
+  "phaser3",
+], function (Game, Phaser) {
+  console.log("global game id = ", globalGameId);
+  game = new Game(globalGameId);
+});

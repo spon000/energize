@@ -235,9 +235,18 @@ button[btn-image="natural-disabled"] {
   background-repeat: no-repeat;
 }
 
+label[cond-image="construction"] {
+  background-image: url(images/under_construction.png);
+  background-size: contain;
+  background-color: #000;
+  background-repeat: no-repeat;
+}
+
 
 /*****************************************/
 /* Data tooltip */
+
+
 
 .help-tip {
   /* top: 18px;
@@ -291,18 +300,40 @@ button[btn-image="natural-disabled"] {
   overflow: hidden;
 }
 
-.vfd-facility-image-btn {
-  width: 40px;
-  height: 40px;
-  margin-top: 0;
-  border-style: none;
-  border-radius: 50%;
+.vfd-title {
+  margin: 0;
+  padding: 0;
 }
 
 .vfd-facility-name {
-  margin-top: 5px;
-  vertical-align: middle;
-  text-align: center;
+  float: left;
+  padding: 5px 10px;
+  margin: 0;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 7px;
+  border-color: #646a6d;
+}
+
+.vfd-facility-name-input {
+  float: left;
+  padding: 5px 10px;
+  margin: 0;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 7px;
+  border-color: #ccc;
+}
+
+.vfd-facility-image-btn {
+  width: 35px;
+  height: 35px;
+  float: left;
+  margin-left: 20px;
+  /* margin-top: 3px; */
+  padding: 0;
+  border-style: none;
+  border-radius: 50%;
 }
 
 .floatleft {
@@ -313,7 +344,134 @@ button[btn-image="natural-disabled"] {
   float: right;
 }
 
-.generator-list {
+.vfd-btn-divider {
+  width: 15px;
+  height: auto;
+  display: inline-block;
+}
+
+.vfd-powerplant-panel {
+  float: left;
+  width: 302px;
+  height: 202px;
+  border-style: solid;
+  border-width: 1px;
+}
+
+
+#vfd-gen-list {
+  margin-top: 60px;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+}
+
+#vfd-verify-dialog {
+  background-color: bisque;
+}
+
+.vfd-remove-gen-button {
+  background-color: gray;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+  display: inline-block;
+  cursor: pointer;
+  padding: 1px 7px;
+  margin: 0;
+}
+
+
+/**********************************************************************
+* multiselect checkboxes
+***********************************************************************/
+.generator-list-checkbox-all {
+  width: 100%;
+  margin: auto;
+}
+
+.vfd-multiselect {
+  margin-top: 15px;
+}
+
+.vfd-multiselect .selectbox {
+  position: relative;
+}
+
+.vfd-multiselect .selectbox select{
+  width: 100%;
+  font-weight: bold;
+  background-color: #BCDBEA;
+}
+
+.vfd-multiselect .overselect {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+#vfd-facility-checkboxes {
+  position: absolute;
+  display: none;
+  border: 1px #dadada solid;
+  background-color: #ffffff;
+  width: 360px;
+}
+
+#vfd-facility-checkboxes label {
+  width: 100%;
+}
+
+#vfd-facility-checkboxes input {
+  margin-right: 7px;
+}
+
+
+.vfd-facility-checkbox:hover :not(.mod-selected) {
+  background-color: #aaaaaa;
+}
+
+.mod-selected {
+  background-color: #1e90ff;
+}
+
+.vfd-facility-summary label {
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+
+.vfd-facility-summary h6 {
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+
+.vfd-gen-list-header {
+  display: block;
+  background-color: #1adada;
+  margin-top:20px; 
+  border-top-style: 1px #1adada solid;
+  border-bottom-style: 1px #1adada solid;
+}
+
+.gen-header-detail {
+  font-weight: bold;
+  float: left;
+}
+
+.gen-header-btn {
+  margin-right: 15px;
+  float: right;
+}
+
+.gen-header-btn button {
+  border-radius: 4px;
+}
+
+
+/* .generator-list {
   margin: 0 auto;
   width: 100%; 
   height: 225px;
@@ -346,7 +504,7 @@ button[btn-image="natural-disabled"] {
 .generator-list-table td {
   border: 1px solid #cecfd5;
   padding: 7px 12px;
-}
+} */
 
 .generator-add-button button {
   text-align: center;
@@ -366,3 +524,8 @@ button[btn-image="natural-disabled"] {
   padding: 10px 10px;
   border-radius: 10px;
 }
+
+/****************************************************************************************************
+* View Facility power plant image
+****************************************************************************************************/
+

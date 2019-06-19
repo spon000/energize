@@ -1,6 +1,6 @@
 define([
   // Libs
-  "Dim2"
+  "Dim2",
   // Classes
 ], function (Dim2) {
   return ({
@@ -11,6 +11,11 @@ define([
       "initialOriginY": 0,
       "width": 1200,
       "height": 600
+    },
+    "phaserConfig": {
+      "width": 1200,
+      "height": 600,
+      "parent": "map-view"
     },
     "terrainImageConfig": {
       "name": "terrainBitmap",
@@ -38,34 +43,14 @@ define([
         { "type": "cityblock1", "frame": 0 }
       ]
     },
-    // "facilitySpriteConfig": {
-    //   "name": "facilitySprites",
-    //   "path": "static/img/tiles/tech-tilesd.png",
-    //   "width": 50,
-    //   "height": 50,
-    //   "sprites": [
-    //     // type 1 - 8 match facility_type table ID field.
-    //     // type 0 is generic facility icon.
-    //     { "type": 0, "frame": 20 },
-    //     { "type": 1, "frame": 21 },
-    //     { "type": 2, "frame": 22 },
-    //     { "type": 3, "frame": 23 },
-    //     { "type": 4, "frame": 24 },
-    //     { "type": 5, "frame": 25 },
-    //     { "type": 6, "frame": 26 },
-    //     { "type": 7, "frame": 27 },
-    //     { "type": 8, "frame": 28 }
-    //   ]
-    // },
     "facilitySpriteConfig": {
       "name": "facilitySprites",
-      "path": "/static/img/tiles/facility_icons_1200x100.png",
+      "path": "/static/img/tiles/facility_icons_1300x100.png",
       "width": 100,
       "height": 100,
       "sprites": [
         // type 1 - 8 match facility_type table ID field.
-        // type 0 is generic facility icon.
-        { "type": 0, "frame": 0 },
+        // type 9 is generic facility icon.
         { "type": 1, "frame": 3 },
         { "type": 2, "frame": 3 },
         { "type": 3, "frame": 5 },
@@ -73,7 +58,8 @@ define([
         { "type": 5, "frame": 2 },
         { "type": 6, "frame": 2 },
         { "type": 7, "frame": 0 },
-        { "type": 8, "frame": 1 }
+        { "type": 8, "frame": 1 },
+        { "type": 9, "frame": 12 }
       ]
     }
   });

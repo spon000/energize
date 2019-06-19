@@ -96,6 +96,11 @@ define([
       }
 
       // Public Methods...
+      setBitmap(row, column, bitmap) {
+        let offset = this._getOffset(row, column);
+
+      }
+
       setTile(row, column, tile, drawSprite = true) {
         let offset = this._getOffset(row, column);
         let tileIndex = this._getTileIndex(row, column);
@@ -132,7 +137,7 @@ define([
         if (this._scaleToLayer) {
           this._container.scaleX = this._scaleX = scaleX;
           this._container.scaleY = this._scaleY = scaleY;
-          console.log("setScale() tilemap = ", this);
+          // console.log("setScale() tilemap = ", this);
         }
       }
 

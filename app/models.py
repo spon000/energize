@@ -66,7 +66,7 @@ class Company(db.Model):
   player_number = db.Column(db.Integer, nullable=False)
   name = db.Column(db.String(30), nullable=False, default='Company #')
   score = db.Column(db.Integer, nullable=False, default=0)
-  budget = db.Column(db.Float, nullable=False, default=10000)
+  budget = db.Column(db.Float, nullable=False, default=1000000000)
   quarter_net = db.Column(db.Float, default=0)
   global_bid_policy = db.Column(db.Enum("high", "medium", "low"), default="medium")
   state = db.Column(db.Enum("new", "view", "build", "turn", "ready"), default="new")
@@ -96,7 +96,7 @@ class Facility(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
   # Foreign keys
-  id_type = db.Column(db.Integer, db.ForeignKey('facility_type.id'), nullable=False)
+  id_type = db.Column(db.Integer, db.ForeignKey('facility_type.id'), nullable=False, default=9)
   id_company = db.Column(db.Integer, db.ForeignKey('company.id'))
   id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
 
@@ -108,6 +108,8 @@ class Facility(db.Model):
   build_turn = db.Column(db.Integer, default=0)
   start_build_date = db.Column(db.String(20))
   start_prod_date = db.Column(db.String(20))
+  om_cost = db.Column(db.Float, default=0)
+  revenue = db.Column(db.Float,default=0)
   column = db.Column(db.Integer, default=0)
   row = db.Column(db.Integer, default=0)
   layer = db.Column(db.Integer, default=2)
@@ -134,17 +136,21 @@ class Generator(db.Model):
   id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
 
   # Data
-  state = db.Column(db.Enum("new", "building", "available", "unavailable"), default="new")
+  state = db.Column(db.Enum("new", "building", "paused", "available", "unavailable", "decommissioning", "decommisioned"), default="new")
+  state_note = db.Column(db.String(30))
   build_turn = db.Column(db.Integer, default=0)
   start_build_date = db.Column(db.String(20))
   start_prod_date = db.Column(db.String(20))
   local_bid_policy = db.Column(db.Enum("option1", "option2", "option3"), default="option2")
   bid_policy_value = db.Column(db.Float, default=0)
+  om_cost = db.Column(db.Float, default=0)
+  revenue = db.Column(db.Float, default=0)
   extension = db.Column(db.Float, default=0)
-
+  
   # Relational Data
   generator_type = db.relationship('GeneratorType')
   facility = db.relationship('Facility')
+  modifications = db.relationship('Modification')
 
   # Methods
   def __repr__(self):
@@ -161,7 +167,26 @@ class Generator(db.Model):
     # return f"Generator('{self.id_type}', '{self.id_facility}', '{self.state}')"
 
 #########################################################################################
-# Generator Model
+# Modification Model    
+class Modification(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+
+  # Foreign keys
+  id_type = db.Column(db.Integer, db.ForeignKey('modification_type.id'), nullable=False)
+  id_generator = db.Column(db.Integer, db.ForeignKey('generator.id'), nullable=False)
+  id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
+
+  # Data
+  complete = db.Column(db.Boolean, default=False)
+
+  # Relational Data
+  modification_type = db.relationship('ModificationType')
+  generators = db.relationship('Generator')
+
+
+
+#########################################################################################
+# City Model
 class City(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
@@ -177,13 +202,45 @@ class City(db.Model):
   row = db.Column(db.Integer)
   layer = db.Column(db.Integer)
 
+
+# Events Models...
+#########################################################################################
+# Prompt Model
+class Prompt(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+
+  # Foreign keys
+  id_type = db.Column(db.Integer, db.ForeignKey('prompt_type.id'), nullable=False)
+  id_company = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
+
+  # Data
+  read = db.Column(db.Boolean, default=False)
+  resolved = db.Column(db.Boolean, default=False)
+  response = db.Column(db.Integer)
+
+  # Relational Data
+  prompt_type = db.relationship('PromptType')
+
+
+#########################################################################################
+# PromptType Model
+class PromptType(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+
+  # Foreign keys
+
+  # Data
+  title =  db.Column(db.String(50))
+  description =  db.Column(db.String(300))
+
+  # Relational Data
+ 
+
+
 ###############################################################################################
 # Facility Type Model
 class FacilityType(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-
-  # Foreign keys
-  # id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
 
   # Data
   maintype = db.Column(db.String(15), nullable=False)
@@ -199,7 +256,7 @@ class FacilityType(db.Model):
   description = db.Column(db.Text)
 
   # Relational Data
-  # game = db.relationship('Game')
+  modification_types = db.relationship('ModificationType')
 
 ###############################################################################################
 # Generator Type Model
@@ -210,8 +267,7 @@ class GeneratorType(db.Model):
   id_facility_type = db.Column(db.Integer, db.ForeignKey('facility_type.id'), nullable=False)
   id_power_type = db.Column(db.Integer, db.ForeignKey('power_type.id'), nullable=False)
   id_resource_type = db.Column(db.Integer, db.ForeignKey('resource_type.id'), nullable=False)
-  # id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
-
+  
   # Data
   nameplate_capacity = db.Column(db.Integer, nullable=False) 
   build_time = db.Column(db.Integer)
@@ -228,7 +284,6 @@ class GeneratorType(db.Model):
   generators = db.relationship('Generator')
   power_type = db.relationship('PowerType')
   resource_type = db.relationship('ResourceType')
-  # game = db.relationship('Game')
 
   # Methods
   def __repr__(self):
@@ -241,6 +296,36 @@ class GeneratorType(db.Model):
       f"Resource Type: {self.id_resource_type}"
     )
 
+
+###############################################################################################
+# Modification Type Model
+class ModificationType(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+
+# Foreign keys
+  id_facility_type = db.Column(db.Integer, db.ForeignKey('facility_type.id'), nullable=False)
+
+  # Data
+  marginal_area = db.Column(db.Float)
+  marginal_cost_build = db.Column(db.Float)
+  marginal_cost_operate = db.Column(db.Float)
+  name = db.Column(db.String(64))
+  description = db.Column(db.String(256))
+  value = db.Column(db.Float)
+
+  # Relational Data
+  facility_type = db.relationship('FacilityType')
+
+  # Methods
+  def __repr__(self):
+    return ( 
+      f"ModificationType -->\n" +
+      f"ID: {self.id}\n" +
+      f"Name: {self.name}\n" +
+      f"Value: {self.value}\n" +
+      f"Facility Type Id: {self.id_facility_type}\n" +
+      f"Facility Type: {self.facility_type}\n" 
+    )
 
 ###############################################################################################
 # Static models. These will not change during gameplay.
@@ -293,6 +378,11 @@ class GeneratorSchema(ma.ModelSchema):
   class Meta:
     model = Generator
 
+# Schema for Modification
+class ModificationSchema(ma.ModelSchema):
+  class Meta:
+    model = Modification    
+
 # Schema for City
 class CitySchema(ma.ModelSchema):
   class Meta:
@@ -307,6 +397,11 @@ class FacilityTypeSchema(ma.ModelSchema):
 class GeneratorTypeSchema(ma.ModelSchema):
   class Meta:
     model = GeneratorType
+
+# Schema for ModificationType
+class ModificationTypeSchema(ma.ModelSchema):
+  class Meta:
+    model = ModificationType   
 
 # Schema for PowerType
 class PowerTypeSchema(ma.ModelSchema):

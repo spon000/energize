@@ -1,11 +1,10 @@
 define([
-  "Vue",
-  "Vuex"
-], function (Vue, Vuex) {
+  "Component",
+], function (Component) {
   return (
-    new Vue({
-      el: "#vue-city-info-box",
-      data: {}
-    })
-  );
+    class CityView extends Component {
+      constructor() {
+        super()
+      }
+    });
 });

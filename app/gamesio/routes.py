@@ -9,19 +9,32 @@ from app.models import FacilitySchema, GeneratorSchema
 
 gamesio = Blueprint('gamesio', __name__)
 
-@sio.on('connect')
-def on_connect():
-  # print("sid = ", sid)
-  company = Company.query.filter_by(id=current_user.current_company).first()
-  emit('game_connect', {'p_num': company.player_number, 'g_num': company.id_game})
-  print('Message: Client connected')
-
+# @sio.on('connect')
+# def on_connect():
+#   print("+"*80)
+#   print(f"connecting...")
+#   print("+"*80)
+#   return 
+ 
 @sio.on('disconnect')
 def on_disconnect():
-  print("disconnected from server.")
-  # company = Company.query.filter_by(id=current_user.current_company).first()
+  
+  print("-"*80)
+  print(f"disconnecting...")
+  print("-"*80)
 
+@sio.on('client_connect')
+def on_client_connect(gid):
+  print("+"*80)
+  print(f"client connecting: gid = {gid}")
+  print("+"*80)
 
+@sio.on('client_disconnect')
+def on_client_disconnect(gid):
+  print("+"*80)
+  print(f"client disconnecting: gid = {gid}")
+  print("+"*80)
+  
 @sio.on('message')
 def on_message(msg):
   print("Message: ", msg)

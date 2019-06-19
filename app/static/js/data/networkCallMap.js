@@ -2,9 +2,9 @@ define([
   // Libs
   // Classes
 ], function () {
+  // The variable globalGameId resides in app/templates/game.html
   let gid = "?gid=" + globalGameId + "&";
   return ({
-    // The variable globalGameId resides in app/templates/game.html
     "server": {
     },
     "gameTable": {
@@ -48,6 +48,22 @@ define([
     "powerTypesTable": {
       name: "powerTypesTable",
       path: "/powertypes"
+    },
+    "addGenerators": {
+      name: "newGenerators",
+      path: "/newgenerators" + gid
+    },
+    "addFacility": {
+      name: "newFacility",
+      path: "/newfacility" + gid
+    },
+    "deleteFacility": {
+      name: "updateFacilityType",
+      path: "/updatefacilitytype" + gid
+    },
+    "updateFacility": {
+      name: "updateFacilityType",
+      path: "/updatefacilitytype" + gid
     }
   });
 });				

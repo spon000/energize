@@ -15,6 +15,7 @@ define([
         super();
         this._facilityLayer = null;
         this._cityLayer = null;
+        this._playerMarkerLayer = null
         this._facility_types = null;
         this._generator_types = null;
         this._resource_types = null;

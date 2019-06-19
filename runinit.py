@@ -1,8 +1,8 @@
 from app import create_app
 from app import db, bcrypt
-from app.models import Game, Company, Facility, Generator, City, User
-from app.models import FacilityType, GeneratorType, PowerType, ResourceType
-from app.game.supply_type_defs import facility_types, generator_types, power_types, resource_types
+from app.models import Game, Company, Facility, Generator, Modification, City, User, Prompt
+from app.models import FacilityType, GeneratorType, PowerType, ResourceType, ModificationType, PromptType
+from app.game.supply_type_defs import facility_types, generator_types, power_types, resource_types, modification_types
 from app.config import Config
 
 ##############################################################################
@@ -20,12 +20,18 @@ def main():
   init_table(Game, db)
   init_table(Company, db)
   init_table(City, db)
+  init_table(ModificationType, db)
+  init_table(Prompt, db)
   init_table(PowerType, db)
   init_table(ResourceType, db)
   init_table(FacilityType, db)
   init_table(GeneratorType, db)
+  init_table(PromptType, db)
+  init_table(Modification, db)
   init_table(Facility, db)
   init_table(Generator, db)
+
+
 
   # Create dummy user.
   u1 = User(
@@ -67,6 +73,17 @@ def main():
     )
     db.session.add(ft)
 
+  for modification_type in modification_types:
+    mt = ModificationType(
+      id_facility_type = modification_type['id_facility_type'],
+      name = modification_type['name'],
+      value = modification_type['value'],
+      marginal_cost_build = modification_type['marginal_cost_build'],
+      marginal_cost_operate = modification_type['marginal_cost_build'],
+      marginal_area = modification_type['marginal_area']
+    )
+    db.session.add(mt)
+
   #
   for generator_type in generator_types:
     gt = GeneratorType(
@@ -104,6 +121,8 @@ def main():
     )
     db.session.add(rt)
 
+  #
+  
   # commit all the additions to the database.
   db.session.commit()
 

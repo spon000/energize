@@ -1,15 +1,19 @@
 define([
   "jquery",
   "EventEmitter",
+  "evtEmitter",
+  "PortfolioViewDialog",
   "ResourceLoader",
-  "networkCallMap"
-], function ($, EventEmitter, ResourceLoader, networkCallMap) {
+  "networkCallMap",
+  "Vue"
+], function ($, EventEmitter, evtEmitter, PortfolioViewDialog, ResourceLoader, networkCallMap, Vue) {
   return (
     class TopMenu extends EventEmitter {
       constructor() {
         super();
         this._facilityButtonId = "facility-btn";
         this._nextTurnButtonId = "next-btn";
+        this._portfolioButtonId = "portfolio-btn";
         this._buildStatus = "build";
 
         this._getCompanyData().then((company) => {
@@ -18,6 +22,7 @@ define([
         });
 
         this._setNextBtnEvent();
+        this._initPortfolioBtn();
       }
 
       // Getters...
@@ -34,6 +39,17 @@ define([
           $.post(networkCallMap.companyTable.path + "pcstate=turn", (data) => { console.log("successful POST", data) });
         });
       }
+
+      _initPortfolioBtn() {
+        $('#' + this._portfolioButtonId).click(this, (evt) => {
+          let pvd = new Vue(PortfolioViewDialog);
+          console.log("pvd = ", pvd);
+        });
+      }
+
+
+
+
 
       _getCompanyData() {
         return new Promise(resolve => {

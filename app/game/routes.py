@@ -5,7 +5,8 @@ from flask_socketio import send
 from app import sio 
 from app import db 
 from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType
-from app.models import FacilitySchema, GeneratorSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema, GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema
+from app.models import FacilitySchema, GeneratorSchema, ModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema
+from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, ModificationTypeSchema
 from app.game.init_game import init_game_models
 from app.game.utils import get_current_game_date
 from app.game.run_turn import calculate_quarter
@@ -94,7 +95,7 @@ def loadgame(gid):
     flash(f'You\'re not playing in this game', 'danger')
     return render_template("title.html")
 
-  budget = '${:,.2f}'.format(company.budget)
+  budget = '${:,}'.format(int(company.budget))
   current_game_date = get_current_game_date(game)
   if company.state == 'new':
     company.state = 'view'
@@ -239,6 +240,7 @@ def player_facility():
 
   gid = request.args.get('gid', None)
   fid = request.args.get('fid', None)
+  owned_facility = False
 
   facility = Facility.query.filter_by(id=fid).first()
   facility_schema = FacilitySchema()
@@ -248,6 +250,9 @@ def player_facility():
   company_schema = CompanySchema()
   company_serialized = company_schema.dump(company).data
 
+  if company.user.id == current_user.id:
+    owned_facility = True
+
   facility_type = facility.facility_type
   facility_type_schema = FacilityTypeSchema()
   facility_type_serialized = facility_type_schema.dump(facility_type).data
@@ -255,6 +260,10 @@ def player_facility():
   generators = Generator.query.filter_by(id_facility=fid, id_game=gid).all()
   generators_schema = GeneratorSchema(many=True)
   generators_serialized = generators_schema.dump(generators).data
+
+  modifications = [{'id': gen.id, 'mods': gen.modifications} for gen in generators]
+  modifications_schema = ModificationSchema(many=True)
+  modifications_serialized = modifications_schema.dump(modifications).data
 
   generator_types = GeneratorType.query.filter_by(id_facility_type=facility_type.id).all()
   generator_types_schema = GeneratorTypeSchema(many=True)
@@ -272,14 +281,21 @@ def player_facility():
   resource_type_schema = ResourceTypeSchema(many=True)
   resource_type_serialized = resource_type_schema.dump(resource_types).data
 
+  modification_types = facility_type.modification_types
+  modification_types_schema = ModificationTypeSchema(many=True)
+  modification_types_serialized = modification_types_schema.dump(modification_types).data
+
   return jsonify({
+    'owned_facility': owned_facility,
     'company': company_serialized,
     'facility': facility_serialized,
     'facility_type': facility_type_serialized,
     'generators': generators_serialized,
+    'modifications': modifications_serialized,
     'generator_types': generator_types_serialized,
     'power_types': power_type_serialized,
-    'resource_types': resource_type_serialized
+    'resource_types': resource_type_serialized,
+    'modification_types': modification_types_serialized
   })
   
 # ###############################################################################  
@@ -301,10 +317,36 @@ def player_facilities():
 # ###############################################################################  
 #
 # ###############################################################################
-@game.route("/buildfacility", methods=["GET", "POST"])
+@game.route("/newfacility", methods=["GET", "POST"])
 @login_required
-def buildfacility():
-  pass
+def new_facility():
+  gid = request.args.get('gid', None)
+  row = request.args.get('row', None)
+  col = request.args.get('col', None)
+
+  company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
+
+  newFacility = Facility(
+    id_game=gid, 
+    id_type=9, 
+    id_company=company.id,
+    column=col,
+    row=row,
+    player_number=company.player_number
+  )
+  db.session.add(newFacility)
+  db.session.commit()
+
+  newFacility.name = newFacility.name + str(newFacility.id)
+  db.session.commit()
+  
+
+  facility_schema = FacilitySchema()
+  facility_serialized = facility_schema.dump(newFacility).data
+
+  return jsonify({
+    'facility': facility_serialized
+  })
 
 # ###############################################################################  
 #

@@ -11,6 +11,10 @@ define([
     let terrainMap = new TerrainMap(terrainMapImage);
     let tileMapName = "terrain";
 
+    // Uncomment to get copy of terrain tilemap in a 2D array 
+    // let tileMapArray = new Array();
+    // let tileTypeArray = new Array();
+
     // create spritesheet.
     let terrainSpriteSheet = new createjs.SpriteSheet({
       images: [terrainTilesImage],
@@ -21,6 +25,7 @@ define([
         regY: 0
       }
     });
+
     terrainSpriteSheet.totalFrameCols = terrainSpriteConfig.frameCols;
     terrainSpriteSheet.totalFrameRows = terrainSpriteConfig.frameRows;
 
@@ -31,7 +36,11 @@ define([
       terrainSpriteConfig.height,
       tileMapName
     );
+
     for (let y = 0; y < terrainTileMap.rows; y++) {
+      // Uncomment to get copy of terrain tilemap in a 2D array 
+      // tileMapArray.push(new Array());
+      // tileTypeArray.push(new Array());
       for (let x = 0; x < terrainTileMap.columns; x++) {
         let terrainTileSprite = _matchTile(
           y,
@@ -39,6 +48,12 @@ define([
           terrainSpriteSheet,
           terrainMap
         );
+
+        // Uncomment to get copy of terrain tilemap in a 2D array 
+        // let tileNumber = terrainTileSprite.tileProperties.tileRow * terrainSpriteConfig.frameCols + terrainTileSprite.tileProperties.tileIndex;
+        // tileMapArray[y].push(tileNumber);
+        // tileTypeArray[y].push(terrainTileSprite.tileProperties.tileType);
+
         if (terrainTileSprite) {
           terrainTileMap.setTile(
             y,
@@ -54,6 +69,10 @@ define([
         }
       }
     }
+
+    // Uncomment to get copy of terrain tilemap in a 2D array 
+    // console.log("tileMapArray = ", JSON.stringify(tileMapArray));
+    // console.log("tileTypeArray = ", JSON.stringify(tileTypeArray));
     return terrainTileMap;
   }
 
@@ -64,6 +83,7 @@ define([
     if (tileProperties) {
       return {
         type: tileProperties.tileType,
+        tileProperties: tileProperties,
         sprite: _getSpriteFromSheet(
           tileProperties.tileRow,
           tileProperties.tileIndex,
@@ -181,13 +201,13 @@ define([
 
         if (tileIndex) {
           if (tileIndex == 46) {
-            tileIndex = Math.random() * 11;
+            tileIndex = Math.floor(Math.random() * 11);
           } else {
             grassSpriteRow += Math.floor(tileIndex / 16) + 1;
             tileIndex = tileIndex - Math.floor(tileIndex / 16) * 16;
           }
         } else {
-          tileIndex = Math.random() * 11;
+          tileIndex = Math.floor(Math.random() * 11);
         }
 
         return {
@@ -200,7 +220,7 @@ define([
         return {
           tileType: tileType,
           tileRow: 13,
-          tileIndex: Math.random() * 4
+          tileIndex: Math.floor((Math.random() * 4))
         };
 
       default:
@@ -210,6 +230,10 @@ define([
 
   const _getSpriteFromSheet = (row, index, spriteSheet) => {
     let totalIndex = row * spriteSheet.totalFrameCols + index;
+    // if (row === 1) {
+    //   console.log(`row = ${row}, spriteSheet.totalFrameCols = ${spriteSheet.totalFrameCols}, index = ${index}, totalIndex = ${totalIndex}`);
+    // }
+
     return new createjs.Sprite(spriteSheet, totalIndex);
   }
 
