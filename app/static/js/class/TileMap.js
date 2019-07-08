@@ -75,6 +75,14 @@ define([
         return "" + (row * this._columns + column);
       }
 
+      _getTileColRowFromIndex(tileIndex) {
+        let idx = parseInt(tileIndex)
+        return ({
+          col: idx % this._columns,
+          row: Math.floor(idx / this._columns)
+        });
+      }
+
       _checkMapBounds(canvasWidth, canvasHeight) {
         let tileWidth = this._width * this._scaleX;
         let tileHeight = this._height * this._scaleY;
@@ -99,6 +107,16 @@ define([
       setBitmap(row, column, bitmap) {
         let offset = this._getOffset(row, column);
 
+      }
+
+      updateTile(tileIndex, tile = null) {
+
+      }
+
+      addBitmapToContainer(bitmap, x = 0, y = 0) {
+        bitmap.x = x;
+        bitmap.y = y;
+        this._container.addChild(bitmap);
       }
 
       setTile(row, column, tile, drawSprite = true) {
@@ -128,7 +146,7 @@ define([
         let oldTile = this._tileMapTiles[tileIndex];
 
         if (oldTile) {
-          this._tileMapTiles[tileIndex] = null;
+          delete this._tileMapTiles[tileIndex];
           this._container.removeChild(oldTile.sprite);
         }
       }

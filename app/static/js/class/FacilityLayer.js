@@ -9,88 +9,98 @@ define([
 ], function (Dim2, createjs, TileMap, Tile, Facility, facilityTileDefs) {
   return (
     class FacilityLayer {
-      constructor(facilitiesSpriteImage, facilitySpriteConfig, terrainImageConfig, terrainSpriteConfig, facilitiesData) {
-        this._facilitiesData = facilitiesData;
+      constructor(facilitiesSpriteImage, facilitySpriteConfig, terrainImageConfig, terrainSpriteConfig) {
         this._facilitySpriteImage = facilitiesSpriteImage;
         this._facilitySpriteConfig = facilitySpriteConfig;
-        this._facilitySpriteSheet = null;
-        this._facilityList = [];
-        this._tileMap = null;
+        this._facilitySpriteSheet = this._createFacilitySpriteSheet();
+
         this._tileMapName = "facilities";
         this._terrainImageConfig = terrainImageConfig;
         this._terrainSpriteConfig = terrainSpriteConfig;
-        this._scaleMap = [new Dim2(1.9, 1.9), new Dim2(.1, .1), new Dim2(.1, .1), new Dim2(.1, .1)];
+        this._scaleMap = [new Dim2(1.7, 1.7), new Dim2(1.8, 1.8), new Dim2(5, 5), new Dim2(5, 5)];
+
+        this._tileMap = this._createTileMap();
       }
 
-      createTileMap() {
-        this._tileMap = new TileMap(
+      // Getters
+      get tileMap() {
+        return this._tileMap;
+      }
+
+
+      // Private methods
+      _createTileMap() {
+        return new TileMap(
           this._terrainImageConfig.height,
           this._terrainImageConfig.width,
           this._terrainSpriteConfig.width,
           this._terrainSpriteConfig.height,
           this._tileMapName
         );
-        // this._tileMap.scaleToLayer = false;
-        this._createFacilityTiles();
-        return this._tileMap;
       }
 
-      createTempFacilityTile() {
-        let facilitySprite = new createjs.Sprite(facilitySpriteSheet, this._facilitySpriteConfig.sprites[0].frame);
-        let tile = new Tile(-1, "temp-facility", this._facilitySpriteConfig.width, this._facilitySpriteConfig.height, facilitySprite);
-        tile.scaleX = this._scaleMap[0].x;
-        tile.scaleY = this._scaleMap[0].y;
-        return tile;
-      }
-
-      createFacilityTile(facility, zoomLevel) {
-        let typeIndex = this._facilitySpriteConfig.sprites.findIndex(x => x.type === facility.id_type);
-        if (typeIndex === -1) typeIndex = 9;
-        console.log(`typeIndex = ${typeIndex}`)
-        console.log('this._facilitySpriteConfig.sprites = ', this._facilitySpriteConfig.sprites);
-        let facilitySprite = new createjs.Sprite(this._facilitySpriteSheet, this._facilitySpriteConfig.sprites[9].frame);
-        let tile = new Tile(facility.id, "facility", this._facilitySpriteConfig.width, this._facilitySpriteConfig.height, facilitySprite, false);
-        tile.scaleX = this._scaleMap[zoomLevel].x;
-        tile.scaleY = this._scaleMap[zoomLevel].y;
-        facility['tile'] = tile;
-        this._facilityList.push(facility);
-        this._tileMap.setTile(facility.row, facility.column, tile);
-      }
-
-      _createFacilityTiles() {
-        this._facilityList = [];
-        let facilitySpriteSheet = new createjs.SpriteSheet({
+      _createFacilitySpriteSheet() {
+        return new createjs.SpriteSheet({
           images: [this._facilitySpriteImage],
           frames: {
             width: this._facilitySpriteConfig.width,
             height: this._facilitySpriteConfig.height
           }
         });
-        this._facilitySpriteSheet = facilitySpriteSheet;
+      }
 
-        this._facilitiesData.forEach((facilityData) => {
-          let typeIndex = this._facilitySpriteConfig.sprites.findIndex(x => x.type === facilityData.facility_type);
-          if (typeIndex === -1) typeIndex = 0;
-          let facilitySprite = new createjs.Sprite(facilitySpriteSheet, this._facilitySpriteConfig.sprites[typeIndex].frame);
-          let tile = new Tile(facilityData.id, "facility", this._facilitySpriteConfig.width, this._facilitySpriteConfig.height, facilitySprite, false);
-          tile.scaleX = this._scaleMap[0].x;
-          tile.scaleY = this._scaleMap[0].y;
-          let facility = new Facility(
-            facilityData.id,
-            facilityData.facility_type,
-            facilityData.id_company,
-            facilityData.name,
-            facilityData.state,
-            facilityData.player_number,
-            facilityData.build_turn,
-            facilityData.start_build_date,
-            facilityData.start_prod_date,
-            facilityData.area,
-            tile
-          );
-          this._facilityList.push(facility);
-          this._tileMap.setTile(facilityData.row, facilityData.column, tile);
+      getTileColRow(fid) {
+        let tileIndex = Object.values(this._tileMap._tileMapTiles).findIndex(t => t.id === fid);
+        let tileKey = Object.keys(this._tileMap._tileMapTiles)[tileIndex];
+        return this._tileMap._getTileColRowFromIndex(tileKey);
+      }
+
+      createFacilityTile(facility) {
+        let typeIndex = this._facilitySpriteConfig.sprites.findIndex(x => x.type === facility.facility_type);
+        if (typeIndex === -1) typeIndex = 8;
+
+        let facilitySprite = new createjs.Sprite(this._facilitySpriteSheet, this._facilitySpriteConfig.sprites[typeIndex].frame);
+        let tile = new Tile(facility.id, "facility", this._facilitySpriteConfig.width, this._facilitySpriteConfig.height, facilitySprite, false);
+
+        tile.scaleX = this._scaleMap[0].x;
+        tile.scaleY = this._scaleMap[0].y;
+        tile.originX = -50;
+        tile.originY = -50;
+        tile.type = facility.facility_type;
+
+        this._tileMap.setTile(facility.row, facility.column, tile);
+      }
+
+      createFacilityTiles(facilities) {
+        facilities.forEach((facility) => {
+          this.createFacilityTile(facility);
         });
       }
+
+      updateFacilityTile(fid, newType) {
+        // let tileIndex = Object.values(this._tileMap._tileMapTiles).findIndex(t => t.id === fid);
+        // let tileKey = Object.keys(this._tileMap._tileMapTiles)[tileIndex];
+        // let colRow = this._tileMap._getTileColRowFromIndex(tileKey);
+        let facilitySprite = new createjs.Sprite(this._facilitySpriteSheet, this._facilitySpriteConfig.sprites[newType - 1].frame);
+        let newTile = new Tile(fid, "facility", this._facilitySpriteConfig.width, this._facilitySpriteConfig.height, facilitySprite, false);
+        let colRow = this.getTileColRow(fid);
+        newTile.scaleX = this._scaleMap[0].x;
+        newTile.scaleY = this._scaleMap[0].y;
+        newTile.originX = -50;
+        newTile.originY = -50;
+        newTile.type = newType;
+
+        this._tileMap.setTile(colRow.row, colRow.col, newTile);
+      }
+
+      removeFacilityTile(fid) {
+        console.log("this._tileMap = ", this._tileMap);
+        let tileIndex = Object.values(this._tileMap._tileMapTiles).findIndex(t => t.id === fid);
+        let tileKey = Object.keys(this._tileMap._tileMapTiles)[tileIndex];
+        let colRow = this._tileMap._getTileColRowFromIndex(tileKey);
+
+        this._tileMap.removeTile(colRow.row, colRow.col);
+      }
+
     });
 });

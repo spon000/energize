@@ -1,3 +1,4 @@
+// Created from https://css-tricks.com/build-a-state-management-system-with-vanilla-javascript/
 define([
 ], function () {
   return (

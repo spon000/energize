@@ -76,6 +76,14 @@ define([
         "allowed": {
           "0": ["lake-outlet", "river"]
         }
+      },
+      "9": {
+        "prohibited": {
+          "0": ["ocean", "mountain", "snow", "lake", "deciduous", "conifers", "ocean-outlet", "lake-outlet", "river"]
+        },
+        "allowed": {
+          "0": []
+        }
       }
     }
   });

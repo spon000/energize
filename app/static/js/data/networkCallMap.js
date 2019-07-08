@@ -37,9 +37,17 @@ define([
       name: "playerFacilities",
       path: "/playerfacilities" + gid
     },
+    "playerCompany": {
+      name: "playerCompany",
+      path: "/playercompany" + gid
+    },
+    "facilityTypes": {
+      name: "facilityTypes",
+      path: "/facilitytypes"
+    },
     "facilityTypesTable": {
       name: "facilityTypesTable",
-      path: "/facilitytypes"
+      path: "/facilitytypestable"
     },
     "generatorTypesTable": {
       name: "generatorTypesTable",
@@ -58,10 +66,10 @@ define([
       path: "/newfacility" + gid
     },
     "deleteFacility": {
-      name: "updateFacilityType",
-      path: "/updatefacilitytype" + gid
+      name: "deleteFacility",
+      path: "/deletefacility" + gid
     },
-    "updateFacility": {
+    "updateFacilityType": {
       name: "updateFacilityType",
       path: "/updatefacilitytype" + gid
     }

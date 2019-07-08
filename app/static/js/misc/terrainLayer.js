@@ -29,6 +29,19 @@ define([
     terrainSpriteSheet.totalFrameCols = terrainSpriteConfig.frameCols;
     terrainSpriteSheet.totalFrameRows = terrainSpriteConfig.frameRows;
 
+    // Get images from tilese and paste them into a canvas element 
+    let imageMapCanvas = document.createElement('canvas');
+    imageMapCanvas.setAttribute("width", "6000");
+    imageMapCanvas.setAttribute("height", "3000");
+    let imageMapContext = imageMapCanvas.getContext("2d");
+
+    let tilesetCanvas = document.createElement('canvas');
+    tilesetCanvas.setAttribute("width", "500");
+    tilesetCanvas.setAttribute("height", "500");
+    let tilesetContext = tilesetCanvas.getContext("2d");
+    let tilesetImage = terrainSpriteSheet.getFrame(0).image;
+    tilesetContext.drawImage(tilesetImage, 0, 0);
+
     let terrainTileMap = new TileMap(
       terrainImageConfig.height,
       terrainImageConfig.width,
@@ -46,7 +59,8 @@ define([
           y,
           x,
           terrainSpriteSheet,
-          terrainMap
+          terrainMap,
+          tilesetContext
         );
 
         // Uncomment to get copy of terrain tilemap in a 2D array 
@@ -63,9 +77,12 @@ define([
               terrainTileSprite.type,
               terrainSpriteConfig.width,
               terrainSpriteConfig.height,
-              terrainTileSprite.sprite
-            )
+              null
+              // terrainTileSprite.sprite
+            ),
+            false
           );
+          imageMapContext.putImageData(terrainTileSprite.image, x * 25, y * 25);
         }
       }
     }
@@ -73,22 +90,32 @@ define([
     // Uncomment to get copy of terrain tilemap in a 2D array 
     // console.log("tileMapArray = ", JSON.stringify(tileMapArray));
     // console.log("tileTypeArray = ", JSON.stringify(tileTypeArray));
+    let terrainImage = document.createElement('img')
+    terrainImage.src = imageMapCanvas.toDataURL("image/png");
+    let terrainBitmap = new createjs.Bitmap(terrainImage);
+    // console.log("terrainBitmap =", terrainBitmap);
+    terrainTileMap.addBitmapToContainer(terrainBitmap);
+
     return terrainTileMap;
   }
 
   // local vars and functions...
-  const _matchTile = (row, column, spriteSheet, terrainMap) => {
+  const _matchTile = (row, column, spriteSheet, terrainMap, tilesetContext) => {
     let tileType = terrainMap.getTerrainType(row, column);
     let tileProperties = _getTilePropertyIndexes(terrainMap, tileType, row, column);
     if (tileProperties) {
+      // let sprite = _getSpriteFromSheet(tileProperties.tileRow, tileProperties.tileIndex, spriteSheet);
+      let image = _getImageFromSheet(tileProperties.tileRow, tileProperties.tileIndex, tilesetContext);
       return {
         type: tileProperties.tileType,
         tileProperties: tileProperties,
-        sprite: _getSpriteFromSheet(
-          tileProperties.tileRow,
-          tileProperties.tileIndex,
-          spriteSheet
-        )
+        sprite: null,
+        image: image,
+        // sprite: _getSpriteFromSheet(
+        //   tileProperties.tileRow,
+        //   tileProperties.tileIndex,
+        //   spriteSheet
+        // )
       };
     }
     return null;
@@ -233,9 +260,14 @@ define([
     // if (row === 1) {
     //   console.log(`row = ${row}, spriteSheet.totalFrameCols = ${spriteSheet.totalFrameCols}, index = ${index}, totalIndex = ${totalIndex}`);
     // }
-
     return new createjs.Sprite(spriteSheet, totalIndex);
   }
+
+  ///////////////////////////////////
+  const _getImageFromSheet = (row, col, tilesetContext) => {
+    return tilesetContext.getImageData(col * 25, row * 25, 25, 25);
+  }
+  //////////////////////////////////
 
   // This function is within getTilePropertyName function.
   const _checkTile = (terrainMap, row, column, checkTileArray, bitmask = 4, reverseBorder = false) => {

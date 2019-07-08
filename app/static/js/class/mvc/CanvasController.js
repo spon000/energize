@@ -1,7 +1,6 @@
 define([
   "canvasData",
   "Dim2",
-  "EventEmitter",
   "Facility",
   "facilityTileDefs",
   "FacilitySelectDialog",
@@ -13,7 +12,6 @@ define([
 ], function (
   canvasData,
   Dim2,
-  EventEmitter,
   Facility,
   facilityTileDefs,
   FacilitySelectDialog,
@@ -25,16 +23,16 @@ define([
 ) {
 
     return (
-      class CanvasController extends EventEmitter {
+      class CanvasController {
         constructor(canvasModel, canvasView, playerSocket) {
-          super();
           this._canvasModel = canvasModel;
           this._canvasView = canvasView;
           this._playerSocket = playerSocket;
           this._terrainClicked = false;
           this._dragging = false;
           this._leftMouseDown = false;
-          this._dialogStatus = "popup" // possible values: "popup", "view", "build", "portfolio", "quarterly"
+          this._rollOver = false;
+          this._dialogStatus = "popup" // possible values: "popup", "deleteing", "viewing", "building", "portfolio", "quarterly"
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -44,6 +42,7 @@ define([
           this._getTerrainLayer();
           this._getCityLayer();
           this._getFacilityLayer();
+          this._getPlayerMarkerLayer();
           // this._setGeneralWindow
           this._canvasView.startCanvasTimer();
           this._setEventEmittersReceived();
@@ -52,21 +51,25 @@ define([
         ///////////////////////////////////////////////////////////////////////////
         // Private methods.
 
-        _setEventEmittersReceived() {
 
-          evtEmitter.on("testing", (data = null) => {
-            console.log("Events Testing Successful for CanvasController! data = ", data);
-          })
 
-        }
-
+        //////////////////////////////////////////////////////////////////////////////////////////
         // Generate terrain tilemap
         _getTerrainLayer() {
+          this._canvasModel.createTerrainTileMap().then(tileMap => {
+            // console.log("tileMap = ", tileMap);
+            this._canvasView.addTileMap(tileMap, 0);
+            this._setTerrainEvents(tileMap);
+          });
+        }
+
+        _getTerrainLayerNew() {
           this._canvasModel.createTerrainTileMap().then(tileMap => {
             this._canvasView.addTileMap(tileMap, 0);
             this._setTerrainEvents(tileMap);
           });
         }
+        ///////////////////////////////////////////////////////////////////////////////////////////
 
         // Generate city tilemap
         _getCityLayer() {
@@ -79,37 +82,43 @@ define([
         // Generate facility tilemap
         _getFacilityLayer() {
           this._canvasModel.createFacilityTileMap().then(tileMap => {
-            console.log("tileMap = ", tileMap);
-            this._canvasView.addTileMap(tileMap);
+            //console.log("tileMap = ", tileMap);
+            this._canvasView.addTileMap(tileMap, 1);
             this._setFacilityEvents(tileMap);
           });
         }
 
+        // Generate player markers tilemap
+        _getPlayerMarkerLayer() {
+          this._canvasModel.createPlayerMarkerTileMap().then(tileMap => {
+            this._canvasView.addTileMap(tileMap, 1);
+          })
+        }
 
         _setGeneralWindowEvents() {
-          this._canvasView.addEventToCanvasMap(null, "keydown", this._onTerrainEvent, this);
+          this._canvasView.addEventToCanvasMap(null, "keydown", this._onTerrainTileEvent, this);
         }
 
         _setTerrainEvents(tileMap) {
-          this._canvasView.addEventToCanvasMap(tileMap, "click", this._onTerrainEvent, this);
-          this._canvasView.addEventToCanvasMap(tileMap, "dblclick", this._onTerrainEvent, this);
-          this._canvasView.addEventToCanvasMap(tileMap, "wheel", this._onTerrainEvent, this);
-          this._canvasView.addEventToCanvasMap(tileMap, "mouseleave", this._onTerrainEvent, this);
-          this._canvasView.addEventToCanvasMap(tileMap, "mousedown", this._onTerrainEvent, this);
-          this._canvasView.addEventToCanvasMap(tileMap, "mouseup", this._onTerrainEvent, this);
-          this._canvasView.addEventToCanvasMap(tileMap, "mousemove", this._onTerrainEvent, this);
+          this._canvasView.addEventToCanvasMap(tileMap, "click", this._onTerrainTileEvent, this);
+          this._canvasView.addEventToCanvasMap(tileMap, "dblclick", this._onTerrainTileEvent, this);
+          this._canvasView.addEventToCanvasMap(tileMap, "wheel", this._onTerrainTileEvent, this);
+          this._canvasView.addEventToCanvasMap(tileMap, "mouseleave", this._onTerrainTileEvent, this);
+          this._canvasView.addEventToCanvasMap(tileMap, "mousedown", this._onTerrainTileEvent, this);
+          this._canvasView.addEventToCanvasMap(tileMap, "mouseup", this._onTerrainTileEvent, this);
+          this._canvasView.addEventToCanvasMap(tileMap, "mousemove", this._onTerrainTileEvent, this);
           //this._canvasView.addEventToCanvasMap(tileMap, "mouseenter", this._onTerrainEvent);
         }
 
         _setCityEvents(tileMap) {
-          this._canvasView.addEventToTileMap(tileMap, "rollout", this._onCityEvent, this);
-          this._canvasView.addEventToTileMap(tileMap, "rollover", this._onCityEvent, this);
+          this._canvasView.addEventToTileMap(tileMap, "rollout", this._onCityTileEvent, this);
+          this._canvasView.addEventToTileMap(tileMap, "rollover", this._onCityTileEvent, this);
         }
 
         _setFacilityEvents(tileMap) {
-          this._canvasView.addEventToTileMap(tileMap, "rollout", this._onFacilityEvent, this);
-          this._canvasView.addEventToTileMap(tileMap, "rollover", this._onFacilityEvent, this);
-          this._canvasView.addEventToTileMap(tileMap, "click", this._onFacilityEvent, this);
+          this._canvasView.addEventToTileMap(tileMap, "rollout", this._onFacilityTileEvent, this);
+          this._canvasView.addEventToTileMap(tileMap, "rollover", this._onFacilityTileEvent, this);
+          this._canvasView.addEventToTileMap(tileMap, "click", this._onFacilityTileEvent, this);
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -117,26 +126,39 @@ define([
 
         // this uses jquery event handler. data and scope of the event is in 
         // evt.data
-        _onTerrainEvent(evt) {
+        _onTerrainTileEvent(evt) {
           let scope = evt.data.scope;
           switch (evt.type) {
             case "click":
+              // evt.originalEvent is used here. Disable double clicks
+              if (evt.originalEvent.detail > 1) break;
               if (scope._terrainClicked) {
                 let colRow = scope._canvasView.getRowCol(evt.offsetX, evt.offsetY);
-                scope._canvasModel.getCompanyData().then((companyData) => {
-                  if (companyData.state === "build") {
-                    let facilityListObj = scope._buildFacilityEvent(colRow);
-                    if (facilityListObj.facilityList) {
-                      scope._buildFacility("facility-dialog", facilityListObj.facilityList, colRow);
+                console.log("scope._dialogStatus = ", scope._dialogStatus);
+
+                if (scope._dialogStatus != "building") {
+                  scope._dialogStatus = "building";
+                  scope._canvasModel.getCompanyData().then((companyData) => {
+                    if (companyData.state === "build") {
+                      let facilityListObj = scope._buildFacilityEvent(colRow);
+                      if (facilityListObj.facilityList) {
+                        evtEmitter.emit("buildfacility", { col: colRow.x, row: colRow.y, facilityTypeList: facilityListObj.facilityList })
+                      }
+                      else {
+                        console.log("can't build: " + facilityListObj.message);
+                      }
                     }
-                    else {
-                      console.log("can't build: " + facilityListObj.message);
-                    }
-                  }
-                });
+                    else
+                      console.log("Not in building mode");
+                  });
+                }
+                else {
+                  console.log("you're in viewing mode...");
+                }
               }
               break;
             case "mousedown":
+              if (evt.originalEvent.detail > 1) break;
               scope._leftMouseDown = true;
               scope._terrainClicked = true
               const mouseDownTimer = setTimeout(() => {
@@ -176,15 +198,17 @@ define([
 
         // This uses easeljs event handler which specifies different listener function prototype
         // That's why there's no need for a scope variable
-        _onCityEvent(evt, data = null) {
+        _onCityTileEvent(evt, data = null) {
           // console.log("CanvasController._onCityEvent", evt, data);
           const tile = data;
           switch (evt.type) {
             case "click":
+              if (evt.originalEvent.detail > 1) break;
               this._terrainClicked = false;
               break;
             case "rollover":
               if (!this._dragging && this._dialogStatus == "popup") {
+
                 this._canvasModel.getCityInformationHTML(tile.id).then((html) => {
                   this._canvasView.displayRolloverInfo(evt, html)
                 });
@@ -198,24 +222,40 @@ define([
 
         // This uses easeljs event handler which specifies different listener function prototype
         // That's why there's no need for a scope variable
-        _onFacilityEvent(evt, data = null) {
+        _onFacilityTileEvent(evt, data = null) {
           //console.log("CanvasController._onFacilityEvent", evt, data);
           const tile = data;
+          let timeout = null;
           switch (evt.type) {
             case "click":
+              // evt.nativeEvent is used here.
+              if (evt.nativeEvent.detail > 1) break;
               this._terrainClicked = false;
               this._dialogStatus = "view";
               this._canvasView.displayRolloverInfo({ "type": "rollout" }, null);
-              this._viewFacility(tile.id);
-              break;
-            case "rollover":
-              if (!this._dragging && this._dialogStatus == "popup") {
-                this._canvasModel.getFacilityInformationHTML(tile.id).then((html) => {
-                  this._canvasView.displayRolloverInfo(evt, html)
+              // generic facility...
+              if (tile.type == "9") {
+                let colRow = this._canvasModel.facilityLayer.getTileColRow(tile.id)
+                let facilityList = this._getFacilitiesAllowed(new Dim2(colRow.col, colRow.row))
+                let facilitySelectDialog = new FacilitySelectDialog(facilityList, tile.id, (evt) => {
+                  this._dialogStatus = "popup";
+                });
+              }
+              else {
+                evtEmitter.emit("updatefacility", {
+                  facilityId: tile.id,
+                  facilityTypeId: null,
+                  facilityTypeList: null
                 });
               }
               break;
+            case "rollover":
+              if (!this._dragging && this._dialogStatus == "popup") {
+        
+              }
+              break;
             case "rollout":
+              this._rollOver = false;
               this._canvasView.displayRolloverInfo(evt, null);
               break;
           }
@@ -240,20 +280,7 @@ define([
             });
           }
 
-          const terrainDefs = facilityTileDefs.allowedFacilityTypesByTerrain;
-          let terrainTileGrid = this._canvasView.getTileGrid("terrain", colRow, 3, 3);
-          let facilitiesAllowed = [];
-
-          for (let facilityId in terrainDefs) {
-            if (this._canvasView.checkForTileRange(terrainDefs[facilityId], terrainTileGrid)) {
-              facilitiesAllowed.push(facilityId);
-            }
-          }
-
-          // Remove duplicate Ids from array.
-          facilitiesAllowed = [...new Set(facilitiesAllowed)];
-          // console.log("facilitiesAllowed = ", facilitiesAllowed);
-
+          let facilitiesAllowed = this._getFacilitiesAllowed(colRow);
           if (facilitiesAllowed.length > 0) {
             return ({
               "facilityList": facilitiesAllowed,
@@ -268,92 +295,106 @@ define([
           }
         }
 
-        _buildFacility(dialogElementId, facilityIdList, colRow) {
-          let modelData = new ModelData();
-          // colRow needs to be swapped !!!
-          modelData.addFacility(colRow.x, colRow.y).then((facility) => {
-            console.log("new facility added...", facility);
-            this._canvasModel._facilityLayer.createFacilityTile(facility, this._canvasView.zoomLevel);
+        _getFacilitiesAllowed(colRow) {
+          const terrainDefs = facilityTileDefs.allowedFacilityTypesByTerrain;
+          // console.log("colRow = ", colRow)
+          let terrainTileGrid = this._canvasView.getTileGrid("terrain", colRow, 3, 3);
+          let facilitiesAllowed = [];
+
+          for (let facilityId in terrainDefs) {
+            if (this._canvasView.checkForTileRange(terrainDefs[facilityId], terrainTileGrid)) {
+              facilitiesAllowed.push(facilityId);
+            }
+          }
+
+          return [...new Set(facilitiesAllowed)];
+        }
+
+        _delayPopup(delayMs, callback) {
+          timeout = setTimeout(() => {
+            if (this._rollOver) {
+              callback();
+            }
+          }, delayMs);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // evtEmitter definitions 
+
+        _setEventEmittersReceived() {
+          evtEmitter.on("changefacility", (data) => {
+            this._onChangeFacility(data.facilityId, data.facilityTypeList);
+          });
+
+          evtEmitter.on("buildfacility", (data) => {
+            this._onBuildFacility(data.col, data.row, data.facilityTypeList);
+          });
+
+          evtEmitter.on("updatefacility", (data) => {
+            this._onUpdateFacility(data.facilityId, data.facilityTypeList, data.facilityTypeId);
+          });
+
+          evtEmitter.on("deletefacility", (data) => {
+            this._onDeleteFacility(data.facilityId);
           });
         }
 
-        _selectFacilityType() {
-          this._canvasModel.getFacilityTypes().then(data => {
-            let facilityData = {
-              powerTypes: data.powerTypesTable.data.power_types,
-              generatorTypes: data.generatorTypesTable.data.generator_types,
-              facilityTypes: data.facilityTypesTable.data.facility_types,
-            }
-            let facilitySelectDialog = new FacilitySelectDialog(facilityData.facilityTypes, facilityIdList);
+        ////////////////////////////////////////////////////////////////////////////////
+        // evtEmitter events
 
-            facilitySelectDialog.openDialog().then(facilityTypeId => {
-              // socketCalls.selectFacility(globalGameId, facilityTypeId)
+        _onChangeFacility(facilityId, facilityTypeList) {
+          this._dialogStatus = "build";
+          this._canvasModel.facilityLayer.updateFacilityTile(facilityId, "9");
+          let facilitySelectDialog = new FacilitySelectDialog(facilityTypeList, facilityId, (evt) => {
+            this._dialogStatus = "popup";
+          });
+        }
 
-              // this._addGenerators(facilityData, facilityTypeId, 0);
+        _onBuildFacility(col, row, facilityTypeList) {
+          let modelData = new ModelData();
+
+          modelData.addFacility(col, row).then((facData) => {
+            let facility = facData.facility;
+            this._canvasModel.facilityLayer.createFacilityTile(facility);
+            this._canvasModel.playerMarkerLayer.createMarkerTile(facility);
+            let facilitySelectDialog = new FacilitySelectDialog(facilityTypeList, facility.id, (evt) => {
+              this._dialogStatus = "popup";
             });
           });
         }
 
-        // this._canvasModel.getFacilityTypes().then(data => {
-        //   let facilityData = {
-        //     powerTypes: data.powerTypesTable.data.power_types,
-        //     generatorTypes: data.generatorTypesTable.data.generator_types,
-        //     facilityTypes: data.facilityTypesTable.data.facility_types,
-        //   }
-        //   let facilitySelectDialog = new FacilitySelectDialog(facilityData.facilityTypes, facilityIdList);
+        _onDeleteFacility(facilityId) {
+          let modelData = new ModelData();
 
-        //   facilitySelectDialog.openDialog().then(facilityTypeId => {
-        //     socketCalls.selectFacility(globalGameId, facilityTypeId)
-
-        //     this._addGenerators(facilityData, facilityTypeId, 0);
-        //   });
-        // });
-
-
-
-        _viewFacility(facilityId, facilityTpyeId = null) {
-          console.log("viewFacility", facilityId);
-          // let facilityViewDialog = new FacilityViewDialog(facilityId).then((result) => {
-          //   console.log("dialog closed");
-          // });
-          evtEmitter.emit("testing");
-
-          evtEmitter.emit("testing", { msg: "hello observer!" });
-          let facilityViewDialog = new FacilityViewDialog(facilityId, facilityTpyeId);
-
-          // this._canvasModel.getAllTypes().then(data => {
-          //   let facilityData = {
-          //     powerTypes: data.powerTypesTable.data.power_types,
-          //     generatorTypes: data.generatorTypesTable.data.generator_types,
-          //     facilityTypes: data.facilityTypesTable.data.facility_types
-          //   }
-
-          //   this._canvasModel.getCompanyData().then(company => {
-          //     facilityData["company"] = company;
-          //     return facilityData;
-
-          //   }).then(facilityData => {
-          //     this._canvasModel.getPlayerFacility(facilityId).then(facility => {
-          //       facilityData["facility"] = facility.facility[0];
-          //       facilityData["generators"] = facility.generators;
-          //       return facilityData;
-
-          //     }).then(facilityData => {
-          //       console.log("_viewFacility() => facilityData = ", facilityData);
-          //       let facilityViewDialog = new FacilityViewDialog({
-          //         "facilityType": facilityData.facilityTypes.find(ft => ft.id === facilityData.facility.facility_type),
-          //         "facility": facilityData.facility,
-          //         "generators": facilityData.generators,
-          //         "powerTypes": facilityData.powerTypes,
-          //         "generatorTypes": facilityData.generatorTypes.filter(gt => gt.facility_type === facilityData.facility.facility_type)
-          //       });
-
-          //       facilityViewDialog.openDialog().then(() => {
-          //         this._dialogStatus = "popup";
-          //       });
-          //     });
-          //   });
-          // });
+          modelData.deleteFacility(facilityId).then((results) => {
+            this._canvasModel.facilityLayer.removeFacilityTile(facilityId);
+            this._canvasModel.playerMarkerLayer.removeMarkerTile(facilityId);
+            this._dialogStatus = "popup";
+            // console.log("this._dialogStatus = ", this._dialogStatus);
+          });
         }
+
+        _onUpdateFacility(facilityId, facilityTypeList, facilityTypeId) {
+          console.log("facilityId : facilityTypeList : facilityTypeId = " + facilityId + " : " + facilityTypeList + " : " + facilityTypeId);
+          let modelData = new ModelData();
+          this._dialogStatus = "viewing";
+
+          if (facilityTypeId) {
+            modelData.updateFacilityType(facilityId, facilityTypeId).then((facData) => {
+              let facility = facData.facility;
+              this._canvasModel.facilityLayer.updateFacilityTile(facility.id, facilityTypeId);
+              let facilityViewDialog = new FacilityViewDialog(facility.id, facilityTypeList, (evt) => {
+                this._dialogStatus = "popup";
+              });
+            });
+          }
+          else {
+            let facilityViewDialog = new FacilityViewDialog(facilityId, facilityTypeList, (evt) => {
+              this._dialogStatus = "popup";
+            });
+          }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////   
       });
   });

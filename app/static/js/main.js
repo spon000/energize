@@ -14,11 +14,11 @@ requirejs.config({
     "jq.bootstrap": "lib/bootstrap/bootstrap.bundle.4.1.1.min",
     easeljs: "lib/easeljs/easeljs.1.0.0.min",
     Handlebars: "lib/handlebars/handlebars-v4.0.12",
-    phaser3: "lib/phaser3/phaser.min",
+    // phaser3: "lib/phaser3/phaser.min",
     socketio: "lib/socketio/socket.io",
     Tabulator: "lib/tabulator/tabulator.min",
-    Vue: "https://cdn.jsdelivr.net/npm/vue/dist/vue",
-    Vuex: "https://unpkg.com/vuex",
+    // Vue: "https://cdn.jsdelivr.net/npm/vue/dist/vue",
+    // Vuex: "https://unpkg.com/vuex",
 
     // MVC classes
     CanvasController: "class/mvc/CanvasController",
@@ -38,7 +38,7 @@ requirejs.config({
     Biome: "class/Biome",
     City: "class/City",
     CityLayer: "class/CityLayer",
-    Component: "class/Compnent",
+    Component: "class/Component",
     Dim2: "class/Dim2",
     EventEmitter: "class/EventEmitter",
     Facility: "class/Facility",
@@ -49,6 +49,7 @@ requirejs.config({
     Generator: "class/Generator",
     Layer: "class/Layer",
     LayerItem: "class/LayerItem",
+    MarkerLayer: "class/MarkerLayer",
     ModelData: "class/ModelData",
     PortfolioViewDialog: "class/PortfolioViewDialog",
     PubSub: "class/PubSub",
@@ -64,11 +65,12 @@ requirejs.config({
 
     //Components
     CityView: "components/CiyView",
+    TopMenuBuild: "components/TopMenuBuild",
 
-    //Central store files
+    //Store 
     state: "store/state",
-    cityActions: "store/cityActions",
-    cityMutants: "store/cityMutants",
+    actions: "store/actions",
+    mutations: "store/mutations",
 
     // Data objects
     canvasData: "data/canvasData",
@@ -83,6 +85,7 @@ requirejs.config({
     evtEmitter: "misc/evtEmitter",
     gameStore: "misc/gameStore",
     terrainLayer: "misc/terrainLayer",
+    // vueFacilitySelectDialog: "misc/vueFacilitySelectDialog",
   },
 
   // Allows you to use non AMD (Asynchronus Module Definition)
@@ -117,8 +120,7 @@ requirejs.config({
 // Main.js starts here...
 require([
   "Game",
-  "phaser3",
-], function (Game, Phaser) {
+], function (Game) {
   console.log("global game id = ", globalGameId);
   game = new Game(globalGameId);
 });

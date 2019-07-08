@@ -39,9 +39,9 @@ class Game(db.Model):
   companies_joined = db.Column(db.Integer, default=0)
   companies_ready = db.Column(db.Integer, default=0)
   game_state = db.Column(db.Enum("initializing", "new", "runturn", "waiting", "playing", "finished"), default="initializing")
-  turn_number = db.Column(db.Integer, default=1)
-  start_quarter = db.Column(db.Integer, default=1)
-  start_year = db.Column(db.Integer, default=2019)
+  turn_number = db.Column(db.Integer, default=0)
+  start_quarter = db.Column(db.Integer, default=4)
+  start_year = db.Column(db.Integer, default=2018)
 
   # Relational data
   companies = db.relationship('Company', lazy=True)

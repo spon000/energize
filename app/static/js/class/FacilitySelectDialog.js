@@ -3,70 +3,97 @@ define([
   "jquery",
   "jqueryui",
   "Handlebars",
-  "FacilitySelectTmplt"
-], function ($, JQUI, Handlebars, FacilitySelectTmplt) {
+  "FacilitySelectTmplt",
+  "ModelData",
+  "evtEmitter"
+], function ($, JQUI, Handlebars, FacilitySelectTmplt, ModelData, evtEmitter) {
   return (
 
     class FacilitySelectDialog {
-      constructor(facilityTypes, allowedFacilities) {
+      constructor(facilityTypeList, facilityId, closeHandler = null) {
+        console.log(`FacilitySelectDialog parms: ${facilityTypeList}, ${facilityId}, ${closeHandler}`);
 
         // Selected facility
-        this._selectedFacility = null;
+        this._selectedFacilityId = null;
+        this._facilityTypeList = facilityTypeList;
+        this._facilityId = facilityId;
+
 
         // Dialog 
         this._dialog = null;
+        this._closeHandler = closeHandler;
 
         // JQueryUI Dialog Parameters
-        this._width = 750;
-        this._height = 600;
+        this._width = 860;
+        this._height = 525;
+        this._unselectedHeight = 200;
         this._isModel = true;
         this._position = {};
         this._title = "Select Facility To Build";
 
         // Element Ids
-        this._elementIdAnchor = "facility-dialog";
+        this._elementIdAnchor = "facility-select-dialog";
         this._elementIdDialog = "select-facility-dialog";
         this._elementIdButtons = "sfd-facility-buttons";
         this._elementIdDetails = "sfd-facility-details";
         this._elementIdWindow = "sfd-facility-detail-window-";
         this._elementClassWindow = "sfd-facility-detail-window";
 
-        // Add extra properties to the each facility type object
-        this._facilityTypes = facilityTypes.map(obj => (
-          {
-            ...obj,
-            simpletype: obj.maintype.split(" ")[0]
-          }
-        ));
+        // Load all needed data.
+        this._modelData = new ModelData();
+        this._modelData.getFacilityTypes().then((data) => {
+          // console.log("loaded data = ", data);
+          this._facilityTypes = data['facility_types'];
+          this._generatorTypes = data['generator_types'];
+          this._powerTypes = data['power_types'];
+          this._resourceTypes = data['resource_types'];
 
-        // Add extra properties for each facility type button
-        this._facilityButtons = this._removeDuplicates(facilityTypes, "maintype").map(obj => (
-          {
-            ...obj,
-            simpletype: obj.maintype.split(" ")[0],
-            enabled: allowedFacilities.find(id => "" + obj.id === id) ? true : false,
-          }
-        ));
+          // Add extra properties to the each facility type object. Also remove the "new" facility type.
+          this._facilityTypes = this._facilityTypes.filter(ft => ft.maintype != "new").map(ft => (
+            {
+              ...ft,
+              simpletype: ft.maintype.split(" ")[0]
+            }
+          ));
 
-        // Event listener classes
-        this._facilityTypeButtonClass = "sfd-facility-btn";
-        this._facilitySelectButtonClass = "sfd-select-facility-data-btn";
+          this._facilityButtons = this._removeDuplicates(this._facilityTypes, "maintype").map(ft => (
+            {
+              ...ft,
+              enabled: this._facilityTypeList.find(id => "" + ft.id === id) ? true : false,
+            }
+          ));
 
-        // HTML for dialog
-        this._facilitySelectWindowHtml = "";
-        this._selectFacilityButtonsHtml = "";
-        this._selectFacilityWindowsHtml = "";
-        this._selectFacilityDetailsHtml = "";
+          // console.log("facilityButtons = ", this._facilityButtons);
 
-        // Facility def info
-        this._closeEvent = null;
-        this._closeEventData = null;
+          // Event listener classes
+          this._facilityTypeButtonClass = "sfd-facility-btn";
+          this._facilitySelectButtonClass = "sfd-select-facility-data-btn";
 
-        // Initialize Dialog HTML
-        this._initWindow();
+          // HTML for dialog
+          this._facilitySelectWindowHtml = "";
+          this._selectFacilityButtonsHtml = "";
+          this._selectFacilityWindowsHtml = "";
+          this._selectFacilityDetailsHtml = "";
 
-        // Create Event responses
-        this._createEvents();
+          // Facility def info
+          this._closeEvent = null;
+          this._closeEventData = null;
+
+          // Initialize Dialog HTML
+          this._initWindow();
+
+          // Create Event responses
+          this._createEvents();
+
+          this.openDialog();
+        });
+      }
+
+      ////////////////////////////////////////////////////////////////
+      // Getters
+
+      get selectedFacilityId() {
+        return this._selectedFacilityId;
       }
 
       ////////////////////////////////////////////////////////////////
@@ -78,20 +105,22 @@ define([
       ////////////////////////////////////////////////////////////////
       // Initialize methods
       _initWindow() {
+
         let compiledTemplate = Handlebars.compile(FacilitySelectTmplt.facilitySelectDialogWindow);
         this._facilitySelectWindowHtml = $(compiledTemplate());
-        $(this._elementIdAnchor).empty();
+        $("#" + this._elementIdAnchor).empty();
         this._createFacilityButtons();
         this._createFacilityWindows();
         this._createFacilityDetails();
+        console.log("anchorID = ", $("#" + this._elementIdAnchor));
       }
 
       _createEvents() {
+        console.log("create events...")
         $("#" + this._elementIdAnchor).off();
         $("#" + this._elementIdAnchor).on("click", "." + this._facilityTypeButtonClass, this, this._showFacilityWindow);
         $("#" + this._elementIdAnchor).on("click", "." + this._facilitySelectButtonClass, this, this._facilitySelectedButton);
       }
-
 
       ////////////////////////////////////////////////////////////////
       // Populate template methods
@@ -100,8 +129,15 @@ define([
         let templateParms = {
           facilityButtons: this._facilityButtons
         };
-        this._selectFacilityButtonsHtml = $(compiledTemplate(templateParms));
-        this._selectFacilityButtonsHtml = $(this._facilitySelectWindowHtml).find("#" + this._elementIdButtons).append(this._selectFacilityButtonsHtml);
+
+        this._selectFacilityButtonsHtml = this._addHtml($(compiledTemplate(templateParms)),
+          this._elementIdButtons, this._facilitySelectWindowHtml)
+
+
+        // console.log("this._facilitySelectWindowHtml = ", this._facilitySelectWindowHtml.html());
+        // this._selectFacilityButtonsHtml = $(compiledTemplate(templateParms));
+        // console.log("this._selectFacilityButtonsHtml = ", this._selectFacilityButtonsHtml);
+        // this._selectFacilityButtonsHtml = $(this._facilitySelectWindowHtml).find("#" + this._elementIdButtons).append(this._selectFacilityButtonsHtml);
       }
 
       _createFacilityWindows() {
@@ -124,8 +160,8 @@ define([
             fixedOperateCost: this._toMoney(facilityType.fixed_cost_operate),
             marginalCost: this._toMoney(facilityType.marginal_cost_build),
             marginalOperateCost: this._toMoney(facilityType.marginal_cost_operate),
-            minimumArea: Math.floor(facilityType.minimum_area) + " square meters",
-            buildTime: facilityType.build_time + " turns",
+            minimumArea: Math.floor(facilityType.minimum_area),
+            buildTime: facilityType.build_time + "",
             simpletype: facilityType.simpletype
           }
           this._selectFacilityDetailsHtml = $(compiledTemplate(templateParms));
@@ -133,9 +169,12 @@ define([
         }
       }
 
-
       ////////////////////////////////////////////////////////////////
-      // Utility methods
+      // Utility methods--*****
+      _addHtml(html, htmlId, windowHtml) {
+        return $(windowHtml).find("#" + htmlId).append(html);
+      }
+
       _removeDuplicates(myArr, prop) {
         return myArr.filter((obj, pos, arr) => {
           return arr.map(mapObj => mapObj[prop]).indexOf(obj[prop]) === pos;
@@ -151,7 +190,6 @@ define([
       _toMoney(amount) {
         return "$" + (amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
       }
-
 
       ////////////////////////////////////////////////////////////////
       // Listener event methods.
@@ -172,7 +210,7 @@ define([
 
       _facilitySelectedButton(evt) {
         let scope = evt.data;
-        scope._selectedFacility = $(evt.target).attr("facility-id");
+        scope._selectedFacilityId = $(evt.target).attr("facility-id");
         scope.closeDialog();
       }
 
@@ -186,23 +224,44 @@ define([
       ////////////////////////////////////////////////////////////////
       // Open and close the dialog methods
       openDialog() {
-        this._selectedFacility = null;
+        console.log("open dialog...")
+        this._selectedFacilityId = null;
         $("#" + this._elementIdAnchor).empty();
         $("#" + this._elementIdAnchor).append(this._facilitySelectWindowHtml);
+
         this._dialog = $("#" + this._elementIdAnchor).dialog({
+          scope: this,
           title: this._title,
           width: this._width,
           height: this._height,
           position: this._position,
-          modal: this._isModel
+          modal: this._isModel,
         });
 
-        return new Promise(resolve => {
-          this._dialog.on("dialogclose", (evt, ui) => {
-            this._dialog.off("dialogclose");
-            resolve(this._selectedFacility);
-          });
-        })
+
+        $(this._dialog).on("dialogclose", this, (evt, ui) => {
+          if (this._closeHandler) {
+            this._closeHandler(evt);
+          }
+
+          if (this._selectedFacilityId) {
+            console.log("selected facility type = ", this._selectedFacilityId);
+            evtEmitter.emit("updatefacility", {
+              facilityId: this._facilityId,
+              facilityTypeId: this._selectedFacilityId,
+              facilityTypeList: this._facilityTypeList
+            });
+          }
+          else {
+            console.log("delete facility. id = ", this._facilityId);
+            evtEmitter.emit("deletefacility", {
+              facilityId: this._facilityId
+            });
+          }
+
+          $("#" + this._elementIdAnchor).empty();
+          this._dialog.dialog("destroy");
+        });
       }
 
       closeDialog() {

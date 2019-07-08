@@ -6,28 +6,31 @@ define([
   "networkCallMap",
   "CityLayer",
   "FacilityLayer",
-  "EventEmitter"
-], function ($, ResourceLoader, terrainLayer, canvasData, networkCallMap, CityLayer, FacilityLayer, EventEmitter) {
+  "MarkerLayer",
+], function ($, ResourceLoader, terrainLayer, canvasData, networkCallMap, CityLayer, FacilityLayer, MarkerLayer) {
 
   return (
-    class CanvasModel extends EventEmitter {
+    class CanvasModel {
       constructor() {
-        super();
         this._facilityLayer = null;
         this._cityLayer = null;
-        this._playerMarkerLayer = null
+        this._playerMarkerLayer = null;
         this._facility_types = null;
         this._generator_types = null;
         this._resource_types = null;
       }
 
       // Getters...
-      facilityLayer() {
+      get facilityLayer() {
         return this._facilityLayer;
       }
 
-      cityLayer() {
+      get cityLayer() {
         return this._cityLayer;
+      }
+
+      get playerMarkerLayer() {
+        return this._playerMarkerLayer;
       }
 
       // Public methods
@@ -126,6 +129,7 @@ define([
               canvasData.terrainImageConfig,
               canvasData.terrainSpriteConfig
             );
+            // console.log("terrainTileMap = ", terrainTileMap);
             resolve(terrainTileMap);
           });
         });
@@ -163,15 +167,41 @@ define([
 
           loaded.then((results) => {
             let resources = ResourceLoader.resourcesToObject(results);
+            let facilities = resources[networkCallMap.facilityTable.name].data.facilities;
             let facilityLayer = new FacilityLayer(
               resources[canvasData.facilitySpriteConfig.name].data,
               canvasData.facilitySpriteConfig,
               canvasData.terrainImageConfig,
-              canvasData.terrainSpriteConfig,
-              resources[networkCallMap.facilityTable.name].data.facilities
+              canvasData.terrainSpriteConfig
             );
             this._facilityLayer = facilityLayer;
-            resolve(facilityLayer.createTileMap());
+            this._facilityLayer.createFacilityTiles(facilities);
+            resolve(facilityLayer.tileMap);
+          });
+        });
+      }
+
+      createPlayerMarkerTileMap() {
+        return new Promise(resolve => {
+          const loaded = ResourceLoader.loadResources([
+            { name: canvasData.playerMarkerConfig.name, type: "img", path: canvasData.playerMarkerConfig.path },
+            { name: networkCallMap.playerFacilities.name, type: "ajax", path: networkCallMap.playerFacilities.path }
+          ]);
+
+          loaded.then((results) => {
+            let resources = ResourceLoader.resourcesToObject(results);
+            let facilities = resources[networkCallMap.playerFacilities.name].data.facilities;
+            // console.log("facilities = ", facilities);
+
+            let playerMarkerLayer = new MarkerLayer(
+              resources[canvasData.playerMarkerConfig.name].data,
+              canvasData.playerMarkerConfig,
+              canvasData.terrainImageConfig,
+              canvasData.terrainSpriteConfig
+            );
+            this._playerMarkerLayer = playerMarkerLayer;
+            this._playerMarkerLayer.createMarkerTiles(facilities);
+            resolve(playerMarkerLayer.tileMap);
           });
         });
       }

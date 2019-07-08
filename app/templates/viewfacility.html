@@ -1,15 +1,16 @@
-<div id="dialog" class="container" width="450" title="  {{ facility.name }}">  {#facility-name="{{ facility.name }}"> #}
+<div id="dialog" class="container" width="450" title="  {{ facility.name }}"> {#facility-name="{{ facility.name }}"> #}
   <div class="vf-facility-info">
     <div class="row">
       <div class="col-lg">
         <label> Type: </label>
       </div>
-      {# <div class="col-md"></div> #}
+      {#
+      <div class="col-md"></div> #}
       <div class="col-md">
         <label>{{ facility_type.name }}</label>
       </div>
     </div>
-    <div class="row">    
+    <div class="row">
       <div class="col-lg">
         <label> Owned By: </label>
       </div>
@@ -30,7 +31,6 @@
         <label> Available Capacity: </label>
       </div>
       <div class="col-md">
-        {# <label> {{ (facility.generators|length * generator_type.nameplate_capacity) }} KW</label> #}
         <label> {{ faccap }} MW</label>
       </div>
     </div>
@@ -55,7 +55,7 @@
         <label> Power Type: </label>
       </div>
       <div class="col-md">
-        <label> {{ generator_type.power_type.name }} </label>
+        <label> {{ power_type }} </label>
       </div>
     </div>
   </div>

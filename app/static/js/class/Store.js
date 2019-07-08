@@ -1,3 +1,4 @@
+// Created from https://css-tricks.com/build-a-state-management-system-with-vanilla-javascript/
 define([
   "PubSub"
 ], function (PubSub) {
@@ -5,11 +6,19 @@ define([
     class Store {
       constructor(params = {}) {
         let self = this;
-        self.actions = params.actions || {};
-        self.mutations = params.mutations || {};
+        self.actions = {};
+        self.mutations = {};
         self.state = {};
         self.status = 'resting';
         self.events = new PubSub();
+
+        if (params.hasOwnProperty('actions')) {
+          self.actions = params.actions;
+        }
+
+        if (params.hasOwnProperty('mutations')) {
+          self.actions = params.mutations;
+        }
 
         self.state = new Proxy((params.state || {}), {
           set: function (state, key, value) {

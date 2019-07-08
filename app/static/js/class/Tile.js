@@ -7,6 +7,7 @@ define([
 		class Tile {
 			constructor(id, name, width, height, sprite = null, scaleToMap = true) {
 				this._name = name;
+				this._type = null;
 				this._id = id;
 				this._sprite = sprite;
 				this._bitmap = null;
@@ -23,6 +24,10 @@ define([
 			// Getters...
 			get name() {
 				return this._name;
+			}
+
+			get type() {
+				return this._type;
 			}
 
 			get id() {
@@ -68,6 +73,10 @@ define([
 			// Setters...
 			set name(name) {
 				this._name = name;
+			}
+
+			set type(type) {
+				this._type = type;
 			}
 
 			set sprite(sprite) {

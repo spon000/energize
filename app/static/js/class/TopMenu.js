@@ -1,17 +1,23 @@
 define([
   "jquery",
-  "EventEmitter",
-  "evtEmitter",
-  "PortfolioViewDialog",
+  "Component",
+  "gameStore",
+  "TopMenuBuild",
   "ResourceLoader",
-  "networkCallMap",
-  "Vue"
-], function ($, EventEmitter, evtEmitter, PortfolioViewDialog, ResourceLoader, networkCallMap, Vue) {
+  "networkCallMap"
+], function ($, Component, gameStore, TopMenuBuild, ResourceLoader, networkCallMap) {
   return (
-    class TopMenu extends EventEmitter {
+    class TopMenu extends Component {
       constructor() {
-        super();
-        this._facilityButtonId = "facility-btn";
+        super({
+          gameStore,
+        });
+
+        // const tmb = new TopMenuBuild();
+
+        // tmb.render();
+
+        this._facilityButtonId = "build-facility-btn";
         this._nextTurnButtonId = "next-btn";
         this._portfolioButtonId = "portfolio-btn";
         this._buildStatus = "build";
@@ -22,7 +28,7 @@ define([
         });
 
         this._setNextBtnEvent();
-        this._initPortfolioBtn();
+        // this._initPortfolioBtn();
       }
 
       // Getters...
@@ -42,7 +48,7 @@ define([
 
       _initPortfolioBtn() {
         $('#' + this._portfolioButtonId).click(this, (evt) => {
-          let pvd = new Vue(PortfolioViewDialog);
+          // let pvd = new Vue(PortfolioViewDialog);
           console.log("pvd = ", pvd);
         });
       }

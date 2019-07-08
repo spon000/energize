@@ -43,6 +43,15 @@ define([
         { "type": "cityblock1", "frame": 0 }
       ]
     },
+    "playerMarkerConfig": {
+      "name": "playerMarks",
+      "path": "/static/img/tiles/player_highlight2.png",
+      "width": 100,
+      "height": 100,
+      "sprites": [
+        { "type": "playermarker", "frame": 0 }
+      ]
+    },
     "facilitySpriteConfig": {
       "name": "facilitySprites",
       "path": "/static/img/tiles/facility_icons_1300x100.png",

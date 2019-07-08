@@ -7,7 +7,7 @@ facility_types = [
   {'maintype': "natural gas", 'subtype': "",       'name': "Natural Gas",        'build_time': 12, 'minimum_area': 2.00E+05,  'fixed_cost_build': 83.25,    'fixed_cost_operate': 0.88,   'marginal_cost_build': 0, 'marginal_cost_operate': 0.22, 'decomission_cost': 0,  'description': ""},
   {'maintype': "coal",        'subtype': "",       'name': "Coal",               'build_time': 12, 'minimum_area': 1.25E+06,  'fixed_cost_build': 600,      'fixed_cost_operate': 6.42,   'marginal_cost_build': 0, 'marginal_cost_operate': 1.02, 'decomission_cost': 0,  'description': ""},
   {'maintype': "hydro",       'subtype': "",       'name': "Hydro",              'build_time': 24, 'minimum_area': 4.65E+03,  'fixed_cost_build': 1632,     'fixed_cost_operate': 11.88,  'marginal_cost_build': 0, 'marginal_cost_operate': 1.97, 'decomission_cost': 0,  'description': ""},
-  {'maintype': "new",         'subtype': "",       'name': "New",                'build_time': 0,  'minimum_area': 0,         'fixed_cost_build': 0,        'fixed_cost_operate': 0,      'marginal_cost_build': 0, 'marginal_cost_operate': 0,    'decomission_cost': 0,  'description': ""}
+  {'maintype': "new",         'subtype': "",       'name': "Undefined",          'build_time': 0,  'minimum_area': 0,         'fixed_cost_build': 0,        'fixed_cost_operate': 0,      'marginal_cost_build': 0, 'marginal_cost_operate': 0,    'decomission_cost': 0,  'description': ""}
 ]     
 
 generator_types = [

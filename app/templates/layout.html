@@ -40,7 +40,8 @@
         <div>
           <!-- Grid Column place holder -->
         </div>
-        <a class="build-btn push-up" id="facility-btn" href="#">Build Facility</a>
+        <!-- <div id="build-facility-btn"></div> -->
+        <a class="build-btn push-up" id="build-facility-btn" href="#">Build Facility</a>
         <a class="help-btn" href="#">Help</a>
         <a class="options-btn" href="#">Options</a>
       </div>
@@ -56,6 +57,11 @@
           <h4 class="alert alert-{{ category }}"> {{ message }} </h4>
           {% endfor %} {% endif %} {% endwith %}
         </div>
+        <!--
+        <div id="testing">
+          <canvas id="testcanvas" width="1200" height="600"></canvas>
+        </div>
+        -->
         <div class="send-component">
           <ul id="messages"></ul>
         </div>

@@ -10,7 +10,6 @@ define([], function () {
         <div id="facility-footer-window" class="vfd-footer"></div>
       </div>
     `,
-
     facilityViewHeader: `
       <div class="vfd-title">
         <h5 class="vfd-facility-name" style="display:none"> {{facilityName}} </h5>
@@ -18,13 +17,11 @@ define([], function () {
         <button class="vfd-facility-image-btn" btn-image="{{simpleType}}" disabled="true"></button> 
       </div>
     `,
-
     facilityFacilityPicture: `
       <div class="vfd-powerplant-panel">
         <img class="vfd-powerplant-img" src="/static/img/background/{{simpleType}}-powerplant-pic-sm.jpg" alt="picture of {{maintype}} power plant"></img>
       </div>
     `,
-
     facilityViewInfo: `
       <div class="vfd-facility-summary-panel">
         <div class="vfd-facility-summary">
@@ -87,7 +84,6 @@ define([], function () {
         </div>
       </div>
     `,
-
     generatorListHeader: `
       <div class='vfd-gen-list-header'>
       {{#if owned}}
@@ -106,9 +102,10 @@ define([], function () {
     facilityViewFooter: `
       <div class="container">
         <div class="row"></div>
-        <div class="row">
-          <div class="col-lg-4"></div>
-          <div class="vfd-footer-buttons col-lg-4">
+        <div class="row justify-content-center">
+          <div class="col-lg-3"></div>
+          <div class="vfd-footer-buttons col-lg-7">
+            <div class="vfd-btn-divider"></div>
             {{#if applyOn}}
               <button id="vfd-footer-apply-btn"> Apply </button>
             {{else}}
@@ -116,16 +113,24 @@ define([], function () {
             {{/if}}
             <div class="vfd-btn-divider"></div>
             <button id="vfd-footer-close-btn"> Close </button>
+            <div class="vfd-btn-divider"></div>
+            <button id="vfd-footer-back-btn"> << Back </button>
           </div>
-          <div class="col-lg-4"></div>
+          <div class="col-lg-2"></div>
         </div>
       </div>
     `,
-
-    verifyDialog: `
+    verifyChangeDialog: `
       <div class='verify-close'>
         <p> You have made modifications to this facility. If you close now before applying them
           you will lose all of those changes. </p>
+        <p class='highlight'> Are you sure you want to close this dialog? </p>
+      </div>
+    `,
+    verifyNewDialog: `
+      <div class='verify-close'>
+        <p> This facility isn't finalized yet. If you close the window without applying
+          this facility will be removed from the map. </p>
         <p class='highlight'> Are you sure you want to close this dialog? </p>
       </div>
     `,
@@ -140,85 +145,3 @@ define([], function () {
     `
   });
 });
-
-
-             // <label for="one">
-                //   <input type="checkbox" id="one" />Mod 1</label>
-                // <label for="two">
-                //   <input type="checkbox" id="two" />Mod 2</label>
-                // <label for="three">
-                //   <input type="checkbox" id="three" />Mod 3</label>
-
-
-// <div class="row">
-// <h6 class="col-lg-6"> Time to Build: </h6>
-// <label class="col-lg-6"> {{ facilityType.build_time }} Quarters</label>
-// </div>
-// <div class="row">
-// <h6 class="col-lg-6"> Number Generators: </h6>
-// <label class="col-lg-6"> {{ numGenerators }} </label>
-// </div>          
-// </div>
-
-// <div class="col-xl-6">
-// <div class="row">
-// <h6 class="col-lg-7"> Owner: </h6>
-// <label class="col-lg-5"> {{ facility.company_name }} </label>
-// </div>
-// <div class="row">
-// <h6 class="col-lg-7"> Start Build Date: </h6>
-// <label class="col-lg-5"> {{ facility.start_build_date }} </label>
-// </div>
-// <div class="row">
-// <h6 class="col-lg-7"> End Build Date: </h6>
-// <label class="col-lg-5"> {{ facility.start_prod_date }} </label>
-// </div>
-// <div class="row">
-// <h6 class="col-lg-7"> Activity Status: </h6>
-// <label class="col-lg-5"> {{ facility.state }} </label>
-// </div>
-
-// {/* <div class="row">
-// <h6 class="col-lg-6"> Operating Cost: </h6>
-// <label class="col-lg-6"> $ {{ formatCurrency facilityType.fixed_cost_operate }} </label>
-// </div> */}
-
-
-
-
-// {/* <table class='generator-list-table'>
-// <thead>
-//   <tr>
-//     <th> Action </th>
-//     <th class="generator-add-button"> <button type='button'> (+) </button></th>
-//     <th> Gen Type </th>
-//     <th> NP Capacity (MWh)</th>
-//     <th> State </th>
-//     <th> Age </th>
-//     <th> Bid Policy </th>
-//     <th> Bid Value </th>
-//   </tr>
-// </thead>
-// <tbody>
-//   {{#each generators}}
-//     <tr>
-//       <td class="generator-minus-button"> 
-//         {{#if new_generator}}
-//           <button type='button'> Remove </button>
-//         {{else}}
-//           <button type='button'> Decom </button>
-//         {{/if}}
-//       </td>
-//       <td> #{{@index}} </td>
-//       <td>{{ gentype_details.pt.name }}</td>
-//       <td>{{ gentype_details.nameplate_capacity }}</td>
-//       <td>{{ state }}</td>
-//       <td> ?? Years </td>
-//       <td> {{ local_bid_policy }}</td>
-//       <td> $ {{formatCurrency bid_policy_value }}</td>
-//     </tr>
-//   {{/each}}
-// </tbody>
-// <tfoot>
-// </tfoot>
-// </table> */}

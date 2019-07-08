@@ -4,13 +4,11 @@ define([
   "Dim2",
   "easeljs",
   "canvasData",
-  "EventEmitter"
-], function ($, $UI, Dim2, createjs, canvasData, EventEmitter) {
+], function ($, $UI, Dim2, createjs, canvasData) {
 
   return (
-    class CanvasView extends EventEmitter {
+    class CanvasView {
       constructor(canvasElementId, model) {
-        super();
         this._canvasElementId = canvasElementId;
         this._canvasModel = model;
         this._infoDialogElementId = "info-dialog";
@@ -249,7 +247,11 @@ define([
           // console.log("html = ", html);
           $("#" + this._infoDialogElementId).empty();
           $("#" + this._infoDialogElementId).dialog({
-            position: { my: "left+10 bottom-10", of: evt.nativeEvent },
+            position: {
+              my: ((evt.stageX > (canvasData.canvasConfig.width / 2)) ? "right-20 " : "left+20 ") +
+                ((evt.stageY > (canvasData.canvasConfig.height / 2)) ? "bottom-20" : "top+20"),
+              of: evt.nativeEvent
+            },
             dialogClass: "no-close-button",
             // width: 350
           });

@@ -2,8 +2,8 @@ define([
   // Libs
   "jquery",
   "jqueryui",
-  "EventEmitter",
   "Handlebars",
+  "evtEmitter",
   "FacilityViewTmplt",
   "Generator",
   "Facility",
@@ -12,8 +12,8 @@ define([
 ], function (
   $,
   JQUI,
-  EventEmitter,
   Handlebars,
+  evtEmitter,
   FacilityViewTmplt,
   Generator,
   Facility,
@@ -21,14 +21,16 @@ define([
   Tabulator) {
     return (
       class FacilityViewDialog {
-        constructor(facilityId, facilityTypeId = null) {
-          console.log();
+        constructor(facilityId, facilityTypeList, closeHandler = null) {
+          console.log("facilityTypeList =", facilityTypeList);
           // Dialog 
           this._dialog = null;
           this._facilityId = facilityId;
-          this._facilityTypeId = facilityTypeId;
           this._ownedFacility = false;
-
+          this._closeHandler = closeHandler;
+          this._deleteFacility = false;
+          this._newFacility = false;
+          this._selectFacilityType = false;
 
           // Parameters
           this._width = 750;
@@ -37,14 +39,12 @@ define([
           this._isModel = true;
           this._position = {};
           this._title = "Facility Viewer";
-          this._modelsLoaded = false;
-          this._facilityModified = false;
-
+          this._facilityModified = facilityTypeList ? true : false;
           this._genListTable = null;
-          this._dialogEvents = new EventEmitter();
+
 
           // Element Ids
-          this._elementIdAnchor = "facility-dialog";
+          this._elementIdAnchor = "facility-view-dialog";
           this._elementIdDialog = "view-facility-dialog";
           this._elementIdFacilityHeader = "facility-header-window";
           this._elementIdFacilityPic = "facility-powerplant-pic";
@@ -77,7 +77,7 @@ define([
           // Load all needed data.
           this._modelData = new ModelData();
           this._modelData.getPlayerFacility(facilityId).then((data) => {
-            console.log("loaded data = ", data);
+            // console.log("loaded data = ", data);
             this._ownedFacility = data['owned_facility'];
             this._company = data['company'];
             this._facility = data['facility'];
@@ -88,7 +88,11 @@ define([
             this._powerTypes = data['power_types'];
             this._resourceTypes = data['resource_types'];
             this._modificationTypes = data['modification_types'];
-            this._modelsLoaded = true;
+
+            this._newFacility = this._facility.state == "new" ? true : false;
+            if (this._newFacility)
+              this._setBack();
+
             this._initialize();
             this._initWindow();
             return this.openDialog();
@@ -125,8 +129,8 @@ define([
             return g_total + (g_curr.state == "available" ? g_curr.gentype_details.nameplate_capacity : 0)
           }), 0);
 
-          console.log('this._generators = ', this._generators);
-          console.log("this._facility = ", this._facility)
+          // console.log('this._generators = ', this._generators);
+          // console.log("this._facility = ", this._facility)
         }
 
         _initWindow() {
@@ -212,12 +216,16 @@ define([
         _createFooter() {
           let compiledTemplate = Handlebars.compile(FacilityViewTmplt.facilityViewFooter);
           let templateParms = {
-            applyOn: false  //this._applyButtonOn
+            applyOn: this._facilityModified
           }
 
           this._facilityViewFooterHtml = this._addHtml($(compiledTemplate(templateParms)),
             this._elementIdFacilityFooter, this._facilityViewWindowHtml);
         }
+
+
+        //////////////////////////////////////////////////////////////////////////
+        // Init event listener functions.
 
         _createEvents() {
 
@@ -225,18 +233,43 @@ define([
           $("#" + this._elementIdAnchor).on("click", ".selectbox", this._showCheckboxes);
           // $("#" + this._elementIdAnchor).on("click", '.vfd-facility-checkbox', this._setup)
           $("#" + this._elementIdAnchor).on("click", "#vfd-add-gen-btn", this, this._addGenerator);
-          // $("#" + this._anchorElementId).on("click", this._addGeneratorButtonId, this, this._addGenerator);
-          $("#" + this._elementIdAnchor).on("click", "#vfd-footer-close-btn", this, this._closeDialog);
 
+          $("#" + this._elementIdAnchor).on("click", "#vfd-footer-apply-btn", this, this._applyUpdates);
+          $("#" + this._elementIdAnchor).on("click", "#vfd-footer-close-btn", this, this._closeDialog);
+          $("#" + this._elementIdAnchor).on("click", "#vfd-footer-back-btn", this, this._backToSelect);
+        }
+
+        //////////////////////////////////////////////////////////////////////////
+        // Listener event functions.
+
+        _backToSelect() {
+          this._backToSelect = true;
+          $("#vfd-footer-close-btn").click();
+        }
+
+        _applyUpdates() {
+
+        }
+
+        _showCheckboxes() {
+          let checkboxes = $("#vfd-facility-checkboxes");
+
+          if ($(checkboxes).attr("expanded") == "false") {
+            $(checkboxes).css("display", "block");
+            $(checkboxes).attr("expanded", "true");
+          }
+          else {
+            $(checkboxes).css("display", "none");
+            $(checkboxes).attr("expanded", "false");
+          }
         }
 
         _initOnEvents() {
         }
 
-        _addHtml(html, htmlId, windowHtml) {
-          return $(windowHtml).find("#" + htmlId).append(html);
-        }
 
+        //////////////////////////////////////////////////////////////////////////
+        // Opening and Closing the dialog 
         openDialog() {
           $("#" + this._elementIdAnchor).empty();
           $("#" + this._elementIdAnchor).append(this._facilityViewWindowHtml);
@@ -260,6 +293,7 @@ define([
           });
 
           // Allow HTML in the Title bar.
+          this._dialog.parent().find('.ui-dialog-title').css("z-index", "1000");
           this._dialog.parent().find('.ui-dialog-title').html(this._title);
 
           $(this._dialog).on("dialogopen", (evt) => {
@@ -271,6 +305,19 @@ define([
           });
 
           $(this._dialog).dialog("open");
+
+          $(this._dialog).on("dialogclose", this, (evt, ui) => {
+            if (this._closeHandler) {
+              this._closeHandler(evt);
+            }
+            if (this._deleteFacility) {
+              console.log("delete facility. id = ", this._facilityId);
+              evtEmitter.emit("deletefacility", {
+                facilityId: this._facilityId
+              });
+            }
+            $("#" + this._elementIdAnchor).empty();
+          });
         }
 
         _closeDialog(evt) {
@@ -279,6 +326,7 @@ define([
         }
 
         _openVerifyDialog(scope) {
+          $("#vfd-verify-dialog").empty()
           let verifyDialog = $("#vfd-verify-dialog").dialog({
             dialogClass: ".no-close",
             autoOpen: false,
@@ -291,17 +339,20 @@ define([
             buttons: [
               {
                 text: "Yes",
-                click: function () {
+                click: function (evt) {
+                  console.log("clicked yes...");
                   scope._facilityModified = false;
-                  $("#vfd-verify-dialog-content").empty();
-                  $(scope._dialog).dialog("close");
+                  scope._deleteFacility = true;
+                  // $("#vfd-verify-dialog").empty();
                   $(this).dialog("close");
+                  $(scope._dialog).dialog("close");
+                  // $(this).dialog.empty();
                 }
               },
               {
                 text: "No",
-                click: function () {
-                  $("#vfd-verify-dialog-content").empty();
+                click: function (evt) {
+                  // $("#vfd-verify-dialog").empty();
                   $(this).dialog("close");
                 }
               }
@@ -310,13 +361,51 @@ define([
 
           $(verifyDialog).on("dialogopen", (evt, ui) => {
             $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
-            this._addHtml(FacilityViewTmplt.verifyDialog, "vfd-verify-dialog-content", "#vfd-verify-dialog");
+            if (this._newFacility)
+              this._addHtml(FacilityViewTmplt.verifyNewDialog, "vfd-verify-dialog-content", "#vfd-verify-dialog");
+            else
+              this._addHtml(FacilityViewTmplt.verifyChangeDialog, "vfd-verify-dialog-content", "#vfd-verify-dialog");
           });
 
           $(verifyDialog).dialog("open");
+
+        }
+
+        //////////////////////////////////////////////////////////////////////////
+        // Misc methods
+
+        // Add leading zeroes
+        _padZeroes(num, size) {
+          return (("000000000" + num).substr((-size)));
+        }
+
+        _addHtml(html, htmlId, windowHtml) {
+          return $(windowHtml).find("#" + htmlId).append(html);
+        }
+
+        _setBack(enable = true) {
+          let btn = $(this._dialog).find("#vfd-footer-back-btn");
+          if (enable)
+            $(btn).removeAttr("disabled");
+          else
+            $(btn).attr("disabled", "true");
+        }
+
+        _setApply(enable = true) {
+          let btn = $(this._dialog).find("#vfd-footer-apply-btn");
+          if (enable)
+            $(btn).removeAttr("disabled");
+          else
+            $(btn).attr("disabled", "true");
         }
 
 
+
+        //////////////////////////////////////////////////////////////////////////
+        //
+        // Generator list table functions 
+        //
+        //////////////////////////////////////////////////////////////////////////
 
         //////////////////////////////////////////////////////////////////////////
         // Create the generator list table
@@ -326,11 +415,11 @@ define([
           // console.log("this._generators = ", this._generators);
           this._generators.forEach((gen, index) => {
             let profit = "rgb(255, 0, 0)" //getProfit(gen);
-            let age = "rgb(250, 218, 94)" //getAge(gen);
+            let condition = "rgb(250, 218, 94)" //getAge(gen);
             let value = "rgb(0, 255, 0)" //getValue(gen);
 
             let profitColor = profit.color;
-            let ageColor = age.color;
+            let conditionColor = condition.color;
             let valueColor = value.color;
 
             generator_table_data.push({
@@ -339,7 +428,7 @@ define([
               name: "gen " + this._padZeroes((index + 1), 2),
               cap: gen.gentype_details.nameplate_capacity,
               prof: profit,
-              age: age,
+              cond: condition,
               value: value,
               bidp: "MC",
               maintp: "routine",
@@ -370,9 +459,9 @@ define([
                   gen_types: this._generatorTypes
                 }
               },
-              { title: "Profit", field: "prof", formatter: "color" },
-              { title: "Age", field: "age", formatter: "color" },
-              { title: "Value", field: "value", formatter: "color" },
+              { title: "Profit", field: "prof", formatter: "color", width: 80 },
+              { title: "Condition", field: "cond", formatter: "color", width: 80 },
+              { title: "Value", field: "value", formatter: "color", width: 80 },
               { title: "Bid Policy", field: "bidp" },
               { title: "Maint Policy", field: "maintp" },
               { title: "State", field: "state", visible: false }
@@ -487,40 +576,12 @@ define([
             color: color
           });
         }
-
-        _setApply(enable = true) {
-          let btn = $(this._dialog).find("#vfd-footer-apply-btn");
-          if (enable)
-            $(btn).removeAttr("disabled");
-          else
-            $(btn).attr("disabled", "true");
-        }
-
-
         //////////////////////////////////////////////////////////////////////////
-        // Listener event functions.
-
-        _showCheckboxes() {
-          let checkboxes = $("#vfd-facility-checkboxes");
-
-          if ($(checkboxes).attr("expanded") == "false") {
-            $(checkboxes).css("display", "block");
-            $(checkboxes).attr("expanded", "true");
-          }
-          else {
-            $(checkboxes).css("display", "none");
-            $(checkboxes).attr("expanded", "false");
-          }
-        }
-
-
+        //
+        // End of Generator list table functions 
+        //
         //////////////////////////////////////////////////////////////////////////
-        // Misc methods
 
-        // Add leading zeroes
-        _padZeroes(num, size) {
-          return (("000000000" + num).substr((-size)));
-        }
       });
   });
 

@@ -45,42 +45,63 @@ define([], function () {
             <tr>
               <td class="td-tip">
                 <div class="help-tip">
-                  <p>This is the fixed build cost for the facility only (does not include generators). This cost will be equally divided between turns until the facility is completed.</p>
+                  <p>This reflects the change in cost associated with capacity and market fluctuations.</p>
                 </div>
               </td>
-              <td class="td-label">Build Cost:</td>
-              <td class="td-value">{{fixedCost}}</td>
+              <td class="td-label">Overnight Capitol Cost:</td>
+              <td class="td-value">{{fixedCost}} /MW</td>
             </tr>
 
             <tr>
               <td class="td-tip">
                 <div class="help-tip">
-                  <p>This is the fixed operating cost for the facility. Each turn this cost is applied to your total quarterly expenditures for facility operation.</p>
+                  <p>(Levelized Cost of Electricity) The LCOE represents the break-even cost over the facility lifetime. This includes all of the build, operation, maintenance, and decommissioning costs over the lifetime of the facility.</p>
                 </div>
               </td> 
-              <td class="td-label">Operating Cost:</td>
-              <td class="td-value">{{fixedOperateCost}}</td>
+              <td class="td-label">LCOE:</td>
+              <td class="td-value">{{fixedOperateCost}} /MWh</td>
             </tr>
 
             <tr>
               <td class="td-tip">
                 <div class="help-tip">
-                  <p> Minimum Area is the minimal amount of land area that is required for the facility. The unit of measure is square meters.</p>
+                  <p>This is the cost of owning a facility whether or not your facility is generating electricity. This includes labor and maintenance, among other things, but does not include fuel costs.</p>
+                </div>
+              </td> 
+              <td class="td-label">Fixed Operating Cost:</td>
+              <td class="td-value">{{fixedOperateCost}} /MW</td>
+            </tr>
+
+            <tr>
+              <td class="td-tip">
+                <div class="help-tip">
+                  <p> The capacity factor reflects the electricity produced with respect to the maximum electricity produced if operating at full capacity 100% of the time. That is, capacity factor compares actual (or expected) generation to theoretical maximum generation.</p>
                 </div>
               </td>
-              <td class="td-label">Minimum Area:</td>
-              <td class="td-value">{{minimumArea}}</td>
+              <td class="td-label">Capacity Factor:</td>
+              <td class="td-value">%</td>
+            </tr>
+            
+            <tr>
+              <td class="td-tip">
+                <div class="help-tip">
+                  <p> The nameplate capacity is the theoretical maximum power generation.</p>
+                </div>
+              </td>
+              <td class="td-label">Nameplate Capacity:</td>
+              <td class="td-value"> MW</td>
             </tr>
 
             <tr>
               <td class="td-tip">
                 <div class="help-tip">
-                  <p> The number of turns that are required to complete this facility so that it will be available for use.</p>
+                  <p> The amount of (predicted) time it will take to build the facility and generators expressed in quarters, where one quarter is one game turn.</p>
                 </div>
               </td>
               <td class="td-label">Build Time:</td>
-              <td class="td-value">{{buildTime}}</td>
-            </tr>          
+              <td class="td-value">{{buildTime}} quarters</td>
+            </tr>    
+
           </tbody>
         </table>
         <br/>

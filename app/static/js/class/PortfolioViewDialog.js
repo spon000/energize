@@ -1,8 +1,8 @@
 define([
   // Libs
   "ModelData",
-  "Vue"
-], function (ModelData, Vue) {
+  // "Vue"
+], function (ModelData, /* Vue */) {
   return ({
     el: '#portfolio-dialog',
     created() {
