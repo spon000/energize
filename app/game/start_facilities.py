@@ -25,7 +25,7 @@ start_facilities = [
   {'id_type': 6, 'fid': 24, 'state': "active", 'start_build_date': "012010", 'start_prod_date': "092015", 'player': 3, 'column': 121,   'row': 66, 'layer': 2},
   {'id_type': 6, 'fid': 25, 'state': "active", 'start_build_date': "012010", 'start_prod_date': "092015", 'player': 3, 'column': 63,   'row': 25, 'layer': 2},
   {'id_type': 5, 'fid': 26, 'state': "active", 'start_build_date': "012010", 'start_prod_date': "092015", 'player': 3, 'column': 126,   'row': 49, 'layer': 2},
-  {'id_type': 5, 'fid': 27, 'state': "active", 'start_build_date': "012010", 'start_prod_date': "092015", 'player': 3, 'column': 79,   'row': 6, 'layer': 2},
+  {'id_type': 5, 'fid': 27, 'state': "active", 'start_build_date': "012010", 'start_prod_date': "092015", 'player': 3, 'column': 79,   'row': 17, 'layer': 2},
   {'id_type': 7, 'fid': 28, 'state': "active", 'start_build_date': "012010", 'start_prod_date': "092015", 'player': 3, 'column': 100,   'row': 52, 'layer': 2},
   {'id_type': 7, 'fid': 29, 'state': "active", 'start_build_date': "012010", 'start_prod_date': "092015", 'player': 3, 'column': 107,   'row': 34, 'layer': 2},
   {'id_type': 7, 'fid': 30, 'state': "active", 'start_build_date': "012010", 'start_prod_date': "092015", 'player': 3, 'column': 135,   'row': 14, 'layer': 2},

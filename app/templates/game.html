@@ -1,12 +1,15 @@
 {% extends "layout.html" %} {% block head_script %}
 <script type=text/javascript>
 		const globalGameId = {{game.id}}
+		const globalPlayerNumber = {{company.player_number}}
 	</script>
 <script data-main="{{ url_for('static', filename='js/main.js') }}" src="{{ url_for('static', filename='js/lib/requirejs/require.2.3.5.min.js') }}">
 </script> {% endblock head_script %} {% block middle_content %}
 <canvas id="gamecanvas" width="1200" height="600"></canvas>
 <div id="facility-select-dialog"></div>
 <div id="facility-view-dialog"></div>
+<div id="facility-view-dialog-vue"></div>
+<div id="progress-bar-dialog"></div>
 <div id="portfolio-dialog"></div>
 <div id="quarterly-report-dialog"></div>
 {% endblock middle_content %}

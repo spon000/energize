@@ -12,9 +12,9 @@ from app.models import FacilityType, GeneratorType
 
 def init_modifiers(cities):
   #t  = np.linspace(0,1*90,1*90*24)
-  t  = np.linspace(0,1,1*24)
-  # cc = cloud_cover(1*90*24)
-  cc = cloud_cover(1*24)
+  t  = np.linspace(0,1*90,90*24)
+  # cc = cloud_cover(90*24)
+  cc = cloud_cover(90*24)
   ri = rain_intensity(cc)
   su = sun_up(t)
   sp = solar_potential(cc,su)
@@ -124,10 +124,10 @@ def pop_growth(t,citiesPop):
 def energy_demand(t,pg,cc):
   ed=[]
   for cityPop in pg:
-    ed += [1e-3*np.multiply(cityPop,(4+np.sin((t*24-6)*np.pi/12.0)+1.5*(1-cc)))]
+    ed += [np.multiply(cityPop,(4+np.sin((t*24-6)*np.pi/12.0)+1.5*(1-cc)))]
 
-  print ("*"*80)
-  print (ed)
+  # print ("*"*80)
+  # print (ed)
   return ed
 
 
@@ -137,7 +137,7 @@ def turn(generators, modifiers):
 # def turn(gens,caps,costOn,costOff,fp,ed,sp):
   i=0
   # for day in range(90):
-  for day in range(1):
+  for day in range(90):
     for hr in range(24):
       iso(generators, modifiers, i)
       i+=1  
@@ -211,9 +211,9 @@ def iso(gens, mods, i):
     fCostOn = gens[j].generator_type.fixed_cost_operate / 8760.0
     #fCostOff = fCostOn * 1.0
     if costF[j] < price: 
-      player_profit[player_num] += [(price - fCostOn - fuel_costs[j]) * (avail[j] * 1e3)] 
+      player_profit[player_num] += [(price - fCostOn - fuel_costs[j]) * (avail[j])] 
     else: 
-      player_profit[player_num] += [(-fCostOn) * (avail[j] * 1e3)]
+      player_profit[player_num] += [(-fCostOn) * (avail[j])]
 
   print("Iteration: " + str(i))
   column_headings = ["playnum", "price", "demand", "price*demand", "sum", "min", "max", "sumAvail"]
@@ -268,7 +268,8 @@ def calculate_quarter(generators, cities):
   # print("len of pg =", len(pg))
   
   turn(generators, modifiers)
-  
+  # facility_turn(facilities)
+
   return None
 
 

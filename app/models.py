@@ -42,6 +42,7 @@ class Game(db.Model):
   turn_number = db.Column(db.Integer, default=0)
   start_quarter = db.Column(db.Integer, default=4)
   start_year = db.Column(db.Integer, default=2018)
+  total_years = db.Column(db.Integer, default=50)
 
   # Relational data
   companies = db.relationship('Company', lazy=True)
@@ -66,10 +67,10 @@ class Company(db.Model):
   player_number = db.Column(db.Integer, nullable=False)
   name = db.Column(db.String(30), nullable=False, default='Company #')
   score = db.Column(db.Integer, nullable=False, default=0)
-  budget = db.Column(db.Float, nullable=False, default=1000000000)
+  balance = db.Column(db.Float, nullable=False, default=1000000000)
   quarter_net = db.Column(db.Float, default=0)
-  global_bid_policy = db.Column(db.Enum("high", "medium", "low"), default="medium")
-  state = db.Column(db.Enum("new", "view", "build", "turn", "ready"), default="new")
+  global_bid_policy = db.Column(db.Enum("MC", "LCOE", "Fixed"), default="MC")
+  state = db.Column(db.Enum("ai", "view", "build", "turn", "ready"), default="ai")
   cost_operational = db.Column(db.Float, default=0)
   connected_to_game = db.Column(db.Integer, nullable=False, default=0)
 
@@ -138,10 +139,12 @@ class Generator(db.Model):
   # Data
   state = db.Column(db.Enum("new", "building", "paused", "available", "unavailable", "decommissioning", "decommisioned"), default="new")
   state_note = db.Column(db.String(30))
+  duty_cycles = db.Column(db.Float, default=0)
+  condition = db.Column(db.Float, default=1.0)
   build_turn = db.Column(db.Integer, default=0)
   start_build_date = db.Column(db.String(20))
   start_prod_date = db.Column(db.String(20))
-  local_bid_policy = db.Column(db.Enum("option1", "option2", "option3"), default="option2")
+  local_bid_policy = db.Column(db.Enum("Global", "MC", "LCOE", "Fixed"), default="Global")
   bid_policy_value = db.Column(db.Float, default=0)
   om_cost = db.Column(db.Float, default=0)
   revenue = db.Column(db.Float, default=0)
@@ -271,7 +274,7 @@ class GeneratorType(db.Model):
   # Data
   nameplate_capacity = db.Column(db.Integer, nullable=False) 
   build_time = db.Column(db.Integer)
-  efficiency = db.Column(db.Float)
+  heat_rate = db.Column(db.Float)
   continuous = db.Column(db.Boolean, default=True)
   lifespan = db.Column(db.Integer)
   fixed_cost_build = db.Column(db.Float)

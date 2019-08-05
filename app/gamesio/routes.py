@@ -2,7 +2,7 @@ import json
 
 from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app
 from flask_login import current_user, login_required
-from flask_socketio import send, emit
+from flask_socketio import send, emit, join_room
 from app import db, sio
 from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType
 from app.models import FacilitySchema, GeneratorSchema
@@ -18,14 +18,15 @@ gamesio = Blueprint('gamesio', __name__)
  
 @sio.on('disconnect')
 def on_disconnect():
-  
   print("-"*80)
   print(f"disconnecting...")
   print("-"*80)
 
 @sio.on('client_connect')
 def on_client_connect(gid):
+  join_room("game" + str(gid['gid']))
   print("+"*80)
+  print(f"client joined room: {'game' + str(gid['gid'])}")
   print(f"client connecting: gid = {gid}")
   print("+"*80)
 
@@ -75,10 +76,6 @@ def on_new_facility(data):
 @sio.on('cancel_facility')
 def on_cancel_facility(data):
   pass 
-
-
- 
-
 
 # @sio.on('player_disconnect')
 # def player_disconnect():

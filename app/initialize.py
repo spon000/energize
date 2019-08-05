@@ -3,18 +3,17 @@ from app import db, bcrypt
 from app.models import Game, Company, Facility, Generator, Modification, City, User, Prompt
 from app.models import FacilityType, GeneratorType, PowerType, ResourceType, ModificationType, PromptType
 from app.game.supply_type_defs import facility_types, generator_types, power_types, resource_types, modification_types
-from app.config import Config
 
-##############################################################################
-def main():
-  initialize_db()  
-  return 
+
 
 ################################################################################
-def initialize_db():
-  app = create_app()
+# Name: initialize_db
+#
+# Notes: 
+#   Assumes app = create_app() has been run.
+################################################################################
 
-  #
+def initialize_db(app):
   ctx = app.app_context()
   ctx.push()
 
@@ -144,11 +143,3 @@ def init_table(tableClass, db):
   # create() creates new table if it doesn't exist
   tableClass.__table__.create(db.engine)
   return 0
-
-################################################################################
-# Invoke main() first
-if __name__ == '__main__':
-  # Need to supply the application context when running this script.
-  # with app.app_context():
-  main()
-

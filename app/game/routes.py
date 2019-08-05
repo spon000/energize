@@ -9,11 +9,12 @@ from app.models import FacilitySchema, GeneratorSchema, ModificationSchema, City
 from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, ModificationTypeSchema
 from app.game.init_game import init_game_models
 from app.game.utils import get_current_game_date
-from app.game.run_turn import calculate_quarter
-# from app.game.runturn import runturn
+from app.game.turn import initialize_turn
+from app.game.turn import calculate_turn
+from app.game.turn import finalize_turn
+from app.game.modifiers import load_modifiers
 
 game = Blueprint('game', __name__)
-
 #################################################################################  
 # initgame: load game models with starting data
 @game.route("/cgame/<int:gid>", methods=["GET", "POST"])
@@ -46,7 +47,7 @@ def joingame(gid):
   game = Game.query.filter_by(id=gid).first()
   company = Company.query.filter_by(id=current_user.current_company).first()
   
-  if company.state != "new":
+  if company.state != "ai":
     flash(f"This company can\'t be used for this game.", "danger")
     return render_template("title.html")
 
@@ -95,13 +96,13 @@ def loadgame(gid):
     flash(f'You\'re not playing in this game', 'danger')
     return render_template("title.html")
 
-  budget = '${:,}'.format(int(company.budget))
+  balance = '${:,}'.format(int(company.balance))
   current_game_date = get_current_game_date(game)
-  if company.state == 'new':
+  if company.state == 'ai':
     company.state = 'view'
   db.session.commit()
 
-  return render_template("game.html", company=company, game=game, budget=budget, facilities=facilities, cgd=current_game_date)
+  return render_template("game.html", company=company, game=game, balance=balance, facilities=facilities, cgd=current_game_date)
 
 
 # ###############################################################################  
@@ -142,6 +143,21 @@ def game_data():
   game_schema = GameSchema()
   serialized_game = game_schema.dump(game).data
   return jsonify({'game': serialized_game})
+
+# ###############################################################################  
+#
+# ###############################################################################
+@game.route("/currentdate", methods=["GET", "POST"])
+@login_required
+def current_date():
+
+  gid = request.args.get('gid', None)
+
+  game = Game.query.filter_by(id=gid).first()
+  current_date = get_current_game_date(game)
+
+  return jsonify({'currentDate': current_date})
+
 
 # ###############################################################################  
 #
@@ -464,12 +480,15 @@ def facility_types():
 @game.route("/runturn", methods=["GET", "POST"])
 @login_required
 def runturn():
-
   gid = request.args.get('gid', None)
   game = Game.query.filter_by(id=gid).first()
-  gens = game.generators
-  cities = game.cities
-  calculate_quarter(gens, cities)
+  # generators = Generator.query.all()
+  # cities = City.query.all()
+
+  modifiers = load_modifiers(game)
+  initialize_turn(game, modifiers)
+  calculate_turn(game, modifiers)
+  finalize_turn(game, modifiers)
 
   return "Done running turn."
   

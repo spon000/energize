@@ -7,7 +7,8 @@ define([
   "CityLayer",
   "FacilityLayer",
   "MarkerLayer",
-], function ($, ResourceLoader, terrainLayer, canvasData, networkCallMap, CityLayer, FacilityLayer, MarkerLayer) {
+  "ModelData"
+], function ($, ResourceLoader, terrainLayer, canvasData, networkCallMap, CityLayer, FacilityLayer, MarkerLayer, ModelData) {
 
   return (
     class CanvasModel {
@@ -129,7 +130,7 @@ define([
               canvasData.terrainImageConfig,
               canvasData.terrainSpriteConfig
             );
-            // console.log("terrainTileMap = ", terrainTileMap);
+            console.log("terrainTileMap = ", terrainTileMap);
             resolve(terrainTileMap);
           });
         });
@@ -167,6 +168,7 @@ define([
 
           loaded.then((results) => {
             let resources = ResourceLoader.resourcesToObject(results);
+            let modelData = new ModelData()
             let facilities = resources[networkCallMap.facilityTable.name].data.facilities;
             let facilityLayer = new FacilityLayer(
               resources[canvasData.facilitySpriteConfig.name].data,
@@ -175,8 +177,32 @@ define([
               canvasData.terrainSpriteConfig
             );
             this._facilityLayer = facilityLayer;
-            this._facilityLayer.createFacilityTiles(facilities);
-            resolve(facilityLayer.tileMap);
+
+            // delete type 9 facility records (current player)
+            let keptFacilities = facilities.filter(facility => {
+              if (facility.player_number == globalPlayerNumber)
+                if (facility.facility_type == 9)
+                  return false;
+                else
+                  return true;
+              else
+                return true;
+            });
+
+            let removeFacilities = facilities.filter(facility =>
+              ((facility.facility_type == 9) && (facility.player_number == globalPlayerNumber))
+            );
+
+            let deletePromises = []
+            removeFacilities.forEach(rf => {
+              deletePromises.push(modelData.deleteFacility(rf.id))
+            });
+            Promise.all(deletePromises).then(() => {
+              this._facilityLayer.createFacilityTiles(keptFacilities);
+              resolve(facilityLayer.tileMap);
+            })
+            // console.log("keptFacilities = ", keptFacilities);
+            // console.log("removeFacilities = ", removeFacilities);
           });
         });
       }

@@ -21,11 +21,12 @@ define([
   Tabulator) {
     return (
       class FacilityViewDialog {
-        constructor(facilityId, facilityTypeList, closeHandler = null) {
+        constructor(facilityId, facilityTypeList = null, closeHandler = null) {
           console.log("facilityTypeList =", facilityTypeList);
           // Dialog 
           this._dialog = null;
           this._facilityId = facilityId;
+          this._facilityTypeList = facilityTypeList;
           this._ownedFacility = false;
           this._closeHandler = closeHandler;
           this._deleteFacility = false;
@@ -41,6 +42,7 @@ define([
           this._title = "Facility Viewer";
           this._facilityModified = facilityTypeList ? true : false;
           this._genListTable = null;
+          this._qtrsPerYear = 4;
 
 
           // Element Ids
@@ -54,6 +56,7 @@ define([
           this._elementIdFacilityFooter = "facility-footer-window";
           this._elementIdGenListTable = "vfd-gen-list-table"
 
+          this._currentDate = null;
           this._company = null;
           this._facility = null;
           this._generators = null;
@@ -73,21 +76,29 @@ define([
           this._facilityViewGeneratorListHtml = "";
           this._facilityViewFooterHtml = "";
 
-
           // Load all needed data.
           this._modelData = new ModelData();
-          this._modelData.getPlayerFacility(facilityId).then((data) => {
+
+          Promise.all([
+            this._modelData.getCurrentDate(),
+            this._modelData.getPlayerFacility(facilityId)
+          ]).then((data) => {
             // console.log("loaded data = ", data);
-            this._ownedFacility = data['owned_facility'];
-            this._company = data['company'];
-            this._facility = data['facility'];
-            this._generators = data['generators'];
-            this._modifications = data['modifications'];
-            this._facilityType = data['facility_type'];
-            this._generatorTypes = data['generator_types'];
-            this._powerTypes = data['power_types'];
-            this._resourceTypes = data['resource_types'];
-            this._modificationTypes = data['modification_types'];
+            this._currentDate = data[0]['currentDate'];
+            return data;
+          }).then((data) => {
+            // console.log("loaded data = ", data);
+            let fdata = data[1];
+            this._ownedFacility = fdata['owned_facility'];
+            this._company = fdata['company'];
+            this._facility = fdata['facility'];
+            this._generators = fdata['generators'];
+            this._modifications = fdata['modifications'];
+            this._facilityType = fdata['facility_type'];
+            this._generatorTypes = fdata['generator_types'];
+            this._powerTypes = fdata['power_types'];
+            this._resourceTypes = fdata['resource_types'];
+            this._modificationTypes = fdata['modification_types'];
 
             this._newFacility = this._facility.state == "new" ? true : false;
             if (this._newFacility)
@@ -104,7 +115,6 @@ define([
           this._facilityType["simpletype"] = this._facilityType.maintype.split(" ")[0];
           this._facility["new_facility"] = this._facility.state == "new" ? true : false;
           this._facility["company_name"] = this._company.name;
-
 
           // Add PowerType and Resource Type record to each generatorType record.
           this._generatorTypes = this._generatorTypes.map(gt => {
@@ -243,7 +253,15 @@ define([
         // Listener event functions.
 
         _backToSelect() {
+          let scope = evt.data;
           this._backToSelect = true;
+          this._openVerifyDialog(scope, (scope) => {
+            evtEmitter.emit("changefacility", {
+              facilityId: this._facilityId,
+              facilityTypeList: this._facilityTypeList
+            });
+          });
+
           $("#vfd-footer-close-btn").click();
         }
 
@@ -325,7 +343,7 @@ define([
           $(dialog).dialog("close");
         }
 
-        _openVerifyDialog(scope) {
+        _openVerifyDialog(scope, closeFunction = null) {
           $("#vfd-verify-dialog").empty()
           let verifyDialog = $("#vfd-verify-dialog").dialog({
             dialogClass: ".no-close",
@@ -346,6 +364,7 @@ define([
                   // $("#vfd-verify-dialog").empty();
                   $(this).dialog("close");
                   $(scope._dialog).dialog("close");
+                  if (closeFunction) closeFunction(scope)
                   // $(this).dialog.empty();
                 }
               },
@@ -415,21 +434,20 @@ define([
           // console.log("this._generators = ", this._generators);
           this._generators.forEach((gen, index) => {
             let profit = "rgb(255, 0, 0)" //getProfit(gen);
-            let condition = "rgb(250, 218, 94)" //getAge(gen);
-            let value = "rgb(0, 255, 0)" //getValue(gen);
+            let condition = "rgb(250, 218, 94)" //getCondition(gen);
+            let age = this._getAge(gen).color;
 
             let profitColor = profit.color;
             let conditionColor = condition.color;
-            let valueColor = value.color;
+            let ageColor = age.color;
 
             generator_table_data.push({
               id: gen.id,
-              check: false,
-              name: "gen " + this._padZeroes((index + 1), 2),
+              name: "generator" + this._padZeroes((index + 1), 2),
               cap: gen.gentype_details.nameplate_capacity,
               prof: profit,
+              age: age,
               cond: condition,
-              value: value,
               bidp: "MC",
               maintp: "routine",
               state: gen.state
@@ -442,15 +460,7 @@ define([
             data: generator_table_data,
             groupBy: ["state"],
             columns: [
-              {
-                title: "", field: "check", align: "center", headerSort: false, width: 20,
-                formatter: this._checkbox_cell,
-                onRendered: () => { console.log("checkbox rendered") },
-                formatterParams: {
-
-                }
-              },
-              { title: "Name", field: "name", width: 75 },
+              { title: "Name", field: "name", width: 100, align: "right" },
               {
                 title: "Capacity", field: "cap", width: 120, align: "center",
                 formatter: this._capacity_cell,
@@ -460,10 +470,11 @@ define([
                 }
               },
               { title: "Profit", field: "prof", formatter: "color", width: 80 },
+              { title: "Age", field: "age", formatter: "color", width: 80 },
               { title: "Condition", field: "cond", formatter: "color", width: 80 },
-              { title: "Value", field: "value", formatter: "color", width: 80 },
-              { title: "Bid Policy", field: "bidp" },
-              { title: "Maint Policy", field: "maintp" },
+
+              { title: "Bid Policy", field: "bidp", align: "center" },
+              { title: "Maint Policy", field: "maintp", align: "center" },
               { title: "State", field: "state", visible: false }
             ]
           }
@@ -553,34 +564,43 @@ define([
           });
         }
 
-        getAge(generator) {
-          let profit = generator.revenue - generator.om_cost;
-          let color = "rgb(255, 0, 0)";
-          if (profit >= 250 && profiit <= 1000) color = "rgb(250, 218, 94)";
-          else if (profit > 1000) color = "rgb(0,255,0)";
+        _getAge(generator) {
+          console.log("generator = ", generator);
+          let currentQtrs = ((this._currentDate.current_year - 1) * this._qtrsPerYear) + this._currentDate.current_quarter
+          // startQtrs = (parseInt(generator.start_prod_dategenerator.substr(2, 4)) - 1) * this._qtrsPerYear) + 0))
 
-          return ({
-            profit: profit,
-            color: color
-          });
+          return {
+            color: "rgb(0, 255, 0)",
+            age: 20
+          }
         }
+        // let profit = generator.revenue - generator.om_cost;
+        // let color = "rgb(255, 0, 0)";
+        // if (profit >= 250 && profiit <= 1000) color = "rgb(250, 218, 94)";
+        // else if (profit > 1000) color = "rgb(0,255,0)";
 
-        getValue(generator) {
-          let profit = generator.revenue - generator.om_cost;
-          let color = "rgb(255, 0, 0)";
-          if (profit >= 250 && profiit <= 1000) color = "rgb(250, 218, 94)";
-          else if (profit > 1000) color = "rgb(0,255,0)";
+        // return ({
+        //   profit: profit,
+        //   color: color
+        // });
 
-          return ({
-            profit: profit,
-            color: color
-          });
-        }
-        //////////////////////////////////////////////////////////////////////////
-        //
-        // End of Generator list table functions 
-        //
-        //////////////////////////////////////////////////////////////////////////
+
+        //     _getValue(generator) {
+        //     let profit = generator.revenue - generator.om_cost;
+        //     let color = "rgb(255, 0, 0)";
+        //     if(profit >= 250 && profiit <= 1000) color = "rgb(250, 218, 94)";
+        //           else if (profit > 1000) color = "rgb(0,255,0)";
+
+        // return ({
+        //   profit: profit,
+        //   color: color
+        // });
+        //         }
+        //         //////////////////////////////////////////////////////////////////////////
+        //         //
+        //         // End of Generator list table functions 
+        //         //
+        //         //////////////////////////////////////////////////////////////////////////
 
       });
   });

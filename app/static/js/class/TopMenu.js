@@ -109,5 +109,23 @@ define([
           });
         });
       }
+
+      // _setBuildStatus() {
+      //   $('#' + this._facilityButtonId).addClass(["building", "no-hover"]);
+      //   $.post(networkCallMap.companyTable.path + "pcstate=build", (data) => { console.log("successful POST", data) });
+      //   this._buildStatus = "build";
+      // }
+
+      // _setViewStatus() {
+      //   $('#' + this._facilityButtonId).removeClass(["building", "no-hover"]);
+      //   $.post(networkCallMap.companyTable.path + "pcstate=view", (data) => { console.log("successful POST", data) });
+      //   this._buildStatus = "view";
+      // }
+
+      // _setTurnStatus() {
+      //   $('#' + this._facilityButtonId).addClass(["no-hover"]);
+      //   $('#' + this._facilityButtonId).removeClass(["building"]);
+      //   this._buildStatus = "turn";
+      // }
     });
 });

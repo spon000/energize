@@ -1,13 +1,18 @@
 define([
   "jquery",
   "easeljs",
+  "ProgressBar",
   "TileMap",
   "Tile",
   "TerrainMap",
   "grassTileDefs"
-], function ($, createjs, TileMap, Tile, TerrainMap, grassTileDefs) {
+], function ($, createjs, ProgressBar, TileMap, Tile, TerrainMap, grassTileDefs) {
 
   const init = (terrainMapImage, terrainTilesImage, terrainImageConfig, terrainSpriteConfig) => {
+    let progressBar = new ProgressBar()
+    progressBar.barStart();
+
+    console.log("init running")
     let terrainMap = new TerrainMap(terrainMapImage);
     let tileMapName = "terrain";
 
@@ -24,20 +29,23 @@ define([
         regX: 0,
         regY: 0
       }
+
     });
 
     terrainSpriteSheet.totalFrameCols = terrainSpriteConfig.frameCols;
     terrainSpriteSheet.totalFrameRows = terrainSpriteConfig.frameRows;
 
     // Get images from tilese and paste them into a canvas element 
-    let imageMapCanvas = document.createElement('canvas');
-    imageMapCanvas.setAttribute("width", "6000");
-    imageMapCanvas.setAttribute("height", "3000");
+    // let imageMapCanvas = document.createElement('canvas');
+    // imageMapCanvas.setAttribute("width", "6000");
+    // imageMapCanvas.setAttribute("height", "3000");
+    let imageMapCanvas = new OffscreenCanvas(6000, 3000)
     let imageMapContext = imageMapCanvas.getContext("2d");
 
-    let tilesetCanvas = document.createElement('canvas');
-    tilesetCanvas.setAttribute("width", "500");
-    tilesetCanvas.setAttribute("height", "500");
+    // let tilesetCanvas = document.createElement('canvas');
+    // tilesetCanvas.setAttribute("width", "500");
+    // tilesetCanvas.setAttribute("height", "500");
+    let tilesetCanvas = new OffscreenCanvas(500, 500)
     let tilesetContext = tilesetCanvas.getContext("2d");
     let tilesetImage = terrainSpriteSheet.getFrame(0).image;
     tilesetContext.drawImage(tilesetImage, 0, 0);
@@ -50,11 +58,28 @@ define([
       tileMapName
     );
 
+    // let barWidthTotalCalcs = terrainTileMap.rows * terrainTileMap.columns;
+    // let barWidthInc = Math.floor(barWidthTotalCalcs / 100);
+    // console.log("barWidthInc = ", barWidthInc);
+
+
+    // let interval = setInterval(() => {
+    //   clearInterval(interval);
+    // }, 5000)
+    let worker = new Worker("../terrainWorker.js");
+
     for (let y = 0; y < terrainTileMap.rows; y++) {
       // Uncomment to get copy of terrain tilemap in a 2D array 
       // tileMapArray.push(new Array());
       // tileTypeArray.push(new Array());
       for (let x = 0; x < terrainTileMap.columns; x++) {
+        // progressBar.barWidth = 
+        // if ((((x + 1) * (y + 1)) % barWidthInc) == 0) {
+        //   // console.log("x * y % inc = " + (x + 1) + " * " + (y + 1) + " % " + barWidthInc + " = " + ((x + 1) * (y + 1)) % barWidthInc);
+        //   progressBar.barWidth++;
+        //   console.log("progressBar.barWidth = ", progressBar.barWidth);
+        // }
+
         let terrainTileSprite = _matchTile(
           y,
           x,
@@ -90,8 +115,13 @@ define([
     // Uncomment to get copy of terrain tilemap in a 2D array 
     // console.log("tileMapArray = ", JSON.stringify(tileMapArray));
     // console.log("tileTypeArray = ", JSON.stringify(tileTypeArray));
-    let terrainImage = document.createElement('img')
-    terrainImage.src = imageMapCanvas.toDataURL("image/png");
+    let terrainImage = imageMapCanvas.convertToBlob({
+      type: "image/png"
+    }).then((result) => {
+      console.log("terrainImage = ", terrainImage);
+    });
+    // let terrainImage = document.createElement('img')
+    // terrainImage.src = imageMapCanvas.toDataURL("image/png");
     let terrainBitmap = new createjs.Bitmap(terrainImage);
     // console.log("terrainBitmap =", terrainBitmap);
     terrainTileMap.addBitmapToContainer(terrainBitmap);

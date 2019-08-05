@@ -17,7 +17,7 @@ requirejs.config({
     // phaser3: "lib/phaser3/phaser.min",
     socketio: "lib/socketio/socket.io",
     Tabulator: "lib/tabulator/tabulator.min",
-    // Vue: "https://cdn.jsdelivr.net/npm/vue/dist/vue",
+    Vue: "https://cdn.jsdelivr.net/npm/vue/dist/vue",
     // Vuex: "https://unpkg.com/vuex",
 
     // MVC classes
@@ -27,6 +27,11 @@ requirejs.config({
     // BuildFacilityController: "class/mvc/BuildFacilityController",
     // BuildFacilityModel: "class/mvc/BuildFacilityModel",
     // BuildFacilityView: "class/mvc/BuildFacilityView",
+
+
+    // Vue files
+    viewFacility: "vue/viewFacility",
+    viewFacilityHtml: "vue/viewFacilityHtml",
 
     // HTML Templates
     // FacilityBuildDialog: "template/FacilityBuildTmplt",
@@ -50,8 +55,10 @@ requirejs.config({
     Layer: "class/Layer",
     LayerItem: "class/LayerItem",
     MarkerLayer: "class/MarkerLayer",
+    MessageBox: "class/MessageBox",
     ModelData: "class/ModelData",
     PortfolioViewDialog: "class/PortfolioViewDialog",
+    ProgressBar: "class/ProgressBar",
     PubSub: "class/PubSub",
     ResourceLoader: "class/ResourceLoader",
     SocketIOCalls: "class/SocketIOCalls",
@@ -84,6 +91,7 @@ requirejs.config({
     dateUtils: "misc/dateUtils",
     evtEmitter: "misc/evtEmitter",
     gameStore: "misc/gameStore",
+    msgBox: "misc/msgBox",
     terrainLayer: "misc/terrainLayer",
     // vueFacilitySelectDialog: "misc/vueFacilitySelectDialog",
   },
@@ -122,5 +130,6 @@ require([
   "Game",
 ], function (Game) {
   console.log("global game id = ", globalGameId);
+  console.log("global player number = ", globalPlayerNumber);
   game = new Game(globalGameId);
 });

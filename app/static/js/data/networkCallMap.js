@@ -72,6 +72,10 @@ define([
     "updateFacilityType": {
       name: "updateFacilityType",
       path: "/updatefacilitytype" + gid
+    },
+    "currentDate": {
+      name: "currentDate",
+      path: "/currentdate" + gid
     }
   });
 });				

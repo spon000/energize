@@ -5,6 +5,8 @@ from app.game.start_cities import start_cities
 from app.game.start_facilities import start_facilities
 from app.game.start_generators import start_generators
 from app.game.supply_type_defs import facility_types, generator_types, power_types, resource_types
+from app.game.modifiers import init_modifiers
+from app.game.history import init_history_table
 
 #######################################################################################
 # Main function
@@ -26,6 +28,13 @@ def init_game_models(game):
   # Add generators.
   init_generators(game)
 
+  # create modifiers table for all the iterations of the game.
+  # cities = City.query.all()
+  # init_modifiers(game, cities)
+
+  # Generate empty history table (file)
+  init_history_table(game)
+   
   return True
 
 #######################################################################################

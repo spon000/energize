@@ -5,11 +5,13 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_socketio import SocketIO
 from app.config import Config
+from app.gamesio.utils import create_rooms
 
 db = SQLAlchemy()
 ma = Marshmallow()
 sio = SocketIO()
 bcrypt = Bcrypt()
+
 login_manager = LoginManager()
 login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'

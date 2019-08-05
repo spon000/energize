@@ -18,7 +18,6 @@ define([
         this._facilityTypeList = facilityTypeList;
         this._facilityId = facilityId;
 
-
         // Dialog 
         this._dialog = null;
         this._closeHandler = closeHandler;

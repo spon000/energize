@@ -6,8 +6,10 @@ define([
   "FacilitySelectDialog",
   "FacilityViewDialog",
   "ModelData",
+  "ProgressBar",
   "SocketIOCalls",
   "evtEmitter",
+  // "viewFacility",
 
 ], function (
   canvasData,
@@ -17,10 +19,11 @@ define([
   FacilitySelectDialog,
   FacilityViewDialog,
   ModelData,
+  ProgressBar,
   SocketIOCalls,
-  evtEmitter
-
-) {
+  evtEmitter,
+    // viewFacility
+  ) {
 
     return (
       class CanvasController {
@@ -32,6 +35,9 @@ define([
           this._dragging = false;
           this._leftMouseDown = false;
           this._rollOver = false;
+          this._popupTimer = null;
+          this._clickPause = false;
+          this._popupDelay = 900;  // milliseconds
           this._dialogStatus = "popup" // possible values: "popup", "deleteing", "viewing", "building", "portfolio", "quarterly"
         }
 
@@ -39,6 +45,11 @@ define([
         // Public methods.
 
         initialize() {
+          let progressBar = new ProgressBar()
+          // progressBar.barStart();
+
+
+
           this._getTerrainLayer();
           this._getCityLayer();
           this._getFacilityLayer();
@@ -46,6 +57,11 @@ define([
           // this._setGeneralWindow
           this._canvasView.startCanvasTimer();
           this._setEventEmittersReceived();
+
+          // let progressBar = new ProgressBar()
+          // progressBar.barStart();
+          // let viewFacilityDialog = viewFacility;
+          // console.log("viewFacilityDialog = ", viewFacilityDialog)
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -85,14 +101,17 @@ define([
             //console.log("tileMap = ", tileMap);
             this._canvasView.addTileMap(tileMap, 1);
             this._setFacilityEvents(tileMap);
+            this._canvasModel.createPlayerMarkerTileMap().then(tileMap => {
+              this._canvasView.addTileMap(tileMap, 1);
+            })
           });
         }
 
         // Generate player markers tilemap
         _getPlayerMarkerLayer() {
-          this._canvasModel.createPlayerMarkerTileMap().then(tileMap => {
-            this._canvasView.addTileMap(tileMap, 1);
-          })
+          //   this._canvasModel.createPlayerMarkerTileMap().then(tileMap => {
+          //     this._canvasView.addTileMap(tileMap, 1);
+          //   })
         }
 
         _setGeneralWindowEvents() {
@@ -130,14 +149,17 @@ define([
           let scope = evt.data.scope;
           switch (evt.type) {
             case "click":
+
               // evt.originalEvent is used here. Disable double clicks
-              if (evt.originalEvent.detail > 1) break;
-              if (scope._terrainClicked) {
+              if (scope._terrainClicked && !this._clickPause) {
+                // prevent multiple quick clicks
+                this._clickPause = true;
+                scope._createDelay(null, 2000, () => { this._clickPause = false });
+
                 let colRow = scope._canvasView.getRowCol(evt.offsetX, evt.offsetY);
                 console.log("scope._dialogStatus = ", scope._dialogStatus);
 
                 if (scope._dialogStatus != "building") {
-                  scope._dialogStatus = "building";
                   scope._canvasModel.getCompanyData().then((companyData) => {
                     if (companyData.state === "build") {
                       let facilityListObj = scope._buildFacilityEvent(colRow);
@@ -208,13 +230,15 @@ define([
               break;
             case "rollover":
               if (!this._dragging && this._dialogStatus == "popup") {
-
-                this._canvasModel.getCityInformationHTML(tile.id).then((html) => {
-                  this._canvasView.displayRolloverInfo(evt, html)
+                this._popupTimer = this._createDelay(this._popupTimer, this._popupDelay, () => {
+                  this._canvasModel.getCityInformationHTML(tile.id).then((html) => {
+                    this._canvasView.displayRolloverInfo(evt, html)
+                  });
                 });
               }
               break;
             case "rollout":
+              this._createDelay(this._popupTimer);
               this._canvasView.displayRolloverInfo(evt, null);
               break;
           }
@@ -230,6 +254,7 @@ define([
             case "click":
               // evt.nativeEvent is used here.
               if (evt.nativeEvent.detail > 1) break;
+              this._createDelay(this._popupTimer);
               this._terrainClicked = false;
               this._dialogStatus = "view";
               this._canvasView.displayRolloverInfo({ "type": "rollout" }, null);
@@ -251,11 +276,17 @@ define([
               break;
             case "rollover":
               if (!this._dragging && this._dialogStatus == "popup") {
-        
+                this._popupTimer = this._createDelay(this._popupTimer, this._popupDelay, () => {
+                  this._canvasModel.getFacilityInformationHTML(tile.id).then((html) => {
+                    this._canvasView.displayRolloverInfo(evt, html)
+                  });
+                });
+
               }
               break;
             case "rollout":
               this._rollOver = false;
+              this._createDelay(this._popupTimer);
               this._canvasView.displayRolloverInfo(evt, null);
               break;
           }
@@ -310,12 +341,17 @@ define([
           return [...new Set(facilitiesAllowed)];
         }
 
-        _delayPopup(delayMs, callback) {
-          timeout = setTimeout(() => {
-            if (this._rollOver) {
+        _createDelay(timeout, delayMs = 0, callback = null) {
+          if (!callback)
+            if (timeout)
+              clearTimeout(timeout)
+
+          if (callback)
+            return setTimeout(() => {
               callback();
-            }
-          }, delayMs);
+            }, delayMs);
+          else
+            return null;
         }
 
         ////////////////////////////////////////////////////////////////////////////////
@@ -343,7 +379,6 @@ define([
         // evtEmitter events
 
         _onChangeFacility(facilityId, facilityTypeList) {
-          this._dialogStatus = "build";
           this._canvasModel.facilityLayer.updateFacilityTile(facilityId, "9");
           let facilitySelectDialog = new FacilitySelectDialog(facilityTypeList, facilityId, (evt) => {
             this._dialogStatus = "popup";

@@ -64,7 +64,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.playerFacility.path + "fid=" + facilityId)
           loaded.then((results) => {
-            // console.log("resultes = ", results);
+            console.log("resultes = ", results);
             resolve(results)
           });
         });
@@ -101,6 +101,16 @@ define([
       getCompany() {
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.playerCompany.path)
+          loaded.then((results) => {
+            console.log("resultes = ", results);
+            resolve(results)
+          });
+        });
+      }
+
+      getCurrentDate() {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.currentDate.path)
           loaded.then((results) => {
             console.log("resultes = ", results);
             resolve(results)
