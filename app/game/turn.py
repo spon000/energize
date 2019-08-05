@@ -36,7 +36,7 @@ def calculate_turn(game, mods):
 # ###############################################################################  
 #
 # ###############################################################################
-def finalize_turn(game, mods):
+def finalize_turn(game, mods, state):
   add_costs_to_company(state)
   age_generators(game.id)
   age_facilities(game.id)

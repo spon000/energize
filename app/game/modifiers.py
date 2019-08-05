@@ -33,7 +33,7 @@ def init_modifiers(game, cities):
     'ed':ed
   }
 
-  mods_filename = get_filename()
+  mods_filename = get_filename(game.id)
   mods_file = open(mods_filename, 'wb')
   pickle.dump(modifiers, mods_file)
   mods_file.close()
