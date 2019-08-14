@@ -270,7 +270,7 @@ define([
 
       }
 
-      faclityUpdateDialog(html) { }
+      facilityUpdateDialog(html) { }
 
       facilityBuildDialog(html) { }
 

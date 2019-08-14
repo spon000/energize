@@ -473,6 +473,20 @@ def facility_types():
     'resource_types': resource_types_serialized
   })
 
+# ###############################################################################  
+#
+# ###############################################################################
+@game.route("/generatordetailhtml", methods=["GET", "POST"])
+@login_required
+def facility_types():
+  gid = request.args.get('gid', None)
+  genid = request.args.get('genid', None)
+  generator = Generator.query.filter_by(id=genid, id_game=gid).first()
+
+  return render_template(
+    "viewgenerator.html", 
+    generator=generator 
+  )  
 
 # ###############################################################################  
 #

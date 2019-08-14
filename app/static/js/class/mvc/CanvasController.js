@@ -45,7 +45,7 @@ define([
         // Public methods.
 
         initialize() {
-          let progressBar = new ProgressBar()
+          // let progressBar = new ProgressBar()
           // progressBar.barStart();
 
 
@@ -379,10 +379,9 @@ define([
         // evtEmitter events
 
         _onChangeFacility(facilityId, facilityTypeList) {
-          this._canvasModel.facilityLayer.updateFacilityTile(facilityId, "9");
-          let facilitySelectDialog = new FacilitySelectDialog(facilityTypeList, facilityId, (evt) => {
-            this._dialogStatus = "popup";
-          });
+          let colRow = this._canvasModel.facilityLayer.getTileColRow(facilityId);
+          this._onDeleteFacility(facilityId);
+          this._onBuildFacility(colRow.col, colRow.row, facilityTypeList);
         }
 
         _onBuildFacility(col, row, facilityTypeList) {

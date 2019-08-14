@@ -9,6 +9,13 @@ def get_current_game_date(game):
   c_year = game.start_year + floor(game.turn_number / yearly_intervals)
   return {'current_quarter': c_qtr, 'current_year': c_year}
 
+def convertDateToQtrYear(date):
+  month = int(date[:2])
+  year = int(date[2:4])
+
+def convertQtrYearToDate(qtrYear):
+  return None
+
 def add_turns_to_game_date(current_qtr, current_year, turns = 1):
   current_month = 0
   new_qtr = 0

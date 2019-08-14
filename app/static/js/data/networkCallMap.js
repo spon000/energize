@@ -76,6 +76,10 @@ define([
     "currentDate": {
       name: "currentDate",
       path: "/currentdate" + gid
+    },
+    "generatorDetailHtml": {
+      name: "generatorDetailHtml",
+      path: "/generatordetailhtml" + gid
     }
   });
 });				

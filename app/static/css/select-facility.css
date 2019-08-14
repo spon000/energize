@@ -309,13 +309,11 @@ label[cond-image="construction"] {
   float: left;
   padding: 5px 10px;
   margin: 0;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 7px;
+  border-style: none;
   border-color: #646a6d;
 }
 
-.vfd-facility-name-input {
+#vfd-facility-name-input {
   float: left;
   padding: 5px 10px;
   margin: 0;
@@ -358,16 +356,11 @@ label[cond-image="construction"] {
   border-width: 1px;
 }
 
-
 #vfd-gen-list {
-  margin-top: 60px;
+  margin-top: 5px;
   margin-left: auto;
   margin-right: auto;
   width: fit-content;
-}
-
-#vfd-verify-dialog {
-  background-color: bisque;
 }
 
 .vfd-remove-gen-button {
@@ -381,6 +374,37 @@ label[cond-image="construction"] {
   padding: 1px 7px;
   margin: 0;
 }
+
+
+.vfd-generator-name .tooltip-text {
+  display: none;
+  width: 80px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: fixed;
+  z-index: 1000;
+}
+
+.vfd-generator-name:hover .tooltip-text {
+  display: inline;
+}
+
+#vfd-verify-dialog {
+  background-color: bisque;
+}
+
+/* div[role="dialog"] {
+  opacity: .2;
+}
+
+div[role="dialog"]:hover {
+  opacity: 1;
+} */
 
 
 /**********************************************************************
@@ -450,10 +474,25 @@ label[cond-image="construction"] {
 
 .vfd-gen-list-header {
   display: block;
-  background-color: #1adada;
   margin-top:20px; 
-  border-top-style: 1px #1adada solid;
-  border-bottom-style: 1px #1adada solid;
+  height: 50px;
+}
+
+.list-color {
+  background-color: #f5edd7;
+  border-top-style: 1px #f5edd7 solid;
+  border-bottom-style: 1px #f5edd7 solid;
+}
+
+.decom-color {
+  background-color: #f1c3c0;
+  border-top-style: 1px #f1c3c0 solid;
+  border-bottom-style: 1px #f1c3c0 solid;  
+}
+
+.vfd-gen-list-header-content {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .gen-header-detail {

@@ -9,8 +9,8 @@ define([
 ], function ($, createjs, ProgressBar, TileMap, Tile, TerrainMap, grassTileDefs) {
 
   const init = (terrainMapImage, terrainTilesImage, terrainImageConfig, terrainSpriteConfig) => {
-    let progressBar = new ProgressBar()
-    progressBar.barStart();
+    // let progressBar = new ProgressBar()
+    // progressBar.barStart();
 
     console.log("init running")
     let terrainMap = new TerrainMap(terrainMapImage);
@@ -36,16 +36,16 @@ define([
     terrainSpriteSheet.totalFrameRows = terrainSpriteConfig.frameRows;
 
     // Get images from tilese and paste them into a canvas element 
-    // let imageMapCanvas = document.createElement('canvas');
-    // imageMapCanvas.setAttribute("width", "6000");
-    // imageMapCanvas.setAttribute("height", "3000");
-    let imageMapCanvas = new OffscreenCanvas(6000, 3000)
+    let imageMapCanvas = document.createElement('canvas');
+    imageMapCanvas.setAttribute("width", "6000");
+    imageMapCanvas.setAttribute("height", "3000");
+    // let imageMapCanvas = new OffscreenCanvas(6000, 3000)
     let imageMapContext = imageMapCanvas.getContext("2d");
 
-    // let tilesetCanvas = document.createElement('canvas');
-    // tilesetCanvas.setAttribute("width", "500");
-    // tilesetCanvas.setAttribute("height", "500");
-    let tilesetCanvas = new OffscreenCanvas(500, 500)
+    let tilesetCanvas = document.createElement('canvas');
+    tilesetCanvas.setAttribute("width", "500");
+    tilesetCanvas.setAttribute("height", "500");
+    // let tilesetCanvas = new OffscreenCanvas(500, 500)
     let tilesetContext = tilesetCanvas.getContext("2d");
     let tilesetImage = terrainSpriteSheet.getFrame(0).image;
     tilesetContext.drawImage(tilesetImage, 0, 0);
@@ -66,7 +66,7 @@ define([
     // let interval = setInterval(() => {
     //   clearInterval(interval);
     // }, 5000)
-    let worker = new Worker("../terrainWorker.js");
+    //let worker = new Worker("../terrainWorker.js");
 
     for (let y = 0; y < terrainTileMap.rows; y++) {
       // Uncomment to get copy of terrain tilemap in a 2D array 
@@ -115,16 +115,36 @@ define([
     // Uncomment to get copy of terrain tilemap in a 2D array 
     // console.log("tileMapArray = ", JSON.stringify(tileMapArray));
     // console.log("tileTypeArray = ", JSON.stringify(tileTypeArray));
-    let terrainImage = imageMapCanvas.convertToBlob({
-      type: "image/png"
-    }).then((result) => {
-      console.log("terrainImage = ", terrainImage);
-    });
+    // let terrainImage = imageMapCanvas.convertToBlob({
+    //   type: "image/png"
+    // }).then((result) => {
+    //   console.log("terrainImage = ", terrainImage);
+    // });
+
+    // image in Canvas
     // let terrainImage = document.createElement('img')
     // terrainImage.src = imageMapCanvas.toDataURL("image/png");
-    let terrainBitmap = new createjs.Bitmap(terrainImage);
-    // console.log("terrainBitmap =", terrainBitmap);
-    terrainTileMap.addBitmapToContainer(terrainBitmap);
+
+    // image on server
+    let terrainImage = document.createElement('img')
+    terrainImage.src = '../static/img/world-map-6000x3000.png';
+    terrainImage.onload = () => {
+      let terrainBitmap = new createjs.Bitmap(terrainImage);
+      terrainTileMap.addBitmapToContainer(terrainBitmap);
+    }
+
+
+    // Save image to img tag
+    // let tImg = imageMapCanvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+    // document.write('<img src="' + tImg + '"/>');
+
+
+    // console.log("window.location.href = ", window.location.href);
+    //terrainImage.src = imageMapCanvas.toDataURL("image/png");
+
+    // let terrainBitmap = new createjs.Bitmap(terrainImage);
+    // // console.log("terrainBitmap =", terrainBitmap);
+    // terrainTileMap.addBitmapToContainer(terrainBitmap);
 
     return terrainTileMap;
   }

@@ -137,11 +137,12 @@ class Generator(db.Model):
   id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
 
   # Data
-  state = db.Column(db.Enum("new", "building", "paused", "available", "unavailable", "decommissioning", "decommisioned"), default="new")
+  state = db.Column(db.Enum("new", "building", "paused", "available", "unavailable", "decommissioning", "decommissioned"), default="new")
   state_note = db.Column(db.String(30))
   duty_cycles = db.Column(db.Float, default=0)
   condition = db.Column(db.Float, default=1.0)
   build_turn = db.Column(db.Integer, default=0)
+  decom_turn = db.Column(db.Integer, default=0)
   start_build_date = db.Column(db.String(20))
   start_prod_date = db.Column(db.String(20))
   local_bid_policy = db.Column(db.Enum("Global", "MC", "LCOE", "Fixed"), default="Global")
