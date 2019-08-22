@@ -13,7 +13,7 @@ define([], function () {
     facilityViewHeader: `
       <div class="vfd-title">
         {{#if owned}}
-          <input id="vfd-facility-name-input" class="" type="text" value="{{facilityName}}" style="position:absolute;top:6px;left:5px;"> 
+          <input id="vfd-facility-name-input" class="" type="text" fid="{{fid}}" value="{{facilityName}}" style="position:absolute;top:6px;left:5px;"> 
         {{else}}
           <h5 class="vfd-facility-name" style="position:absolute;top:6px;left:5px;"> {{facilityName}} </h5>
         {{/if}}
@@ -33,36 +33,38 @@ define([], function () {
           </div>
 
           <div id="vfd-generator-dialog"></div>
+
+          <div id="vfd-info-message-dialog"></div>
           
           <div class="container">
             <div class="row">
-              <h6 class="col-lg-4" style="font-weight: bold;"> Owner: </h6>
+              <h6 class="col-lg-5" style="font-weight: bold;"> Owner: </h6>
               <label class="col-lg-4"> {{ facility.company_name }} </h6>
             </div>
 
             <div class="row">
-              <h6 class="col-lg-4" style="font-weight: bold;"> OM Costs: </h6>
+              <h6 class="col-lg-5" style="font-weight: bold;"> OM Costs: </h6>
               <label class="col-lg-4"> $ </label>
             </div>
 
             <div class="row">
-              <h6 class="col-lg-4" style="font-weight: bold;"> Revenue: </h6>
+              <h6 class="col-lg-5" style="font-weight: bold;"> Revenue: </h6>
               <label class="col-lg-4"> $ </label>
             </div>
 
             <div class="row">
-              <h6 class="col-lg-4" style="font-weight: bold;"> Profit: </h6>
+              <h6 class="col-lg-5" style="font-weight: bold;"> Profit: </h6>
               <!-- <label class="col-lg-4"> $ {{ formatCurrency facilityType.fixed_cost_build }} </label> -->
               <label class="col-lg-4"> $ </label>
             </div>
 
             <div class="row">
-              <h6 class="col-lg-4" style="font-weight: bold;"> Capacity: </h6>
+              <h6 class="col-lg-5" style="font-weight: bold;"> Capacity: </h6>
               <label class="col-lg-4"> {{ facility.total_capacity }} MWh </label>
             </div>
 
             <div class="row">
-              <h6 class="col-lg-4" style="font-weight: bold;"> Num. Generators: </h6>
+              <h6 class="col-lg-5" style="font-weight: bold;"> Num. Generators: </h6>
               <label class="col-lg-4"> {{ numGenerators }}  </label>
             </div>
           </div>
@@ -119,6 +121,16 @@ define([], function () {
           border-left: solid 2px #eaeaea;
           border-bottom: solid 2px #777;
           border-right: solid 2px #777;
+          padding: 0;
+          user-select: none;
+          cursor: default;
+        }
+
+        #vfd-sub-gen-btn {
+          padding: 3px 6px;
+        }
+
+        #vfd-add-gen-btn {
           padding: 3px 6px;
         }
 
@@ -129,7 +141,7 @@ define([], function () {
           border-left: solid 2px #777;
           border-bottom: solid 2px #eaeaea;
           border-right: solid 2px #eaeaea;
-          padding: 3px 6px;
+          padding: 0;
         }
 
         .gen-header-btn .tooltip-text {
@@ -172,19 +184,15 @@ define([], function () {
 
             <div class="center-block">
             {{#if facilityOwned}}
-              {{#if applyOn}}
-                <button id="vfd-footer-apply-btn"> Apply </button>
-              {{else}}
-                <button id="vfd-footer-apply-btn" disabled="true"> Apply </button>
-              {{/if}}
+              <button id="vfd-footer-apply-btn" disabled="true"> Apply </button>
             {{/if}}
+
+            <div class="vfd-btn-divider"></div>
+            <button id="vfd-footer-close-btn"> Close </button>             
 
             {{#if_eq state "new"}}
               <div class="vfd-btn-divider"></div>
               <button id="vfd-footer-remove-btn"> Remove </button>
-            {{else}}
-              <div class="vfd-btn-divider"></div>
-              <button id="vfd-footer-close-btn"> Close </button>
             {{/if_eq}}
 
             {{#if facilitySelected}}
@@ -197,6 +205,11 @@ define([], function () {
           <div class="col col-lg-2"></div>
         </div>
       </div>
+    `,
+    infoMessageDialog: `
+    <div class='info-msg-dialog'>
+      <p> {{msg}} </p>
+    </div>
     `,
     verifyChangeDialog: `
       <div class='verify-close'>
@@ -245,18 +258,39 @@ define([], function () {
     `,
     selectCapacity: `
       <div class="capacity-selectbox">
-        <select>
+        <select genid="{{genId}}" MW">
         {{#each genTypes}}
-          <option value="{{nameplate_capacity}}"> {{nameplate_capacity}} MW</option>
+          {{#if_eq ../capacity nameplate_capacity}}
+            <option gtid="{{id}}" value="{{nameplate_capacity}}" selected="selected"> {{nameplate_capacity}} MW</option>
+          {{else}}
+            <option gtid="{{id}}" value="{{nameplate_capacity}}"> {{nameplate_capacity}} MW</option>
+          {{/if_eq}}
         {{/each}}
         </select>
       </div>
     `,
     selectBidPolicy: `
       <div class="bidpolicy-selectbox">
-        <select>
+        <select genid="{{genId}}">
         {{#each bidp_opts}}
-          <option value="{{this}}"> {{this}} </option>
+          {{#if_eq ../bidp this}}
+            <option value="{{this}}" selected="selected"> {{this}} </option>
+          {{else}}
+            <option value="{{this}}"> {{this}} </option>
+          {{/if_eq}}
+        {{/each}}
+        </select>
+      </div>
+    `,
+    selectMaintPolicy: `
+      <div class="maintpolicy-selectbox">
+        <select genid="{{genId}}">
+        {{#each maintp_opts}}
+          {{#if_eq ../maintp this}}
+            <option value="{{this}}" selected="selected"> {{this}} </option>
+          {{else}}
+            <option value="{{this}}"> {{this}} </option>
+          {{/if_eq}}
         {{/each}}
         </select>
       </div>

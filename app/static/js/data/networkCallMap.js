@@ -61,6 +61,14 @@ define([
       name: "newGenerators",
       path: "/newgenerators" + gid
     },
+    "updateGenerators": {
+      name: "updateGenerators",
+      path: "/updategenerators" + gid
+    },
+    "deleteGenerator": {
+      name: "deleteGenerator",
+      path: "/deletegenerator" + gid
+    },
     "addFacility": {
       name: "newFacility",
       path: "/newfacility" + gid
@@ -73,6 +81,10 @@ define([
       name: "updateFacilityType",
       path: "/updatefacilitytype" + gid
     },
+    "updateFacility": {
+      name: "updateFacility",
+      path: "/updatefacility" + gid
+    },
     "currentDate": {
       name: "currentDate",
       path: "/currentdate" + gid
@@ -80,6 +92,10 @@ define([
     "generatorDetailHtml": {
       name: "generatorDetailHtml",
       path: "/generatordetailhtml" + gid
+    },
+    "portfolioHtml": {
+      name: "portfolioHtml",
+      path: "/portfoliohtml" + gid
     }
   });
 });				

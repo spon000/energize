@@ -23,7 +23,7 @@ define([
         this._closeHandler = closeHandler;
 
         // JQueryUI Dialog Parameters
-        this._width = 860;
+        this._width = 770;
         this._height = 525;
         this._unselectedHeight = 200;
         this._isModel = true;
@@ -233,6 +233,8 @@ define([
           title: this._title,
           width: this._width,
           height: this._height,
+          minWidth: this._width,
+          minHeight: this._height,
           position: this._position,
           modal: this._isModel,
         });

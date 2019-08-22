@@ -4,8 +4,9 @@ define([
   "gameStore",
   "TopMenuBuild",
   "ResourceLoader",
-  "networkCallMap"
-], function ($, Component, gameStore, TopMenuBuild, ResourceLoader, networkCallMap) {
+  "networkCallMap",
+  "PortfolioViewDialog"
+], function ($, Component, gameStore, TopMenuBuild, ResourceLoader, networkCallMap, PortfolioViewDialog) {
   return (
     class TopMenu extends Component {
       constructor() {
@@ -28,7 +29,7 @@ define([
         });
 
         this._setNextBtnEvent();
-        // this._initPortfolioBtn();
+        this._initPortfolioBtn();
       }
 
       // Getters...
@@ -48,14 +49,10 @@ define([
 
       _initPortfolioBtn() {
         $('#' + this._portfolioButtonId).click(this, (evt) => {
-          // let pvd = new Vue(PortfolioViewDialog);
+          let pvd = new PortfolioViewDialog();
           console.log("pvd = ", pvd);
         });
       }
-
-
-
-
 
       _getCompanyData() {
         return new Promise(resolve => {

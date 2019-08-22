@@ -20,18 +20,18 @@ define([
         });
       }
 
-      addGenerator(fid, generator) {
+      addGenerators(fid, fTypeId, generators = []) {
         return new Promise(resolve => {
-          const loaded = $.get(networkCallMap.addGenerator.path + "fid=" + fid + "&gen" + generator);
+          if (!generators.length)
+            generators.push({ state: "new" })
+
+          let serializedGenerators = JSON.stringify(generators);
+          const loaded = $.get(networkCallMap.addGenerators.path + "fid=" + fid + "&ftid=" + fTypeId + "&gens=" + serializedGenerators);
           loaded.then((results) => {
-            // console.log("addGenerator resultes = ", results);
+            // console.log("addGenerators resultes = ", results);
             resolve(results)
           });
         });
-      }
-
-      addGenerators(generators) {
-
       }
 
       /////////////////////////////////////////////////////////////////////
@@ -48,7 +48,9 @@ define([
 
       updateFacility(fid, facility) {
         return new Promise(resolve => {
-          const loaded = $.get(networkCallMap.updateFacility.path + "fid=" + fid + "&facility" + facility)
+          let serializedFacility = JSON.stringify(facility);
+          const loaded = $.get(networkCallMap.updateFacility.path + "fid=" + fid + "&facility=" + serializedFacility)
+
           loaded.then((results) => {
             // console.log("updateFacilityType resultes = ", results);
             resolve(results)
@@ -58,7 +60,9 @@ define([
 
       updateGenerators(fid, generators) {
         return new Promise(resolve => {
-          const loaded = $.get(networkCallMap.updateGenerators.path + "fid=" + fid + "&gens" + generators)
+          let serializedGenerators = JSON.stringify(generators)
+          const loaded = $.get(networkCallMap.updateGenerators.path + "fid=" + fid + "&gens=" + serializedGenerators)
+
           loaded.then((results) => {
             // console.log("updateGenerators resultes = ", results);
             resolve(results)
@@ -72,7 +76,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.deleteFacility.path + "fid=" + fid)
           loaded.then((results) => {
-            console.log("deleteFacility resultes = ", results);
+            // console.log("deleteFacility resultes = ", results);
             resolve(results)
           });
         });
@@ -80,7 +84,7 @@ define([
 
       delGenerator(genId) {
         return new Promise(resolve => {
-          const loaded = $.get(networkCallMap.delGenerator.path + "genid=" + genId)
+          const loaded = $.get(networkCallMap.deleteGenerator.path + "genid=" + genId)
           loaded.then((results) => {
             // console.log("delGenerator resultes = ", results);
             resolve(results)
@@ -104,7 +108,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.playerFacility.path + "fid=" + facilityId)
           loaded.then((results) => {
-            console.log("resultes = ", results);
+            // console.log("getPlayerFacility resultes = ", results);
             resolve(results)
           });
         });
@@ -126,7 +130,7 @@ define([
 
       getGeneratorDetailHtml(genId) {
         return new Promise(resolve => {
-          const loaded = $.get(networkCallMap.generatorDetailHtml.path + "genid" + genId)
+          const loaded = $.get(networkCallMap.generatorDetailHtml.path + "genid=" + genId)
           loaded.then((results) => {
             // console.log("resultes = ", results);
             resolve(results)
@@ -152,7 +156,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.playerCompany.path)
           loaded.then((results) => {
-            console.log("resultes = ", results);
+            // console.log("getCompany resultes = ", results);
             resolve(results)
           });
         });
@@ -162,10 +166,22 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.currentDate.path)
           loaded.then((results) => {
-            console.log("resultes = ", results);
+            // console.log("getCurrentDate resultes = ", results);
             resolve(results)
           });
         });
       }
+
+
+      getPortfolioHtml() {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.portfolioHtml.path)
+          loaded.then((results) => {
+            // console.log("resultes = ", results);
+            resolve(results)
+          });
+        });
+      }
+
     });
 });

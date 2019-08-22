@@ -1,7 +1,7 @@
 body {
   background-color: lightgray;
   margin: auto;
-  overflow: hidden;
+  overflow: auto;
 }
 
 #game {

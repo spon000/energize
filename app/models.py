@@ -24,6 +24,15 @@ class User(db.Model, UserMixin):
   companies = db.relationship('Company')
 
   # Methods
+
+  # Allows you to access object properties as an associative array ex: generator['state']
+  def __getitem__(self, key):
+    return getattr(self, key)
+  
+  # Allows you to assign values to object properties as an associative array ex: generator['state'] = "new"
+  def __setitem__(self, key, value):
+    setattr(self, key, value)
+      
   def __repr__(self):
     return f"User('{self.username}', {self.email}, '{self.image_file}')" 
 
@@ -51,6 +60,15 @@ class Game(db.Model):
   cities = db.relationship('City', lazy=True)
     
   # Methods
+
+  # Allows you to access object properties as an associative array ex: generator['state']
+  def __getitem__(self, key):
+    return getattr(self, key)
+  
+  # Allows you to assign values to object properties as an associative array ex: generator['state'] = "new"
+  def __setitem__(self, key, value):
+    setattr(self, key, value)
+
   def __repr__(self):
     return f"Game('{self.name}', '{self.companies_max}', '{self.generators}')"
 
@@ -70,6 +88,7 @@ class Company(db.Model):
   balance = db.Column(db.Float, nullable=False, default=1000000000)
   quarter_net = db.Column(db.Float, default=0)
   global_bid_policy = db.Column(db.Enum("MC", "LCOE", "Fixed"), default="MC")
+  global_maintenance_policy = db.Column(db.Enum("Routine", "Proactive", "Reactive"), default="Routine")
   state = db.Column(db.Enum("ai", "view", "build", "turn", "ready"), default="ai")
   cost_operational = db.Column(db.Float, default=0)
   connected_to_game = db.Column(db.Integer, nullable=False, default=0)
@@ -80,6 +99,15 @@ class Company(db.Model):
   user = db.relationship('User')
 
   # Methods
+
+  # Allows you to access object properties as an associative array ex: generator['state']
+  def __getitem__(self, key):
+    return getattr(self, key)
+  
+  # Allows you to assign values to object properties as an associative array ex: generator['state'] = "new"
+  def __setitem__(self, key, value):
+    setattr(self, key, value)
+
   def __repr__(self):
     return f"Company( \
       'company name: {self.name}\n', \
@@ -122,7 +150,17 @@ class Facility(db.Model):
   company = db.relationship('Company')
   game = db.relationship('Game')
 
+
   # Methods
+
+  # Allows you to access object properties as an associative array ex: generator['state']
+  def __getitem__(self, key):
+    return getattr(self, key)
+  
+  # Allows you to assign values to object properties as an associative array ex: generator['state'] = "new"
+  def __setitem__(self, key, value):
+    setattr(self, key, value)
+
   def __repr__(self):
     return f"Facility('{self.name}', '{self.id_type}', '{self.player_number}', '{self.state}')"
 
@@ -145,11 +183,13 @@ class Generator(db.Model):
   decom_turn = db.Column(db.Integer, default=0)
   start_build_date = db.Column(db.String(20))
   start_prod_date = db.Column(db.String(20))
-  local_bid_policy = db.Column(db.Enum("Global", "MC", "LCOE", "Fixed"), default="Global")
+  local_bid_policy = db.Column(db.Enum("Company Wide", "MC", "LCOE", "Fixed"), default="Company Wide")
+  lobal_maintenance_policy = db.Column(db.Enum("Company Wide", "Routine", "Proactive", "Reactive"), default="Company Wide")
   bid_policy_value = db.Column(db.Float, default=0)
   om_cost = db.Column(db.Float, default=0)
   revenue = db.Column(db.Float, default=0)
   extension = db.Column(db.Float, default=0)
+  
   
   # Relational Data
   generator_type = db.relationship('GeneratorType')
@@ -157,18 +197,24 @@ class Generator(db.Model):
   modifications = db.relationship('Modification')
 
   # Methods
-  def __repr__(self):
-    return f"Generator( \
-      'Id: {self.id}\n')" 
-      # 'Type Id: {self.id_type}\n', \
-      # 'Type: {self.generator_type}\n', \
-      # 'Facility Id: {self.id_facility}\n', \
-      # 'Facility: {self.facility}\n', \
-      # 'Game Id: {self.id_game}\n', \
-      # 'State: {self.state}\n', \
-    # )"
 
-    # return f"Generator('{self.id_type}', '{self.id_facility}', '{self.state}')"
+  # Allows you to access object properties as an associative array ex: generator['state']
+  def __getitem__(self, key):
+    return getattr(self, key)
+  
+  # Allows you to assign values to object properties as an associative array ex: generator['state'] = "new"
+  def __setitem__(self, key, value):
+    setattr(self, key, value)
+
+  def __repr__(self):
+    return (
+      f"Generator -\n"
+      f"\tId: {self.id}\n"
+      f"\tType Id: {self.id_type}\n"
+      f"\tGame Id: {self.id_game}\n"
+      f"\tFacility Id: {self.id_facility}\n"
+      f"\tState: {self.state}\n"
+    )
 
 #########################################################################################
 # Modification Model    
@@ -274,6 +320,7 @@ class GeneratorType(db.Model):
   
   # Data
   nameplate_capacity = db.Column(db.Integer, nullable=False) 
+  maximum_capacity = db.Column(db.Integer, nullable=False)
   build_time = db.Column(db.Integer)
   heat_rate = db.Column(db.Float)
   continuous = db.Column(db.Boolean, default=True)
@@ -296,7 +343,7 @@ class GeneratorType(db.Model):
       f"ID: {self.id}\n" +
       f"Facility Type Id: {self.id_facility_type}\n" +
       f"Power Type Id: {self.id_power_type}\n" +
-      f"Power Type : {self.power_type.maintype}\n" +
+      f"Power Type : {self.power_type.name}\n" +
       f"Resource Type: {self.id_resource_type}"
     )
 

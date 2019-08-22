@@ -34,13 +34,13 @@ define([
           this._selectFacilityType = false;
 
           // Parameters
-          this._width = 750;
+          this._width = 850;
           this._height = 650;
           this._unOwnedHeight = 360;
           this._isModel = true;
           this._position = {};
           this._title = "Facility Viewer";
-          this._facilityModified = facilityTypeList ? true : false;
+          this._facilityModified = false;
           this._facilityPreviousSelected = facilityTypeList ? true : false;
           this._decomissionFacilityOn = false;
           this._genListTable = null;
@@ -67,10 +67,12 @@ define([
           this._powerTypes = null;
           this._resourceTypes = null;
           this._generatorStateList = ["new", "building", "paused", "available", "unavailable", "decommissioning", "decommissioned"];
-          this._bidPolicyOptions = ["Global", "MC", "LCOE", "Fixed"];
+          this._bidPolicyOptions = ["Company Wide", "MC", "LCOE", "Fixed"];
+          this._maintPolicyOptions = ["Company Wide", "Routine", "Proactive", "Reactive"];
 
           this._updatedFacility = {};
           this._updatedGenerator = {};
+          this._updatedGenerators = [];
 
           // Event listener IDs
 
@@ -184,6 +186,7 @@ define([
           let compiledTemplate = Handlebars.compile(FacilityViewTmplt.facilityViewHeader);
           let templateParms = {
             owned: this._ownedFacility,
+            fid: this._facility.id,
             facilityName: this._facility.name,
             simpleType: this._facilityType.simpletype
           }
@@ -227,7 +230,7 @@ define([
           let compiledTemplate = Handlebars.compile(FacilityViewTmplt.generatorListHeader);
           let templateParms = {
             owned: this._ownedFacility,
-            oldFacility: !this._facilityPreviousSelected
+            oldFacility: !this._newFacility
           }
           this._facilityViewGenListHeaderHtml = this._addHtml($(compiledTemplate(templateParms)),
             this._elementIdGeneratorListHeader, this._facilityViewWindowHtml);
@@ -249,7 +252,6 @@ define([
         _createFooter() {
           let compiledTemplate = Handlebars.compile(FacilityViewTmplt.facilityViewFooter);
           let templateParms = {
-            applyOn: this._facilityModified,
             facilityOwned: this._ownedFacility,
             facilitySelected: this._facilityPreviousSelected,
             state: this._facility.state
@@ -280,12 +282,33 @@ define([
 
           $("#vfd-facility-name-input").change(this, this._editFacilityName);
 
-          $(".vfd-generator-name").on("click", this, this._generatorNameAction);
+          this._createTableEvents();
         }
+
+        /* *********************************************************************************** */
+        _deleteEvents() {
+
+        }
+
+        /* *********************************************************************************** */
+        _createTableEvents() {
+          $(".vfd-generator-name").on("click", this, this._generatorNameAction);
+          $(".capacity-selectbox").on("change", this, this._capacityOptionChange);
+          $(".bidpolicy-selectbox").on("change", this, this._bidPolicyOptionChange);
+          $(".maintpolicy-selectbox").on("change", this, this._maintPolicyOptionChange);
+        }
+
+        /* *********************************************************************************** */
+        _deleteTableEvents() {
+
+        }
+
 
         //////////////////////////////////////////////////////////////////////////
         // Listener event functions.
 
+        /* *********************************************************************************** */
+        // Generator Header button (add and decomission) events
         /* *********************************************************************************** */
         _addGeneratorClick(evt) {
           let scope = evt.data;
@@ -316,20 +339,103 @@ define([
         }
 
         /* *********************************************************************************** */
+        // Generator list events
+        /* *********************************************************************************** */
         _generatorNameAction(evt) {
-          // console.log("testing", evt)
           let scope = evt.data;
-          let link = evt.currentTarget;
-          let genTable = scope._generatorListTable();
+          let link = evt.currentTarget.firstElementChild;
+          let action = $(link).attr("action");
+          let genId = $(link).attr("gid");
 
-          // if (action == )
+          switch (action) {
+            case "details":
+              scope._openGeneratorDialog("test", 1, genId, scope)
+              break;
+            case "remove":
+              scope._delGenerator(genId, scope)
+              break;
+            case "decomission":
+              scope._decomissionGenerator(genId, scope)
+              break
+          }
+          console.log("testing", link, genId)
+
+          // let genTable = scope._generatorListTable();
+
         }
 
         /* *********************************************************************************** */
-        _applyUpdates() {
+        _capacityOptionChange(evt) {
+          let scope = evt.data
+          let genId = $("select", this).first().attr("genid");
+          let genTypeId = $("option:selected", this).first().attr("gtid");
+          let genIndex = scope._updatedGenerators.findIndex(gen => gen.id == genId)
 
+          if (genIndex > -1)
+            scope._updatedGenerators[genIndex]['id_type'] = genTypeId;
+          else
+            scope._updatedGenerators.push({ 'id': genId, 'id_type': genTypeId });
+
+          console.log("_capacityOptionChange(): ", genId, genTypeId, scope._updatedGenerators);
+          scope._turnOnApply(scope);
         }
 
+        /* *********************************************************************************** */
+        _bidPolicyOptionChange(evt) {
+          let scope = evt.data
+          let genId = $("select", this).first().attr("genid");
+          let value = $("option:selected", this).first().val();
+          let genIndex = scope._updatedGenerators.findIndex(gen => gen.id == genId)
+
+          if (genIndex > -1)
+            scope._updatedGenerators[genIndex]['local_bid_policy'] = value;
+          else
+            scope._updatedGenerators.push({ 'id': genId, 'local_bid_policy': value });
+
+          console.log("_bidPolicyOptionChange(): ", genId, value, scope._updatedGenerators);
+          scope._turnOnApply(scope);
+        }
+
+        /* *********************************************************************************** */
+        _maintPolicyOptionChange(evt) {
+          let scope = evt.data
+          let genId = $("select", this).first().attr("genid");
+          let value = $("option:selected", this).first().val();
+          let genIndex = scope._updatedGenerators.findIndex(gen => gen.id == genId)
+
+          if (genIndex > -1)
+            scope._updatedGenerators[genIndex]['local_maintenance_policy'] = value;
+          else
+            scope._updatedGenerators.push({ 'id': genId, 'local_maintnenace_policy': value });
+
+          console.log("_maintPolicyOptionChange(): ", genId, value, scope._updatedGenerators);
+          scope._turnOnApply(scope);
+        }
+
+        /* *********************************************************************************** */
+        _applyUpdates(evt) {
+          let scope = evt.data;
+          console.log("_updatedFacility", scope._updatedFacility);
+
+          if (scope._updatedFacility !== {}) {
+            scope._modelData.updateFacility(scope._facilityId, scope._updatedFacility).then((facility) => {
+              console.log("_applyUpdates() Facility was updated", facility);
+              scope._updatedFacility = {};
+            })
+          }
+
+          if (scope._updatedGenerators !== []) {
+            scope._modelData.updateGenerators(scope._facilityId, scope._updatedGenerators).then((generators) => {
+              console.log("_applyUpdates() Generators were updated", generators);
+              scope._updatedGenerators = [];
+            })
+          }
+
+          scope._turnOffApply(scope)
+        }
+
+        /* *********************************************************************************** */
+        // Footer button events...
         /* *********************************************************************************** */
         _closeDialog(evt) {
           let scope = evt.data
@@ -341,7 +447,7 @@ define([
         /* *********************************************************************************** */
         _backToSelect(evt) {
           let scope = evt.data;
-          let msgType = scope._facilityModified ? "mod" : "none";
+          let msgType = scope._facilityPreviousSelected ? "mod" : "none";
 
           scope._openVerifyDialog(msgType, scope, (scope) => {
             evtEmitter.emit("changefacility", {
@@ -377,23 +483,24 @@ define([
         //   }
         // }
 
-        /* *********************************************************************************** */
-        _initOnEvents() {
-        }
+
 
         /* *********************************************************************************** */
         _editFacilityName(evt) {
           let scope = evt.data;
           let facilityName = evt.currentTarget.value.trim();
+          let fid = $(evt.currentTarget).attr("fid");
+
           if (facilityName == "") {
-            evt.currentTarget.value = scope._updatedFacility["name"];
-            // console.log("bad facility name change", evt, facilityName);
+            evt.currentTarget.value = scope._updatedFacility['name'];
+            console.log("_editFacilityName bad facility name change", scope._updatedFacility);
           }
           else {
-            scope._updatedFacility["name"] = facilityName;
-            evt.currentTarget.value = scope._updatedFacility["name"]
+            scope._updatedFacility['id'] = fid;
+            scope._updatedFacility['name'] = facilityName;
+            evt.currentTarget.value = scope._updatedFacility['name']
             scope._turnOnApply(scope);
-            // console.log("good facility name change", evt, facilityName);
+            console.log("_editFacilityName: good facility name change", scope._updatedFacility);
           }
           $(':focus').blur();
         }
@@ -422,6 +529,7 @@ define([
             scope: this,
             owned: this._ownedFacility,
             autoOpen: false,
+            closeOnEscape: false,
 
             // Stuff to do after dialog is opened...
             open: (evt, ui) => {
@@ -435,9 +543,6 @@ define([
               // Show the generator list if the facility is owned or has been created by the player.
               if (this._ownedFacility) {
                 this._generatorListTable = this._generatorListTable();
-
-                if (this._facilityPreviousSelected)
-                  this._addGenerator(this);
               }
 
               // Setup Listener events
@@ -490,6 +595,10 @@ define([
             autoOpen: false,
             open: (evt, ui) => {
               $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+              $('.vfd-title').hide();
+            },
+            close: (evt, ui) => {
+              $('.vfd-title').show();
             },
             title: "Warning: facility changes will be lost.",
             width: 400,
@@ -520,18 +629,25 @@ define([
         }
 
         /* *********************************************************************************** */
-        _openGeneratorDialog(facilityName, genNumber, generator, scope, closeFunction = null) {
-          ModelData.getGeneratorDetailHtml(generator.id).then((html) => {
+        _openGeneratorDialog(facilityName, genNumber, genId, scope, closeFunction = null) {
+          this._modelData.getGeneratorDetailHtml(genId).then((html) => {
             $("#vfd-generator-dialog").empty()
             $("#vfd-generator-dialog").append(html)
 
             let generatorDialog = $("#vfd-generator-dialog").dialog({
               scope: scope,
               title: "Generator #" + genNumber + " for facility: " + facilityName,
-              width: 400,
-              height: 400,
+              width: 500,
+              height: 500,
               position: {},
               modal: true,
+              open: (evt, ui) => {
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                $('.vfd-title').hide();
+              },
+              close: (evt, ui) => {
+                $('.vfd-title').show();
+              },
               buttons: [
                 {
                   text: "Close",
@@ -545,6 +661,42 @@ define([
             })
           });
         }
+
+        /* *********************************************************************************** */
+        _openMessageDialog(scope, msg, closeFunction = null) {
+          let html = Handlebars.compile(FacilityViewTmplt.infoMessageDialog)({
+            msg: msg
+          });
+
+          $("#vfd-info-message-dialog").empty()
+          $("#vfd-info-message-dialog").append(html)
+
+          let infoMessageDialog = $("#vfd-info-message-dialog").dialog({
+            scope: scope,
+            title: "Warning",
+            width: 300,
+            position: {},
+            modal: true,
+            open: (evt, ui) => {
+              $('.vfd-title').hide();
+            },
+            close: (evt, ui) => {
+              $('.vfd-title').show();
+            },
+            buttons: [
+              {
+                text: "OK",
+                click: function (evt) {
+                  $(this).dialog("close")
+                  if (closeFunction)
+                    closeFunction(scope)
+                }
+              }
+            ]
+          })
+        }
+
+
 
         //////////////////////////////////////////////////////////////////////////
         // Misc methods
@@ -601,7 +753,7 @@ define([
         /* *********************************************************************************** */
         _generatorListTable() {
           const generator_table_data = [];
-          console.log("this._generators = ", this._generators);
+          console.log("_generatorListTable() this._generators = ", this._generators);
           this._generators.forEach((gen, index) => {
             let profit = "rgb(255, 0, 0)" //getProfit(gen);
             let condition = "rgb(250, 218, 94)" //getCondition(gen);
@@ -620,7 +772,7 @@ define([
               age: age,
               cond: condition,
               bidp: gen.local_bid_policy,
-              maintp: "routine",
+              maintp: gen.local_maint_policy,
               state: gen.state
             });
           })
@@ -632,7 +784,7 @@ define([
             groupBy: ["state"],
             columns: [
               {
-                title: "Name", field: "name", width: 100, align: "center",
+                title: "Name", field: "name", width: 110, align: "center",
                 formatter: this._name_cell,
                 // onRendered: () => { console.log("capacity rendered") },
                 formatterParams: {
@@ -640,7 +792,7 @@ define([
                 },
               },
               {
-                title: "Capacity", field: "cap", width: 120, align: "center",
+                title: "Capacity", field: "cap", align: "center",
                 formatter: this._capacity_cell,
                 // onRendered: () => { console.log("capacity rendered") },
                 formatterParams: {
@@ -669,14 +821,20 @@ define([
                 }
               },
               {
-                title: "Bid Policy", field: "bidp", width: 110, align: "center",
+                title: "Bid Policy", field: "bidp", align: "center",
                 formatter: this._bidPolicy_cell,
                 // onRendered: () => { console.log("bid policy rendered") },
                 formatterParams: {
                   bidPolicyOptions: this._bidPolicyOptions
                 }
               },
-              { title: "Maint Policy", field: "maintp", align: "center" },
+              {
+                title: "Maint Policy", field: "maintp", align: "center",
+                formatter: this._maintPolicy_cell,
+                formatterParams: {
+                  maintPolicyOptions: this._maintPolicyOptions
+                }
+              },
               { title: "State", field: "state", visible: false }
             ]
           }
@@ -707,7 +865,9 @@ define([
 
           if (cell.getData().state == "new") {
             let templateParms = {
-              genTypes: formatterParams.gen_types
+              genId: cell.getData().id,
+              genTypes: formatterParams.gen_types,
+              capacity: cell.getData().cap
             }
             html = Handlebars.compile(FacilityViewTmplt.selectCapacity)(templateParms);
           }
@@ -722,9 +882,11 @@ define([
         _bidPolicy_cell(cell, formatterParams) {
           let html = ""
 
-          if (cell.getData().state == "available") {
+          if (cell.getData().state != "decommissioned" && cell.getData().state != "decommissioning") {
             let templateParms = {
-              bidp_opts: formatterParams.bidPolicyOptions
+              genId: cell.getData().id,
+              bidp_opts: formatterParams.bidPolicyOptions,
+              bidp: cell.getData().bidp
             }
             html = Handlebars.compile(FacilityViewTmplt.selectBidPolicy)(templateParms);
           }
@@ -734,6 +896,26 @@ define([
 
           return html;
         }
+
+        /* *********************************************************************************** */
+        _maintPolicy_cell(cell, formatterParams) {
+          let html = ""
+
+          if (cell.getData().state != "decommissioned" && cell.getData().state != "decommissioning") {
+            let templateParms = {
+              genId: cell.getData().id,
+              maintp_opts: formatterParams.maintPolicyOptions,
+              maintp: cell.getData().maintp
+            }
+            html = Handlebars.compile(FacilityViewTmplt.selectMaintPolicy)(templateParms);
+          }
+          else {
+            html = `<label> ${cell.getValue()} </label>`
+          }
+
+          return html;
+        }
+
 
         _profit_cell(cell, formatterParams) {
           let templateParms = {
@@ -789,12 +971,25 @@ define([
 
         //////////////////////////////////////////////////////////////////////////
         // Generator List Table methods
+
         /* *********************************************************************************** */
         _addGenerator(scope) {
           console.log("_addGenerator()...", scope);
-          scope._turnOnApply(scope);
+          // scope._turnOnApply(scope);
+
+          // fid: gen.id_facility,
+          //   id: gen.id,
+          //     name: "generator " + this._padZeroes((index + 1), 2),
+          //       cap: gen.gentype_details.nameplate_capacity,
+          //         prof: profit,
+          //           age: age,
+          //             cond: condition,
+          //               bidp: gen.local_bid_policy,
+          //                 maintp: gen.local_maint_policy,
+          //                   state: gen.state
 
           let newGen = {
+            "id": 0,
             "state": "new",
             "name": "generator " + scope._padZeroes((scope._generators.length + 1), 2),
             "cap": 0,
@@ -805,23 +1000,48 @@ define([
             "maintp": "N/A",
             "modified": true,
             "id_type": scope._generatorTypes[0],
-            "id_facility": scope._facilityId,
+            "fid": scope._facilityId,
             "state_note": "under construction"
           }
           let genRow = scope._generatorListTable.rowManager.rows.find(row => row.getData().state == "available");
+
           if (genRow)
             genRow.getGroup().hide();
 
-          scope._generatorListTable.addRow(newGen).then((row) => row.scrollTo());
-          // console.log("this._generatorListTable = ", scope._generatorListTable);
-          scope._generators.push(newGen);
-          $(".vfd-generator-name").on("click", scope, scope._generatorNameAction);
+          scope._modelData.addGenerators(scope._facility.id, scope._facilityType.id).then((results) => {
+            console.log("addGenerators results = ", results)
+            newGen.id = results.generators[0].id;
+            scope._generatorListTable.addRow(newGen).then((row) => row.scrollTo());
+            // console.log("this._generatorListTable = ", scope._generatorListTable);
+            scope._generators.push(newGen);
+            scope._createTableEvents()
+            // $(".vfd-generator-name").on("click", scope, scope._generatorNameAction);
+          });
         }
 
-        _delGenerator(evt) {
-          let delRow = s
+        /* *********************************************************************************** */
+        _delGenerator(genId, scope) {
+          console.log("delGenerator genId = ", genId);
+          let newGeneratorRows = scope._generatorListTable.rowManager.rows.reduce((total, row) => {
+            return (row.getData().state == "new" ? total + 1 : total)
+          }, 0);
+          // console.log("newGeneratorRows = ", newGeneratorRows);
+          if ((scope._newFacility) && (newGeneratorRows <= 1)) {
+            scope._openMessageDialog(scope, "You must have at least one generator ready for construction.")
+          }
+          else {
+            let row = scope._generatorListTable.rowManager.rows.find(row => row.getData().id == genId);
+            console.log("row = ", row);
+            scope._modelData.delGenerator(genId).then((results) => {
+              row.delete();
+            });
+          }
         }
 
+        /* *********************************************************************************** */
+        _decomissionGenerator(genId, scope) {
+
+        }
 
         /* *********************************************************************************** */
         getProfit(generator) {

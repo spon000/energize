@@ -1,74 +1,80 @@
+<style>
+  .even-row {
+    background-color: #e6eaec;
+  }
+</style>
+
 <div class="row">
-  <div class="col-lg">
+  <div class="col-lg-8">
     <label> OM Costs: </label>
   </div>
-  <div class="col-md">
-    <label>{{ generator.om_cost }}</label>
+  <div class="col-md-4">
+    <label>{{ format_money(generator.om_cost) }}</label>
   </div>
 </div>
-<div class="row">
-  <div class="col-lg">
+<div class="row even-row">
+  <div class="col-lg-8">
     <label> Revenue: </label>
   </div>
-  <div class="col-md">
-    <label> {{ generator.revenue }}</label>
+  <div class="col-md-4">
+    <label> {{ format_money(generator.revenue) }}</label>
   </div>
 </div>
 <div class="row">
-  <div class="col-lg">
+  <div class="col-lg-8">
     <label> Profit: </label>
   </div>
-  <div class="col-md">
-    <label> 0.0 </label>
+  <div class="col-md-4">
+    <label> {{ format_money(0.0) }}</label>
   </div>
 </div>
-<div class="row">
-  <div class="col-lg">
+<div class="row even-row">
+  <div class="col-lg-8">
     <label> Total Nameplate Capacity: </label>
   </div>
-  <div class="col-md">
+  <div class="col-md-4">
     <label> {{ generator.generator_type.nameplate_capacity }} MW</label>
   </div>
 </div>
 <div class="row">
-  <div class="col-lg">
+  <div class="col-lg-8">
     <label> Start Date: </label>
   </div>
-  <div class="col-md">
-    </label>{{ generator.start_prod_date }}</label>
+  <div class="col-md-4">
+    </label>{{ to_qtr_year_string(generator.start_prod_date, True) }}</label>
   </div>
 </div>
-<div class="row">
-  <div class="col-lg">
+<div class="row even-row">
+  <div class="col-lg-8">
     <label> Lifetime (anticipated end date): </label>
   </div>
-  <div class="col-md">
+  <div class="col-md-4">
     </label> </label>
   </div>
 </div>
 <div class="row">
-  <div class="col-lg">
+  <div class="col-lg-8">
     <label> Bid Policy: </label>
   </div>
-  <div class="col-md">
+  <div class="col-md-4">
     <label> {{ generator.local_bid_policy }} </label>
   </div>
 </div>
 
-<div class="row">
-  <div class="col-lg">
+<div class="row even-row">
+  <div class="col-lg-8">
     <label> Maintenance Policy: </label>
   </div>
-  <div class="col-md">
+  <div class="col-md-4">
     <label> Routine </label>
   </div>
 </div>
 
 <div class="row">
-  <div class="col-lg">
+  <div class="col-lg-8">
     <label> Modifications: </label>
   </div>
-  <div class="col-md">
+  <div class="col-md-4">
     <label> </label>
   </div>
 </div>

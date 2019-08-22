@@ -43,62 +43,44 @@ define([], function () {
         <table class="data-details-table">
           <tbody>
             <tr>
-              <td class="td-tip">
-                <div class="help-tip">
-                  <p>This reflects the change in cost associated with capacity and market fluctuations.</p>
-                </div>
+              <td class="td-label">Capitol Cost:
+                <p>This reflects the change in cost associated with capacity and market fluctuations.</p>
               </td>
-              <td class="td-label">Overnight Capitol Cost:</td>
-              <td class="td-value">{{fixedCost}} /MW</td>
+              <td class="td-value">{{fixedCost}} MW</td>
             </tr>
 
             <tr>
-              <td class="td-tip">
-                <div class="help-tip">
-                  <p>(Levelized Cost of Electricity) The LCOE represents the break-even cost over the facility lifetime. This includes all of the build, operation, maintenance, and decommissioning costs over the lifetime of the facility.</p>
-                </div>
-              </td> 
-              <td class="td-label">LCOE:</td>
+              <td class="td-label">LCOE:
+                <p>(Levelized Cost of Electricity) The LCOE represents the break-even cost over the facility lifetime. This includes all of the build, operation, maintenance, and decommissioning costs over the lifetime of the facility.</p>
+              </td>
               <td class="td-value">{{fixedOperateCost}} /MWh</td>
             </tr>
 
             <tr>
-              <td class="td-tip">
-                <div class="help-tip">
-                  <p>This is the cost of owning a facility whether or not your facility is generating electricity. This includes labor and maintenance, among other things, but does not include fuel costs.</p>
-                </div>
-              </td> 
-              <td class="td-label">Fixed Operating Cost:</td>
+              <td class="td-label">Fixed Operating Cost:
+                <p>This is the cost of owning a facility whether or not your facility is generating electricity. This includes labor and maintenance, among other things, but does not include fuel costs.</p>
+              </td>
               <td class="td-value">{{fixedOperateCost}} /MW</td>
             </tr>
 
             <tr>
-              <td class="td-tip">
-                <div class="help-tip">
-                  <p> The capacity factor reflects the electricity produced with respect to the maximum electricity produced if operating at full capacity 100% of the time. That is, capacity factor compares actual (or expected) generation to theoretical maximum generation.</p>
-                </div>
+              <td class="td-label">Capacity Factor:
+                <p> The capacity factor reflects the electricity produced with respect to the maximum electricity produced if operating at full capacity 100% of the time. That is, capacity factor compares actual (or expected) generation to theoretical maximum generation.</p>              
               </td>
-              <td class="td-label">Capacity Factor:</td>
               <td class="td-value">%</td>
             </tr>
             
             <tr>
-              <td class="td-tip">
-                <div class="help-tip">
-                  <p> The nameplate capacity is the theoretical maximum power generation.</p>
-                </div>
+              <td class="td-label">Nameplate Capacity:
+                <p> The nameplate capacity is the theoretical maximum power generation.</p>
               </td>
-              <td class="td-label">Nameplate Capacity:</td>
               <td class="td-value"> MW</td>
             </tr>
 
             <tr>
-              <td class="td-tip">
-                <div class="help-tip">
-                  <p> The amount of (predicted) time it will take to build the facility and generators expressed in quarters, where one quarter is one game turn.</p>
-                </div>
+              <td class="td-label">Build Time:
+                <p> The amount of (predicted) time it will take to build the facility and generators expressed in quarters, where one quarter is one game turn.</p>
               </td>
-              <td class="td-label">Build Time:</td>
               <td class="td-value">{{buildTime}} quarters</td>
             </tr>    
 

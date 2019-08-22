@@ -37,7 +37,7 @@ define([
           this._rollOver = false;
           this._popupTimer = null;
           this._clickPause = false;
-          this._popupDelay = 900;  // milliseconds
+          this._popupDelay = 600;  // milliseconds
           this._dialogStatus = "popup" // possible values: "popup", "deleteing", "viewing", "building", "portfolio", "quarterly"
         }
 
@@ -403,7 +403,7 @@ define([
           modelData.deleteFacility(facilityId).then((results) => {
             this._canvasModel.facilityLayer.removeFacilityTile(facilityId);
             this._canvasModel.playerMarkerLayer.removeMarkerTile(facilityId);
-            this._dialogStatus = "popup";
+            this._dialogStatus = "viewing";
             // console.log("this._dialogStatus = ", this._dialogStatus);
           });
         }
@@ -411,14 +411,18 @@ define([
         _onUpdateFacility(facilityId, facilityTypeList, facilityTypeId) {
           console.log("facilityId : facilityTypeList : facilityTypeId = " + facilityId + " : " + facilityTypeList + " : " + facilityTypeId);
           let modelData = new ModelData();
-          this._dialogStatus = "viewing";
+          this._dialogStatus = "popup";
 
           if (facilityTypeId) {
             modelData.updateFacilityType(facilityId, facilityTypeId).then((facData) => {
               let facility = facData.facility;
               this._canvasModel.facilityLayer.updateFacilityTile(facility.id, facilityTypeId);
-              let facilityViewDialog = new FacilityViewDialog(facility.id, facilityTypeList, (evt) => {
-                this._dialogStatus = "popup";
+              modelData.addGenerators(facility.id, facilityTypeId).then((results) => {
+                // console.log("modelData.addGenerators results = ", results);
+                let facilityViewDialog = new FacilityViewDialog(results.facility.id, facilityTypeList, (evt) => {
+                  this._dialogStatus = "popup";
+                });
+                this._setFacilityEvents(this._canvasView.getTileMap("facilities"));
               });
             });
           }

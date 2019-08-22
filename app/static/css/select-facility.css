@@ -1,3 +1,8 @@
+#select-facility-dialog {
+  width: 100%;
+}
+
+
 .sfd-flex-button-container {
   display: flex;
   flex-direction: row;
@@ -85,7 +90,8 @@
   overflow: hidden; 
   /* max-height: 400px; */
   /* height: 400px; */
-  width: 32.7%;
+  /* width: 32.7%; */
+  width: 240px;
   display: inline-block;
 }
 
@@ -108,45 +114,29 @@
 }
 
 .simpletype-nuclear {
-  background-color: #522d80;
-  opacity: .5;
+  background-color: rgb(82, 45, 128, .5);
 }
 
 .simpletype-wind {
-  background-color: #72c7db;
-  opacity: .5;
+  background-color: rgb(114, 199, 219, .5);
 }
 
+
 .simpletype-solar {
-  background-color: #ffd671;
-  opacity: .5;
+  background-color: rgb(255, 214, 113, .5);
 }
 
 .simpletype-natural {
-  background-color: #f66733;
-  opacity: .5;
+  background-color: rgb(246, 103, 51, .5);
 }
 
 .simpletype-coal {
-  background-color: #646a6d;
-  opacity: .5;
+  background-color: rgb(100, 106, 109, .5);
 }
 
 .simpletype-hydro {
-  background-color: #0e9096;
-  opacity: .5;
+  background-color: rgb(14, 144, 150, .5);
 }
-
-/* Table elements */
-
-.td-label {
-  font-size: 12px;
-}
-
-.td-value {
-  font-size: 10px;
-}
-
 
 /*****************************************************/
 /* Button Images                                     */
@@ -247,33 +237,61 @@ label[cond-image="construction"] {
 /* Data tooltip */
 
 
+/* Table elements */
+
+.td-label {
+  font-size: 12px;
+  cursor: default;
+  font-weight: bold;
+}
+
+.td-value {
+  font-size: 12px;
+}
 
 .help-tip {
   /* top: 18px;
   right: 18px; */
-  text-align: center;
+  /* text-align: center;
   background-color: #BCDBEA;
   border-radius: 50%;
   width: 18px;
   height: 18px;
-  font-size: 12px;
+  font-size: 12px; */
   /* line-height: 20px; */
-  cursor: default;
+  cursor: pointer;
 }
 
-.help-tip:before {
+/* .help-tip:before {
   content:'?';
   text-align: left;
   font-weight: bold;
   color:#fff;
-}
+} */
 
-.help-tip:hover p {
+.td-label:hover p {
   display: inline-block;
   /* transform-origin: 100% 0%;
   -webkit-animation: fadeIn 0.3s ease-in-out;
   animation: fadeIn 0.3s ease-in-out; */
 
+}
+.td-label p {    /* The tooltip */
+  overflow: hidden;
+  display: none;
+  white-space: normal;
+  text-align: left;
+  background-color: #1E2021;
+  padding: 15px;
+  width: 230px;
+  margin-top: 20px;
+  position: fixed;
+  border-radius: 3px; 
+  /* box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);  */
+  color: #FFF;
+  font-size: 13px;
+  /* line-height: 1.4;  */
+  z-index: 10; 
 }
 
 .help-tip p {    /* The tooltip */
@@ -284,7 +302,7 @@ label[cond-image="construction"] {
   background-color: #1E2021;
   padding: 15px;
   width: 230px;
-  position: absolute;
+  position: fixed;
   border-radius: 3px; 
   /* box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);  */
   color: #FFF;
@@ -498,6 +516,7 @@ div[role="dialog"]:hover {
 .gen-header-detail {
   font-weight: bold;
   float: left;
+  margin-left: 4px;
 }
 
 .gen-header-btn {

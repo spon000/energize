@@ -2,13 +2,14 @@ from random import choice, seed
 from flask import Blueprint, flash, url_for, redirect, render_template, request, jsonify
 from flask_login import login_required, current_user
 from flask_socketio import send
+import json
 from app import sio 
 from app import db 
 from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType, ResourceType
 from app.models import FacilitySchema, GeneratorSchema, ModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema
 from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, ModificationTypeSchema
 from app.game.init_game import init_game_models
-from app.game.utils import get_current_game_date
+from app.game.utils import get_current_game_date, convert_to_money_string, convert_date_to_qtr_year, format_qtr_year
 from app.game.turn import initialize_turn
 from app.game.turn import calculate_turn
 from app.game.turn import finalize_turn
@@ -97,12 +98,20 @@ def loadgame(gid):
     return render_template("title.html")
 
   balance = '${:,}'.format(int(company.balance))
-  current_game_date = get_current_game_date(game)
+  # current_game_date = get_current_game_date(game)
   if company.state == 'ai':
     company.state = 'view'
   db.session.commit()
 
-  return render_template("game.html", company=company, game=game, balance=balance, facilities=facilities, cgd=current_game_date)
+  return render_template(
+    "game.html", 
+    company=company, 
+    game=game, 
+    balance=balance, 
+    get_game_date=get_current_game_date,
+    format_money=convert_to_money_string)
+    # facilities=facilities, 
+
 
 
 # ###############################################################################  
@@ -395,14 +404,49 @@ def updateFacilityType():
 # ###############################################################################  
 #
 # ###############################################################################
+@game.route("/updatefacility", methods=["GET", "POST"])
+@login_required
+def update_facility():
+  gid = request.args.get('gid', None)
+  fid = request.args.get('fid', None)
+  facility_updates = json.loads(request.args.get('facility', None))
+
+  print(f"*"*80)
+  print(f"facility = {facility_updates}")
+
+  facility = Facility.query.filter_by(id=fid, id_game=gid).first()
+  facility_update_keys = list(facility_updates.keys())
+
+  for fu_key in facility_update_keys:
+    if fu_key != 'id':
+      facility[fu_key] = facility_updates[fu_key]
+
+  db.session.commit()
+
+  facility_schema = FacilitySchema()
+  facility_serialized = facility_schema.dump(facility).data
+
+  return jsonify({
+    'facility': facility_serialized
+  })
+
+# ###############################################################################  
+#
+# ###############################################################################
 @game.route("/deletefacility", methods=["GET", "POST"])
 @login_required
 def deleteFacility():
   gid = request.args.get('gid', None)
   fid = request.args.get('fid', None)
 
+  generators = Generator.query.filter_by(id_facility=fid, id_game=gid).all()
+  if (generators):
+    for gen in generators:
+      db.session.delete(gen)
+
   facility = Facility.query.filter_by(id=fid, id_game=gid).first()
   db.session.delete(facility)
+
   db.session.commit()
 
   return jsonify({
@@ -429,6 +473,106 @@ def viewfacility():
     power_type=power_type,
     faccap=facility_capacity
   )
+
+# ###############################################################################  
+#
+# ###############################################################################
+@game.route("/newgenerators", methods=["GET", "POST"])
+@login_required
+def new_generators():  
+  gid = request.args.get('gid', None)
+  fid = request.args.get('fid', None)
+  ftid = request.args.get('ftid', None)
+  generators = json.loads(request.args.get('gens', None))
+  
+  game = Game.query.filter_by(id=gid).first()
+  facility = Facility.query.filter_by(id=fid,id_game=gid).first()
+  facility_schema = FacilitySchema()
+  facility_serialized = facility_schema.dump(facility).data
+  default_generator_type = GeneratorType.query.filter_by(id_facility_type=ftid).first()
+
+  for gen in generators:
+
+    # Check to see if key is in dictionary
+    if 'id_type' not in gen:
+      gen_type = default_generator_type.id
+    else:
+      gen_type = gen['id_type']
+
+    currentDate = get_current_game_date(game)
+    currentDateStr = format_qtr_year(currentDate['current_quarter'], currentDate['current_year'])
+    defined_gens = list()
+
+    generator = Generator(
+      id_game=gid,
+      id_facility=fid,
+      id_type=gen_type,
+      start_build_date=currentDateStr
+    )
+    gen_keys = list(gen.keys())
+    for key in gen_keys:
+      generator[key] = gen[key]
+
+    db.session.add(generator)
+    db.session.commit()
+
+    generator_schema = GeneratorSchema()
+    generator_serialized = generator_schema.dump(generator).data
+    # print(f"-"*80)
+    # print(f"generator = {generator}")
+    defined_gens.append(generator_serialized)    
+
+  return jsonify({
+    'facility': facility_serialized,
+    'generators': defined_gens
+  })
+
+# ###############################################################################  
+#
+# ###############################################################################
+@game.route("/updategenerators", methods=["GET", "POST"])
+@login_required
+def update_generators():
+  gid = request.args.get('gid', None)
+  fid = request.args.get('fid', None)
+  generator_updates = json.loads(request.args.get('gens', None))
+  
+  # print(f"*"*80)
+  # print(f"generators = {generator_updates}")
+
+  updated_generators = []
+  for gen in generator_updates:
+    generator = Generator.query.filter_by(id=gen['id'], id_game=gid).first()
+    generator_update_keys = list(gen.keys())
+    for gu_key in generator_update_keys:
+      if gu_key != 'id':
+        generator[gu_key] = gen[gu_key]
+  
+    db.session.commit()
+    generator_schema = GeneratorSchema()
+    generator_serialized = generator_schema.dump(generator).data
+    updated_generators.append(generator_serialized)
+
+  return jsonify({
+    'generators': updated_generators
+  })
+
+# ###############################################################################  
+#
+# ###############################################################################
+@game.route("/deletegenerator", methods=["GET", "POST"])
+@login_required
+def delete_generator(): 
+  gid = request.args.get('gid', None)
+  genId = request.args.get('genid', None)
+
+  generator = Generator.query.filter_by(id=genId, id_game=gid).first()
+  print(f"*"*80)
+  print(f"{generator}")
+  db.session.delete(generator)
+  db.session.commit()
+
+  return jsonify({'status': 'success'})
 
 # ###############################################################################  
 #
@@ -478,16 +622,32 @@ def facility_types():
 # ###############################################################################
 @game.route("/generatordetailhtml", methods=["GET", "POST"])
 @login_required
-def facility_types():
+def generator_detail_html():
   gid = request.args.get('gid', None)
+  # print(f"gid = {gid}")
   genid = request.args.get('genid', None)
+  # print(f"genid = {genid}")
   generator = Generator.query.filter_by(id=genid, id_game=gid).first()
 
   return render_template(
     "viewgenerator.html", 
-    generator=generator 
+    generator=generator,
+    format_money=convert_to_money_string,
+    to_qtr_year_string=convert_date_to_qtr_year
   )  
 
+# ###############################################################################  
+#
+# ###############################################################################
+@game.route("/portfoliohtml", methods=["GET", "POST"])
+@login_required
+def portfolio_html():
+  gid = request.args.get('gid', None)
+
+  return render_template(
+    "viewportfolio.html", 
+  )    
+ 
 # ###############################################################################  
 #
 # ###############################################################################

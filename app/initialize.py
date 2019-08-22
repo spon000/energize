@@ -95,6 +95,7 @@ def initialize_db(app):
       id_power_type = generator_type['id_power_type'],
       id_resource_type = generator_type['id_resource_type'],
       build_time = generator_type['build_time'],
+      maximum_capacity = generator_type['maximum_capacity'],
       nameplate_capacity = generator_type['nameplate_capacity'],
       heat_rate = generator_type['heat_rate'],
       continuous = generator_type['continuous'],
