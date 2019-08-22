@@ -10,8 +10,11 @@ import numpy as np
 # import matplotlib.pyplot as plt
 from datetime import datetime 
 from app import db
-from app.models import Facility, Generator, City, Company, Game
+from app.models import Facility, Generator, City, Company, Game, Prompt
 from app.models import FacilityType, GeneratorType
+
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 
 # ###############################################################################  
 #
@@ -38,7 +41,7 @@ def calculate_turn(game, mods):
 # ###############################################################################
 def finalize_turn(game, mods, state):
   add_costs_to_company(state)
-  age_generators(game.id)
+  state=age_generators(state,game.id)
   age_facilities(game.id)
 
 
@@ -46,32 +49,60 @@ def finalize_turn(game, mods, state):
 #
 # ###############################################################################
 def add_costs_to_company(state):
+  # this already happens within the ISO for now
   pass
 
 # ###############################################################################  
 #
 # ###############################################################################
 def add_population_growth(state):
+  # for now, population growth is decided at the beginning of the game, and has no
+  # feedback with what's going on in the game. Sometime down the line, this function
+  # should be expanded to include those feedbacks
   pass
+
 
 # ###############################################################################  
 #
 # ###############################################################################
-def age_generators(gid):
-  pass
+def age_generators(state,gid):
 
+  i = state['i']
+  generators = Generator.query.all()
+  for gen in generators:
+    if gen.state == 'building':
+      if gen.build_turn>0:
+        gen.build_turn -= 1
+      if gen.build_turn<=0:
+        gen.state = 'available'
+        gen.build_turn  = 0
+        set_state_vars(db,state,mods)
+        state = get_state_vars(state,mods)
+    if gen.state == 'available' and gen.condition<0.20:
+      gen.state = 'unavailable'
+      set_state_vars(db,state,mods)
+      state = get_state_vars(state,mods)
+
+  return state
 
 def caculate_generator_cost(generator, state):
+  # this already happens within the ISO for now
   pass
 
 # ###############################################################################  
 #
 # ###############################################################################
 def age_facilities(gid):
-  pass
+
+  for facility in Facility.query.all():
+    if facility.state=='inactive' and facility.counter>0:
+      facility.counter -= 1
+      if facility.counter==0:
+        facility.state='active'
 
 
 def calculate_facility_cost(facility, state):
+  # this already happens within the ISO for now
   pass
 
 # ###############################################################################  
@@ -82,7 +113,7 @@ def run_turn(game, mods):
   state = {}
   state['i'] = game.turn_number * 90 * 24
   state = get_state_vars(state, mods)
-  
+
   filename = "history" + str(game.id) + ".txt"
   file = open(filename,'w')
 
@@ -96,11 +127,13 @@ def run_turn(game, mods):
       state = iso(mods, state, file)
       state['i'] += 1
 
+  roll_for_events(game,db,mods,state)
+
   file.close()
   return state
 
 
-# ###############################################################################  
+# ###############################################################################
 #
 # ###############################################################################
 def iso(mods, state, file):
@@ -153,7 +186,8 @@ def iso(mods, state, file):
       player_profit[state['pn'][j]] += [loss]
       gen_profit[j]         = loss
 
-    if i%61==0 or True:
+
+    if i%61==0:
       id   = state['gens'][j].id
       mt   = state['types'][j]
       if mt=='natural gas': mt = 'natgas'
@@ -161,7 +195,10 @@ def iso(mods, state, file):
       file.write('gen %s %i %i %f %f %f %f %f %f %f %f\n' % (mt,i,id,state['dc'][j],state['cn'][j],state['opMaint_gen'][j],state['opMaint_fac'][j],state['fuel_costs'][j],gen_profit[j],state['aoc'][j],state['availCap'][j]) )
       # file.close()
 
-  if i%61==0 or True:
+  for company in Company.query.all():
+    company.balance += np.sum(player_profit[str(company.player_number)])
+
+  if i%61==0:
     # file=open('log.txt','a')
     file.write('time %i %f %f %f\n' % (i,price,demand,np.sum(state['availCap'])) )
     # file.close()
@@ -174,7 +211,7 @@ def iso(mods, state, file):
   return state
 
 
-# ###############################################################################  
+# ###############################################################################
 #
 # ###############################################################################
 def get_state_vars(state, mods):
@@ -236,6 +273,199 @@ def get_state_vars(state, mods):
           'types':types,
           'pn':pn}
 
+def roll_for_events(game,db,mods,state):
+
+  i = state['i']
+
+  # this function runs every hour, so probabilities should be scaled accordingly
+
+  if game.turn_number%4==1:
+    # Spring, nice weather, nothing bad ever happens in spring
+    pass
+
+  if game.turn_number%4==2:
+    # Summer, 40% chance of heatwave
+    # roll random number to decide if a new heatwave starts
+    quarterlyProb = 1.5
+    hourlyProb    = quarterlyProb / (90.0*24.0)
+    if np.random.uniform(0,1)<hourlyProb or True:
+      # roll random numbers to decide heatwave severity and duration, increase demand by 10-25% for 4-12 days
+      dur  = 4+np.random.randint(9)
+      peak = np.random.uniform(0.10,0.25)
+      # create event object with message describing heatwave
+      # push event notification to all companies
+      desc = 'A heatwave has struck and is expected to last for %i days, increasing energy demand by as much as %i percent' % (dur,np.ceil(peak*100))
+      event = Prompt( id_type=1, description=desc, start=i, end=i+dur*24 )
+      print(event.prompt_type)
+      event.companies += Company.query.all()
+      # create randomly fluctuating timeseries to represent increase in energy demand due to heat
+      x1 = np.linspace(0,14,6)
+      y1 = np.random.uniform(0.2,0.5,6)
+      y1[0] = 0
+      y1[-1] = 0
+      y1 = y1*(1.0/(1+np.exp(-10*(x1-1))))*(1.0-1.0/(1+np.exp(-10*(x1-dur))))
+      x2  = np.linspace(0,14,14*24)
+      y2  = scipy.interpolate.interp1d(x1,y1,kind='cubic')(x2)
+      y2 *= (1.0/(1+np.exp(-10*(x2-1))))*(1.0-1.0/(1+np.exp(-10*(x2-dur))))
+      y2 /= np.max(y2)
+      y2 *= peak
+      y2 += 1.0
+      # update the energy demand accordingly
+      for jj in range(len(mods['ed'])):
+        for kk in range(14*24):
+          mods['ed'][jj][0][i+kk] *= y2[kk]
+      # push event object to database
+      db.session.add(event)
+      db.session.commit()
+      # in the future, the location of the heatwave would also be decided here
+      # therefore the demand of individual cities might become too high for the transmission lines in some places
+      # aint no tranmission network yet so we'll ignore that for now
+
+  if game.turn_number%4==3:
+    # Fall, 25% probability of hurricane
+    # roll random number to decide if hurricane happens
+    quarterlyProb = 2.00
+    hourlyProb    = quarterlyProb / (90.0*24.0)
+    if np.random.uniform(0,1)<hourlyProb or True:
+      # roll random duration, location (has to be coastal)
+      dur  = 4+np.random.randint(9)
+      sev  = np.random.uniform(30,70)
+      # determine set of facilities affected (ie knocked offline)
+      x = [75,50,20,10,30,35,15,12,5,5]
+      y = [120,105,100,90,85,75,55,40,20,5]
+      cl = coastal_length(x,y)
+      dc = np.random.uniform(0,cl)
+      dS = dc-sev
+      dN = dc+sev
+      if dS<0: dS=0
+      if dN>cl: dN=cl
+      xc,yc=coastal_dist_to_xy(x,y,dc)
+      xS,yS=coastal_dist_to_xy(x,y,dS)
+      xN,yN=coastal_dist_to_xy(x,y,dN)
+      xi = xc + sev*1.5
+      yi = yc + np.random.normal(0,0.2*sev,1)
+      polyx = [0, 0, xS, xi, xN, 0,  0]
+      polyy = [yc,yS,yS, yi, yN, yN, yc]
+      polygon = Polygon( zip(polyx,polyy) )
+      for company in Company.query.all():
+        # count facilities that are in the impacted polygon
+        off_facs = []
+        for facility in Facility.query.all():
+          if company.player_number==facility.player_number:
+            point = Point(facility.column, facility.row)
+            if polygon.contains(point):
+              off_facs += [facility]
+        if len(off_facs)>0:
+          desc = 'A hurricane has struck, and %i of your facilities are expected to be offline for %i days' % (len(off_facs),dur)
+          event = Prompt( id_type=2, description=desc, start=game.turn_number, end=game.turn_number+dur )
+          event.companies += [company]
+          db.session.add(event)
+          db.session.commit()
+        else:
+          desc = 'A hurricane has struck, none of your facilities were directly affected'
+          event = Prompt( id_type=2, description=desc, start=i, end=i+dur*24 )
+          event.companies += [company]
+          db.session.add(event)
+          db.session.commit()
+      for facility in Facility.query.all():
+        point = Point(facility.column, facility.row)
+        if polygon.contains(point):
+          facility.state='inactive'
+          facility.counter=dur
+
+      '''plt.figure()
+      im = plt.imread("./app/static/img/world-map-240x120.png")
+      implot = plt.imshow(im,origin='upper')
+      plt.plot(x,y,c='b')
+      plt.scatter(xS,yS,c='r')
+      plt.scatter(xN,yN,c='r')
+      plt.scatter(xi,yi,c='r')
+      plt.plot( polyx, polyy, '--r' )
+      polygon = Polygon( zip(polyx,polyy) )
+      for city in City.query.all():
+        point = Point(city.column, city.row)
+        if polygon.contains(point):
+          plt.scatter(city.column,city.row,s=20,c='red')
+        plt.scatter(city.column,city.row,s=5,c='black')
+      for facility in Facility.query.all():
+        point = Point(facility.column, facility.row)
+        if polygon.contains(point):
+          plt.scatter(facility.column,facility.row,s=20,c='red')
+        else:
+          plt.scatter(facility.column,facility.row,s=20,c='black')
+        plt.scatter(facility.column,facility.row,s=5,c='gray')
+      plt.xlim([0,240])
+      plt.ylim([0,120])
+      plt.gca().invert_yaxis()
+      plt.savefig('hurricane.eps',format='eps',bbox_inches='tight')
+      plt.close()'''
+
+    #desc = 'Blizzards are expected next quarter, consider weatherizing your facilities')
+    #event = Event( title='Blizzard warning', desc=desc, start=game.turn_number, end=game.turn_number )
+    #event.companies += Company.query.all()
+    #db.session.add(event)
+    #db.session.commit()
+
+  if game.turn_number%4==0:
+    # Winter, 25% probability of blizzard
+    quarterlyProb = 0.75
+    hourlyProb    = quarterlyProb / (90.0*24.0)
+    if np.random.uniform(0,1)<hourlyProb or True:
+      # roll random duration, location (has to be coastal)
+      dur  = 4+np.random.randint(9)
+      # determine set of facilities affected (ie knocked offline)
+      polyx = [0, 0, 80, 160, 240,  240, 0]
+      polyy = [0, np.random.uniform(20,60), np.random.uniform(20,60), np.random.uniform(20,60), np.random.uniform(20,60), 0, 0]
+      polygon = Polygon( zip(polyx,polyy) )
+      for company in Company.query.all():
+        # count facilities that are in the impacted polygon
+        off_facs = []
+        for facility in Facility.query.all():
+          if company.player_number==facility.player_number:
+            point = Point(facility.column, facility.row)
+            if polygon.contains(point) or facility.facility_type.maintype=='coal':
+              off_facs += [facility]
+        if len(off_facs)>0:
+          desc = 'A blizzard has struck, and %i of your facilities are expected to be offline for %i days' % (len(off_facs),dur)
+          event = Prompt( id_type=3, description=desc, start=i, end=i+dur*24 )
+          event.companies += [company]
+          db.session.add(event)
+          db.session.commit()
+        else:
+          desc = 'A blizzard has struck, none of your facilities were directly affected'
+          event = Prompt( id_type=3, description=desc, start=i, end=i+dur*24 )
+          event.companies += [company]
+          db.session.add(event)
+          db.session.commit()
+      for facility in Facility.query.all():
+        point = Point(facility.column, facility.row)
+        if polygon.contains(point):
+          facility.state='inactive'
+          facility.counter=dur
+
+      '''plt.figure()
+      im = plt.imread("./app/static/img/world-map-240x120.png")
+      implot = plt.imshow(im,origin='upper')
+      plt.plot( polyx, polyy, '--r' )
+      polygon = Polygon( zip(polyx,polyy) )
+      for city in City.query.all():
+        point = Point(city.column, city.row)
+        if polygon.contains(point):
+          plt.scatter(city.column,city.row,s=20,c='red')
+        plt.scatter(city.column,city.row,s=5,c='black')
+      for facility in Facility.query.all():
+        point = Point(facility.column, facility.row)
+        if polygon.contains(point) or facility.facility_type.maintype=='coal':
+          plt.scatter(facility.column,facility.row,s=20,c='red')
+        else:
+          plt.scatter(facility.column,facility.row,s=20,c='black')
+        plt.scatter(facility.column,facility.row,s=5,c='gray')
+      plt.xlim([0,240])
+      plt.ylim([0,120])
+      plt.gca().invert_yaxis()
+      plt.savefig('blizzard.eps',format='eps',bbox_inches='tight')
+      plt.close()'''
+
 
 # ###############################################################################  
 #
@@ -248,6 +478,21 @@ def set_state_vars(state, mods):
   db.session.add_all(gens)
   db.session.commit()
 
+def coastal_length(x,y):
+  d=0.0
+  for i in range(len(x)-1):
+    d += ((x[i]-x[i+1])**2+(y[i]-y[i+1])**2)**0.5
+  return d
+
+def coastal_dist_to_xy(x,y,d0):
+  d=0.0
+  for i in range(len(x)-1):
+    dd = ((x[i]-x[i+1])**2+(y[i]-y[i+1])**2)**0.5
+    if (d+dd)>d0: break
+    else: d+=dd
+  x0 = x[i]+(x[i+1]-x[i])*(d0-d)/dd
+  y0 = y[i]+(y[i+1]-y[i])*(d0-d)/dd
+  return x0,y0
 
 
 

@@ -7,6 +7,11 @@ from flask_login import UserMixin
 def load_user(user_id):
   return User.query.get(int(user_id))
 
+
+prompt_x_company = db.Table('prompt_x_company',
+  db.Column('prompt_id',  db.Integer, db.ForeignKey('prompt.id'),  primary_key=True),
+  db.Column('company_id', db.Integer, db.ForeignKey('company.id'), primary_key=True))
+
 #########################################################################################
 # User Model
 class User(db.Model, UserMixin):
@@ -97,6 +102,7 @@ class Company(db.Model):
   facilities = db.relationship('Facility')
   game = db.relationship('Game')
   user = db.relationship('User')
+  prompts = db.relationship( 'Prompt', secondary=prompt_x_company, back_populates='companies')
 
   # Methods
 
@@ -135,14 +141,15 @@ class Facility(db.Model):
   state = db.Column(db.Enum("new", "abandoned", "paused", "building", "active", "inactive"), default="new")
   player_number = db.Column(db.Integer)
   build_turn = db.Column(db.Integer, default=0)
-  start_build_date = db.Column(db.String(20))
-  start_prod_date = db.Column(db.String(20))
+  start_build_date = db.Column(db.Integer, default=0)
+  start_prod_date = db.Column(db.Integer, default=0)
   om_cost = db.Column(db.Float, default=0)
   revenue = db.Column(db.Float,default=0)
   column = db.Column(db.Integer, default=0)
   row = db.Column(db.Integer, default=0)
   layer = db.Column(db.Integer, default=2)
   area = db.Column(db.Float)
+  counter = db.Column(db.Integer,default=0)
 
   # Relational data
   facility_type = db.relationship('FacilityType')
@@ -181,8 +188,8 @@ class Generator(db.Model):
   condition = db.Column(db.Float, default=1.0)
   build_turn = db.Column(db.Integer, default=0)
   decom_turn = db.Column(db.Integer, default=0)
-  start_build_date = db.Column(db.String(20))
-  start_prod_date = db.Column(db.String(20))
+  start_build_date = db.Column(db.Integer, default=0)
+  start_prod_date = db.Column(db.Integer, default=0)
   local_bid_policy = db.Column(db.Enum("Company Wide", "MC", "LCOE", "Fixed"), default="Company Wide")
   lobal_maintenance_policy = db.Column(db.Enum("Company Wide", "Routine", "Proactive", "Reactive"), default="Company Wide")
   bid_policy_value = db.Column(db.Float, default=0)
@@ -210,14 +217,16 @@ class Generator(db.Model):
     return (
       f"Generator -\n"
       f"\tId: {self.id}\n"
-      f"\tType Id: {self.id_type}\n"
       f"\tGame Id: {self.id_game}\n"
-      f"\tFacility Id: {self.id_facility}\n"
       f"\tState: {self.state}\n"
+      f"\tFacility Id: {self.id_facility}\n"
+      f"\tFacility: {self.facility}\n"
+      f"\tType Id: {self.id_type}\n"
+      f"\tType: {self.type}\n"
     )
 
 #########################################################################################
-# Modification Model    
+# Modification Model
 class Modification(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
@@ -267,9 +276,13 @@ class Prompt(db.Model):
   read = db.Column(db.Boolean, default=False)
   resolved = db.Column(db.Boolean, default=False)
   response = db.Column(db.Integer)
+  description =  db.Column(db.String(300))
+  start = db.Column(db.Integer)
+  end = db.Column(db.Integer)
 
   # Relational Data
   prompt_type = db.relationship('PromptType')
+  companies = db.relationship( 'Company', secondary=prompt_x_company, back_populates='prompts')
 
 
 #########################################################################################
@@ -280,8 +293,8 @@ class PromptType(db.Model):
   # Foreign keys
 
   # Data
-  title =  db.Column(db.String(50))
-  description =  db.Column(db.String(300))
+  title = db.Column(db.String(50))
+  image = db.Column(db.String(20), nullable=False, default='default.png')
 
   # Relational Data
  
@@ -297,7 +310,7 @@ class FacilityType(db.Model):
   subtype = db.Column(db.String(10))
   name = db.Column(db.String(25))
   build_time = db.Column(db.Integer)
-  minimum_area = db.Column(db.Float) 
+  minimum_area = db.Column(db.Float)
   fixed_cost_build = db.Column(db.Float)
   fixed_cost_operate = db.Column(db.Float)
   marginal_cost_build = db.Column(db.Float)
@@ -370,11 +383,11 @@ class ModificationType(db.Model):
   # Methods
   def __repr__(self):
     return ( 
-      f"ModificationType -->\n" +
-      f"ID: {self.id}\n" +
-      f"Name: {self.name}\n" +
-      f"Value: {self.value}\n" +
-      f"Facility Type Id: {self.id_facility_type}\n" +
+      f"ModificationType -->\n"
+      f"ID: {self.id}\n"
+      f"Name: {self.name}\n"
+      f"Value: {self.value}\n"
+      f"Facility Type Id: {self.id_facility_type}\n"
       f"Facility Type: {self.facility_type}\n" 
     )
 

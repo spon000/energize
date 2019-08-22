@@ -135,7 +135,7 @@ def init_facilities(game):
   num_facilities = Facility.query.filter_by(id_game=game.id).count()
 
   companies = Company.query.filter_by(id_game=game.id).all()
-  
+
   if num_facilities == 0:
     for index, facility in enumerate(start_facilities):
       newfacility = Facility(
@@ -155,11 +155,27 @@ def init_facilities(game):
         layer = facility['layer']
       )
       db.session.add(newfacility)
+      db.session.commit()
+
+      # since currently Facility has no lifespan, find longest lifespan of compatible GeneratorTypes
+      lspan_max=0
+      for genType in genTypes:
+        if genType.facility_type.id==newfacility.id_type:
+          lspan = genType.lifespan
+          if lspan>lspan_max: lspan_max=lspan
+      # draw an age from a Poisson distribution such that "most" generators are about 2/3 through their lifespan
+      # ensure that the age doesn't exceed the GeneratorType lifespan
+      while True:
+        age = np.random.poisson(lspan_max*90.0*24.0*0.66, size=1)[0]
+        if age<(lspan_max*90*24): break
+      newfacility.start_prod_date  = -age
+      newfacility.start_build_date = -age - int(newfacility.facility_type.build_time)*90.0*24.0
 
     # Commit (write to database) all the added records.
-    db.session.commit()  
-  return True      
-  
+    db.session.commit()
+
+  return True
+
 #######################################################################################
 # Populate generator table.
 def init_generators(game):
@@ -176,6 +192,19 @@ def init_generators(game):
         start_build_date = generator['start_build_date'],
         start_prod_date = generator['start_prod_date']
       )
+
+      # find the age of the facility, and lifespan of the generator
+      # draw age from Poisson distribution, ensuring that it does not exceed facility age or generator lifespan
+      facility_age = abs(int(Facility.query.filter_by(fid=generator['id_facility'],id_game=game.id).first().start_build_date))
+      genType = GeneratorType.query.filter_by(id=generator['id_type']).first()
+      genType_lspan = float(genType.lifespan)*90.0*24.0
+      genType_buildTime = float(genType.build_time) * 90.0*24.0
+      while True:
+        age = np.random.poisson(genType_lspan*0.66, size=1)[0]
+        print(age,genType_lspan,facility_age)
+        if age<genType_lspan and age<facility_age: break
+      newgenerator.start_prod_date  = -age
+      newgenerator.start_build_date = -age - genType_buildTime
       db.session.add(newgenerator)
 
   # Commit (write to database) all the added records.
