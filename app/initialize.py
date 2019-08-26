@@ -1,8 +1,8 @@
 from app import create_app
 from app import db, bcrypt
-from app.models import Game, Company, Facility, Generator, Modification, City, User, Prompt
-from app.models import FacilityType, GeneratorType, PowerType, ResourceType, ModificationType, PromptType
-from app.game.supply_type_defs import facility_types, generator_types, power_types, resource_types, modification_types
+from app.models import Game, Company, Facility, Generator, FacilityModification, GeneratorModification, City, User, Prompt
+from app.models import FacilityType, GeneratorType, PowerType, ResourceType, FacilityModificationType, GeneratorModificationType, PromptType
+from app.game.supply_type_defs import facility_types, generator_types, power_types, resource_types, facility_modification_types, generator_modification_types
 
 
 
@@ -24,14 +24,16 @@ def initialize_db(app):
   init_table(Game, db)
   init_table(Company, db)
   init_table(City, db)
-  init_table(ModificationType, db)
+  init_table(FacilityModificationType, db)
+  init_table(GeneratorModificationType, db)
   init_table(Prompt, db)
   init_table(PowerType, db)
   init_table(ResourceType, db)
   init_table(FacilityType, db)
   init_table(GeneratorType, db)
   init_table(PromptType, db)
-  init_table(Modification, db)
+  init_table(FacilityModification, db)
+  init_table(GeneratorModification, db)
   init_table(Facility, db)
   init_table(Generator, db)
 
@@ -77,16 +79,16 @@ def initialize_db(app):
     )
     db.session.add(ft)
 
-  for modification_type in modification_types:
-    mt = ModificationType(
-      id_facility_type = modification_type['id_facility_type'],
-      name = modification_type['name'],
-      value = modification_type['value'],
-      marginal_cost_build = modification_type['marginal_cost_build'],
-      marginal_cost_operate = modification_type['marginal_cost_build'],
-      marginal_area = modification_type['marginal_area']
+  for facility_modification_type in facility_modification_types:
+    fmt = FacilityModificationType(
+      id_facility_type = facility_modification_type['id_facility_type'],
+      name = facility_modification_type['name'],
+      value = facility_modification_type['value'],
+      marginal_cost_build = facility_modification_type['marginal_cost_build'],
+      marginal_cost_operate = facility_modification_type['marginal_cost_build'],
+      marginal_area = facility_modification_type['marginal_area']
     )
-    db.session.add(mt)
+    db.session.add(fmt)
 
   #
   for generator_type in generator_types:
@@ -106,6 +108,18 @@ def initialize_db(app):
       decomission_cost = generator_type['decomission_cost']
     )
     db.session.add(gt)
+
+  for generator_modification_type in generator_modification_types:
+    gmt = GeneratorModificationType(
+      id_generator_type = generator_modification_type['id_generator_type'],
+      name = generator_modification_type['name'],
+      value = generator_modification_type['value'],
+      marginal_cost_build = generator_modification_type['marginal_cost_build'],
+      marginal_cost_operate = generator_modification_type['marginal_cost_build'],
+      marginal_area = generator_modification_type['marginal_area']
+    )
+    db.session.add(gmt)
+
 
   #
   for power_type in power_types:

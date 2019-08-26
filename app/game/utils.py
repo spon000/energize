@@ -1,25 +1,129 @@
 from math import floor, ceil
-from app.models import User, Game, Company
 
+# date modifiers
+quarters_per_year = 4
+
+months_per_year = 12
+months_per_quarter = 3
+
+days_per_year = 360
+days_per_quarter = 90
+days_per_month = 30
+
+hours_per_year = 8640
 hours_per_quarter = 2160
-
-qtr_intervals = 4
-num_months = 12
-months_in_qtr = 3
+hours_per_turn = 2160
+hours_per_month = 720
+hours_per_day = 24
 
 ####################################################################
 # Date utilities
 
-def format_date(hours, formatStr):
+
+####################################################################
+# Returns date string based on number of hours since zero_year 
+# (defined in Game object).
+####################################################################
+def hours_to_date(zero_year, hours):
+  date_array = [
+    str(floor(hours / hours_per_year) + zero_year),               # years
+    str(floor((hours % hours_per_year) / hours_per_month) + 1),   # months
+    str(floor((hours % hours_per_month) / hours_per_day) + 1),    # days
+    str(hours % hours_per_day),                                   # hours
+  ]
+  return ":".join(date_array)
+
+####################################################################
+# Returns number of hours since zero_year (defined in Game object).
+####################################################################
+def date_to_hours(zero_year, date):
+  date_array = date.split(":")
+  year_hours = (int(date_array[0]) - zero_year) * hours_per_year
+  month_hours = (int(date_array[1]) - 1) * hours_per_month
+  day_hours = (int(date_array[2]) - 1) * hours_per_day
+  hour_hours = (int(date_array[3])) 
+
+  return year_hours + month_hours + day_hours + hour_hours
+
+####################################################################
+# Returns date string based on number of hours since zero_year
+# (defined in Game object).
+####################################################################
+def format_date(date, format_str):
+
+  date_array = date.split(":")
+  if (format_str == "Q Y"):
+    return "Q" + str(get_quarter(date)) + " " + str(date_array[0])
+
+  if (format_str == "Y Q"):
+    return str(date_array[0]) + " Q" + str(get_quarter(date))
+
+  return date
+
+####################################################################
+# Returns the quarter number based on the current month.
+####################################################################
+def get_quarter(date):
+  date_array = date.split(":")
+
+  return int(ceil(int(date_array[1]) / months_per_quarter))
+
+####################################################################
+# Returns the current month based on current quarter and day.
+####################################################################
+def get_month_from_quarter(quarter, day=1):
   return None
 
+####################################################################
+# Returns standardized date string. "yyyy:m:d:h"
+####################################################################
+def date_to_date_str(year, month = 1, day = 1, hour = 0):
+  date_array = [str(year), str(month), str(day), str(hour)]
+
+  return ":".join(date_array)
+
+####################################################################
+# Returns standardized date string. "yyyy:m:d:h"
+####################################################################
 def get_current_game_date(game):
-  c_qtr = game.start_quarter - (game.turn_number % qtr_intervals)
-  c_year = game.start_year + floor(game.turn_number / qtr_intervals)
-  return {'current_quarter': c_qtr, 'current_year': c_year}
+  current_date_hours = date_to_hours(game.zero_year, game.sim_start_date) + game.turn_number * hours_per_turn
+  print(f"start_hours = {date_to_hours(game.zero_year, game.sim_start_date)}")
+  print(f"current_hours = {date_to_hours(game.zero_year, game.sim_start_date) + game.turn_number * hours_per_turn}")
+  
+  return hours_to_date(game.zero_year, current_date_hours)
+
+###################################################################
+# Money utilities
+
+####################################################################
+# Returns monenatary value (cents are truncated) string
+####################################################################
+def convert_to_money_string(value):
+  return '${:,}'.format(int(value))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def get_current_game_date(game):
+#   c_qtr = game.start_quarter - (game.turn_number % quarters_per_year)
+#   c_year = game.start_year + floor(game.turn_number / quarters_per_year)
+#   return {'current_quarter': c_qtr, 'current_year': c_year}
 
 def convert_date_to_qtr_year(date, format=False):
-  qtr =  str(ceil(int(date[:2]) / months_in_qtr))
+  qtr =  str(ceil(int(date[:2]) / months_per_quarter))
   year = date[2:6]
   result =  {'qtr': qtr, 'year': year}
 
@@ -33,8 +137,8 @@ def convert_qtr_year_to_date(qtrYear):
 
 def add_turns_to_date(qtr, year, turns = 1):
   # num_qtrs = (int(qtr) + turns) % qtr_intervals
-  new_qtr = (int(qtr) + turns) % qtr_intervals
-  new_year = int(year) + floor((int(qtr) + turns) / qtr_intervals)
+  new_qtr = (int(qtr) + turns) % quarters_per_year
+  new_year = int(year) + floor((int(qtr) + turns) / quarters_per_year)
   return {'qtr': new_qtr, 'year': new_year}
 
 def format_qtr_year(qtr, year):

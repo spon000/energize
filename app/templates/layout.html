@@ -34,8 +34,7 @@
           <a class="market-btn push-up" href="#"> World Market</a>
           <a class="social-btn" href="#"> Social</a>
           <a class="q-report-btn push-up" href="#"> Quarterly Report</a>
-          <a class="turn-btn push-up" href="#"> Q{{ get_game_date(game).current_quarter }} {{ get_game_date(game).current_year
-            }}
+          <a class="turn-btn push-up" href="#"> {{ current_game_date }}
             <br/>
             <label> Turn: {{ game.turn_number }} </label>
           </a>

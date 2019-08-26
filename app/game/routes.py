@@ -3,17 +3,18 @@ from flask import Blueprint, flash, url_for, redirect, render_template, request,
 from flask_login import login_required, current_user
 from flask_socketio import send
 import json
-from app import sio 
+
 from app import db 
 from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType, ResourceType
-from app.models import FacilitySchema, GeneratorSchema, ModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema
-from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, ModificationTypeSchema
+from app.models import FacilitySchema, GeneratorSchema, FacilityModificationSchema, GeneratorModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema
+from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, FacilityModificationTypeSchema, GeneratorModificationTypeSchema
 from app.game.init_game import init_game_models
-from app.game.utils import get_current_game_date, convert_to_money_string, convert_date_to_qtr_year, format_qtr_year
+from app.game.utils import format_date, get_current_game_date, convert_to_money_string, convert_date_to_qtr_year, format_qtr_year
 from app.game.turn import initialize_turn
 from app.game.turn import calculate_turn
 from app.game.turn import finalize_turn
 from app.game.modifiers import load_modifiers
+from app.game.sio_outgoing import game_turn_complete
 
 game = Blueprint('game', __name__)
 #################################################################################  
@@ -48,7 +49,7 @@ def joingame(gid):
   game = Game.query.filter_by(id=gid).first()
   company = Company.query.filter_by(id=current_user.current_company).first()
   
-  if company.state != "ai":
+  if company.player_type != "ai":
     flash(f"This company can\'t be used for this game.", "danger")
     return render_template("title.html")
 
@@ -60,7 +61,7 @@ def joingame(gid):
   # be assigned user id of 0 so it won't be chosen as a dummy
   # company by another player. 
   if len(dummy_companies) == 0:
-    game.game_state = "playing"
+    game.game_state = "new"
     db.session.commit()
   else:
     seed()
@@ -68,6 +69,7 @@ def joingame(gid):
     dc.id_user = None
     db.session.commit()
     company.player_number = dc.player_number
+    company.player_type = "human"
     company.id_game = dc.id_game
     Facility.query.filter_by(id_company=dc.id).update({Facility.id_company: company.id}, synchronize_session=False)
     db.session.delete(dc)
@@ -98,9 +100,6 @@ def loadgame(gid):
     return render_template("title.html")
 
   balance = '${:,}'.format(int(company.balance))
-  # current_game_date = get_current_game_date(game)
-  if company.state == 'ai':
-    company.state = 'view'
   db.session.commit()
 
   return render_template(
@@ -108,8 +107,9 @@ def loadgame(gid):
     company=company, 
     game=game, 
     balance=balance, 
-    get_game_date=get_current_game_date,
-    format_money=convert_to_money_string)
+    current_game_date=format_date(get_current_game_date(game), "Y Q"),
+    format_money=convert_to_money_string
+  )
     # facilities=facilities, 
 
 
@@ -290,17 +290,17 @@ def player_facility():
   generators_schema = GeneratorSchema(many=True)
   generators_serialized = generators_schema.dump(generators).data
 
-  modifications = [{'id': gen.id, 'mods': gen.modifications} for gen in generators]
-  modifications_schema = ModificationSchema(many=True)
-  modifications_serialized = modifications_schema.dump(modifications).data
+  generator_modifications = [{'id': gen.id, 'mods': gen.modifications} for gen in generators]
+  generator_modifications_schema = GeneratorModificationSchema(many=True)
+  generator_modifications_serialized = generator_modifications_schema.dump(generator_modifications).data
 
   generator_types = GeneratorType.query.filter_by(id_facility_type=facility_type.id).all()
   generator_types_schema = GeneratorTypeSchema(many=True)
   generator_types_serialized = generator_types_schema.dump(generator_types).data
 
-  gen_type_list = [gen_type.id for gen_type in generator_types]
-  print("-"*80)
-  print(gen_type_list)
+  # gen_type_list = [gen_type.id for gen_type in generator_types]
+  # print("-"*80)
+  # print(gen_type_list)
 
   power_types = [gen_type.power_type for gen_type in generator_types]
   power_type_schema = PowerTypeSchema(many=True)
@@ -310,9 +310,9 @@ def player_facility():
   resource_type_schema = ResourceTypeSchema(many=True)
   resource_type_serialized = resource_type_schema.dump(resource_types).data
 
-  modification_types = facility_type.modification_types
-  modification_types_schema = ModificationTypeSchema(many=True)
-  modification_types_serialized = modification_types_schema.dump(modification_types).data
+  generator_modification_types = [gen_type.modification_types for gen_type in generator_types]
+  generator_modification_types_schema = GeneratorModificationTypeSchema(many=True)
+  generator_modification_types_serialized = generator_modification_types_schema.dump(generator_modification_types).data
 
   return jsonify({
     'owned_facility': owned_facility,
@@ -320,11 +320,11 @@ def player_facility():
     'facility': facility_serialized,
     'facility_type': facility_type_serialized,
     'generators': generators_serialized,
-    'modifications': modifications_serialized,
+    'modifications': generator_modifications_serialized,
     'generator_types': generator_types_serialized,
     'power_types': power_type_serialized,
     'resource_types': resource_type_serialized,
-    'modification_types': modification_types_serialized
+    'modification_types': generator_modification_types_serialized
   })
   
 # ###############################################################################  
@@ -583,6 +583,9 @@ def viewcity():
   gid = request.args.get('gid', None)
   city_id = request.args.get('cid', None)
   city = City.query.get(city_id)
+
+  
+
   return render_template("viewcity.html", city=city)
 
 
@@ -656,13 +659,16 @@ def portfolio_html():
 def runturn():
   gid = request.args.get('gid', None)
   game = Game.query.filter_by(id=gid).first()
-  # generators = Generator.query.all()
-  # cities = City.query.all()
 
   modifiers = load_modifiers(game)
   initialize_turn(game, modifiers)
-  calculate_turn(game, modifiers)
-  finalize_turn(game, modifiers)
+  state = calculate_turn(game, modifiers)
+  finalize_turn(game, modifiers, state)
 
-  return "Done running turn."
+  # Have server inform each client in game room game.id 
+  # that the turn is over. This should cause each client 
+  # to refresh.
+  game_turn_complete(game)
+ 
+  return redirect(url_for('game.loadgame' , gid=gid))
   

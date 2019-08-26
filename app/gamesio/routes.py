@@ -66,7 +66,7 @@ def on_new_facility(data):
   db.session.commit()
   facility_schema = FacilitySchema()
   facility_serialized = facility_schema.dump(facility).data
-  emit('new_facility', facility_serialized, namespace='/game'+ str(data['gid']))
+  emit('playing', facility_serialized, namespace='/game'+ str(data['gid']))
 
   return (facility_serialized)
 
@@ -96,6 +96,4 @@ def on_cancel_facility(data):
 def build_facility(facility):
   None
 
-@sio.on('player_turn_button')
-def player_next_turn():
-  None
+

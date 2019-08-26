@@ -1,3 +1,6 @@
+import numpy as np
+
+from sqlalchemy import func
 from app import db
 from flask_login import current_user
 from app.models import User, Game, City, Company, Facility, Generator, FacilityType, GeneratorType
@@ -8,10 +11,17 @@ from app.game.supply_type_defs import facility_types, generator_types, power_typ
 from app.game.modifiers import init_modifiers
 from app.game.history import init_history_table
 
+# Functions
+from app.game.utils import date_to_hours, hours_to_date, date_to_date_str
+# Constants
+from app.game.utils import hours_per_turn
+
 #######################################################################################
 # Main function
 #######################################################################################
 def init_game_models(game):
+  # seed the randomizer
+  np.random.seed()
   
   # Add companies
   init_companies(game)
@@ -30,10 +40,10 @@ def init_game_models(game):
 
   # create modifiers table for all the iterations of the game.
   # cities = City.query.all()
-  # init_modifiers(game, cities)
+  #init_modifiers(game, cities)
 
   # Generate empty history table (file)
-  init_history_table(game)
+  #init_history_table(game)
    
   return True
 
@@ -61,53 +71,6 @@ def init_companies(game):
   return True
 
 #######################################################################################
-# Populate facility and generator type tables.
-# def init_types(game):
-#   num_factypes = FacilityType.query.filter_by(id_game=game.id).count()
-#   num_gentypes = GeneratorType.query.filter_by(id_game=game.id).count()
-
-#   if num_factypes == 0:
-#     for factype in facility_types:
-#       ft = FacilityType(
-#         id_game = game.id,
-#         maintype = factype['maintype'],
-#         subtype = factype['subtype'],
-#         name = factype['name'],
-#         build_time = factype['build_time'],
-#         minimum_area = factype['minimum_area'],
-#         fixed_cost_build = factype['fixed_cost_build'],
-#         fixed_cost_operate = factype['fixed_cost_operate'],
-#         marginal_cost_build = factype['marginal_cost_build'],
-#         marginal_cost_operate = factype['marginal_cost_build'],
-#         decomission_cost = factype['decomission_cost'],
-#         description = factype['description']
-#       )
-#       db.session.add(ft)
-
-#   if num_gentypes == 0:
-#     for gentype in generator_types:
-#       gt = GeneratorType(
-#         id_game = game.id,
-#         id_facility_type = gentype['id_facility_type'],
-#         id_power_type = gentype['id_power_type'],
-#         id_resource_type = gentype['id_resource_type'],
-#         build_time = gentype['build_time'],
-#         nameplate_capacity = gentype['nameplate_capacity'],
-#         efficiency = gentype['efficiency'],
-#         continuous = gentype['continuous'],
-#         lifespan = gentype['lifespan'],
-#         fixed_cost_build = gentype['fixed_cost_build'],
-#         fixed_cost_operate = gentype['fixed_cost_operate'],
-#         variable_cost_operate = gentype['variable_cost_operate'],
-#         decomission_cost = gentype['decomission_cost']
-#       )
-#       db.session.add(gt)
-
-#   # Commit (write to database) all the added records.
-#   db.session.commit()     
-#   return True
-
-#######################################################################################
 # Populate city table.
 def init_cities(game):
   num_cities = City.query.filter_by(id_game=game.id).count()
@@ -133,12 +96,11 @@ def init_cities(game):
 # Populate facility table.
 def init_facilities(game):
   num_facilities = Facility.query.filter_by(id_game=game.id).count()
-
   companies = Company.query.filter_by(id_game=game.id).all()
 
   if num_facilities == 0:
     for index, facility in enumerate(start_facilities):
-      newfacility = Facility(
+      new_facility = Facility(
         id_type = facility['id_type'],
         id_game = game.id,
         id_company = next((company.id for company in companies if facility['player'] == company.player_number), None),
@@ -148,31 +110,32 @@ def init_facilities(game):
         name = "Facility #" + str(index),
         state = facility['state'],
         player_number = facility['player'],
-        start_build_date = facility['start_build_date'],
-        start_prod_date = facility['start_prod_date'],
         column = facility['column'],
         row = facility['row'],
         layer = facility['layer']
       )
-      db.session.add(newfacility)
-      db.session.commit()
 
+      # Add record to database cache. Doesn't get written until commit() is invoked.
+      db.session.add(new_facility)
+  
       # since currently Facility has no lifespan, find longest lifespan of compatible GeneratorTypes
-      lspan_max=0
-      for genType in genTypes:
-        if genType.facility_type.id==newfacility.id_type:
-          lspan = genType.lifespan
-          if lspan>lspan_max: lspan_max=lspan
+      lifespan_max = db.session.query(db.func.max(GeneratorType.lifespan)).filter_by(id_facility_type=new_facility.id_type).scalar()
+      
       # draw an age from a Poisson distribution such that "most" generators are about 2/3 through their lifespan
-      # ensure that the age doesn't exceed the GeneratorType lifespan
-      while True:
-        age = np.random.poisson(lspan_max*90.0*24.0*0.66, size=1)[0]
-        if age<(lspan_max*90*24): break
-      newfacility.start_prod_date  = -age
-      newfacility.start_build_date = -age - int(newfacility.facility_type.build_time)*90.0*24.0
+      age_hours = int(np.random.poisson(lifespan_max * hours_per_turn * 0.66, size=1)[0])
 
-    # Commit (write to database) all the added records.
-    db.session.commit()
+      # ensure that the age doesn't exceed the GeneratorType lifespan
+      if age_hours > (lifespan_max * hours_per_turn):
+        age_hours = lifespan_max * hours_per_turn 
+
+      prod_date_hours = date_to_hours(game.zero_year, game.sim_start_date) - age_hours 
+
+      facility_type = FacilityType.query.filter_by(id=new_facility.id_type).first()
+      new_facility.start_prod_date  = hours_to_date(game.zero_year, prod_date_hours)
+      new_facility.start_build_date = hours_to_date(game.zero_year, (prod_date_hours - facility_type.build_time * hours_per_turn))
+
+  # Commit (write to database) all the added records.
+  db.session.commit()
 
   return True
 
@@ -183,32 +146,47 @@ def init_generators(game):
 
   if num_generators == 0:
     for generator in start_generators:
-      facility = Facility.query.filter_by(fid=generator['id_facility'],id_game=game.id).first()
-      newgenerator = Generator(
+      new_generator = Generator(
         id_type = generator['id_type'],
         id_game = game.id,
-        id_facility = facility.id,
-        state = generator['state'],
-        start_build_date = generator['start_build_date'],
-        start_prod_date = generator['start_prod_date']
+        id_facility = generator['id_facility'],
+        state = generator['state']
       )
+
+      # Add record to database cache. Doesn't get written until commit() is invoked.
+      db.session.add(new_generator)
 
       # find the age of the facility, and lifespan of the generator
       # draw age from Poisson distribution, ensuring that it does not exceed facility age or generator lifespan
-      facility_age = abs(int(Facility.query.filter_by(fid=generator['id_facility'],id_game=game.id).first().start_build_date))
-      genType = GeneratorType.query.filter_by(id=generator['id_type']).first()
-      genType_lspan = float(genType.lifespan)*90.0*24.0
-      genType_buildTime = float(genType.build_time) * 90.0*24.0
-      while True:
-        age = np.random.poisson(genType_lspan*0.66, size=1)[0]
-        print(age,genType_lspan,facility_age)
-        if age<genType_lspan and age<facility_age: break
-      newgenerator.start_prod_date  = -age
-      newgenerator.start_build_date = -age - genType_buildTime
-      db.session.add(newgenerator)
+      facility = Facility.query.filter_by(id=new_generator.id_facility).first()
+      generator_type = GeneratorType.query.filter_by(id=new_generator.id_type).first()
+      genType_buildTime_hours = float(generator_type.build_time) * hours_per_turn
+
+      # since currently Facility has no lifespan, find longest lifespan of compatible GeneratorTypes
+      lifespan_max = db.session.query(db.func.max(GeneratorType.lifespan)).filter_by(id_facility_type=facility.id_type).scalar()
+
+      if generator_type.lifespan >= lifespan_max:
+        facility_age_hours = date_to_hours(game.zero_year, game.sim_start_date) - date_to_hours(game.zero_year, facility.start_prod_date)
+        age_hours = facility_age_hours
+      else:
+        genType_lspan_hours = float(generator_type.lifespan) * hours_per_turn
+        age_hours = int(np.random.poisson(genType_lspan_hours * 0.66, size=1)[0])
+        
+      prod_date_hours = date_to_hours(game.zero_year, game.sim_start_date) - age_hours
+
+      # print(
+      #   f"{'-'*80}\n"
+      #   f"facility_prod_date = {facility.start_prod_date}\n"
+      #   f"generator_prod_date = {hours_to_date(game.zero_year, prod_date_hours)}\n\n"
+      #   f"gnerator_age_hours = {age_hours}\n"
+      # )
+
+      new_generator.start_prod_date  = hours_to_date(game.zero_year, prod_date_hours)
+      new_generator.start_build_date = hours_to_date(game.zero_year, int((prod_date_hours - genType_buildTime_hours)))
 
   # Commit (write to database) all the added records.
-  db.session.commit()  
+  db.session.commit()
+
   return True
 
 

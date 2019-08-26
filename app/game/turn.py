@@ -41,9 +41,16 @@ def calculate_turn(game, mods):
 # ###############################################################################
 def finalize_turn(game, mods, state):
   add_costs_to_company(state)
-  state=age_generators(state,game.id)
+  state=age_generators(state, game.id)
   age_facilities(game.id)
 
+  game.turn_number += 1
+  game.state = "playing"
+  
+  for company in game.companies:
+      company.state = "view"
+
+  db.session.commit()
 
 # ###############################################################################  
 #
@@ -60,7 +67,6 @@ def add_population_growth(state):
   # feedback with what's going on in the game. Sometime down the line, this function
   # should be expanded to include those feedbacks
   pass
-
 
 # ###############################################################################  
 #
@@ -95,9 +101,9 @@ def caculate_generator_cost(generator, state):
 def age_facilities(gid):
 
   for facility in Facility.query.all():
-    if facility.state=='inactive' and facility.counter>0:
+    if facility.state=='inactive' and facility.counter > 0:
       facility.counter -= 1
-      if facility.counter==0:
+      if facility.counter == 0:
         facility.state='active'
 
 
@@ -427,14 +433,12 @@ def roll_for_events(game,db,mods,state):
               off_facs += [facility]
         if len(off_facs)>0:
           desc = 'A blizzard has struck, and %i of your facilities are expected to be offline for %i days' % (len(off_facs),dur)
-          event = Prompt( id_type=3, description=desc, start=i, end=i+dur*24 )
-          event.companies += [company]
+          event = Prompt( id_game=game.id, id_company=company.id, id_type=3, description=desc, start=i, end=i+dur*24 )
           db.session.add(event)
           db.session.commit()
         else:
           desc = 'A blizzard has struck, none of your facilities were directly affected'
-          event = Prompt( id_type=3, description=desc, start=i, end=i+dur*24 )
-          event.companies += [company]
+          event = Prompt( id_game=game.id, id_company=company.id, id_type=3, description=desc, start=i, end=i+dur*24 )
           db.session.add(event)
           db.session.commit()
       for facility in Facility.query.all():
@@ -493,56 +497,3 @@ def coastal_dist_to_xy(x,y,d0):
   x0 = x[i]+(x[i+1]-x[i])*(d0-d)/dd
   y0 = y[i]+(y[i+1]-y[i])*(d0-d)/dd
   return x0,y0
-
-
-
-
-
-
-
-
-# def build_generators(state, mods, file):
-#   i = state['i']
-#   generators = Generator.query.all()
-#   for gen in generators:
-#     if gen.state == 'building':
-#       if gen.build_turn>0:
-#         gen.build_turn -= 1
-#       if gen.build_turn<=0:
-#         gen.state = 'available'
-#         gen.build_turn  = 0
-#         set_state_vars(db,state,mods)
-#         state = get_state_vars(state,mods)
-#     if gen.state == 'available' and gen.condition<0.20:
-#       gen.state = 'unavailable'
-#       set_state_vars(db,state,mods)
-#       state = get_state_vars(state,mods)
-
-#   if np.random.uniform(0,1)<(1.0/(24.0*90.0)):
-#     # facs = Facility.query.all()
-#     genTypes = GeneratorType.query.all()
-#     facs = Facility.query.filter_by()
-#     fac = np.random.choice(facs)
-#     facType = fac.facility_type
-#     genTypesThis = []
-#     for genType in genTypes:
-#       if genType.facility_type.id==facType.id:
-#         genTypesThis += [genType]
-#     genType  = np.random.choice(genTypesThis)
-#     newGen = Generator(
-#       id_type = genType.id,
-#       id_game = fac.id_game,
-#       id_facility = fac.id,
-#       state = "building",
-#       build_turn = genType.build_time*24*90,
-#       start_build_date = "123456",
-#       start_prod_date  = "123456"
-#     )
-#     db.session.add(newGen)
-#     db.session.commit()
-
-#     # file = open('log.txt','a')
-#     file.write('comp %i %i %f\n' % (state['i'],fac.player_number,-newGen.generator_type.fixed_cost_build) )
-#     # file.close()
-
-#   return state

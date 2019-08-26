@@ -8,9 +8,9 @@ def load_user(user_id):
   return User.query.get(int(user_id))
 
 
-prompt_x_company = db.Table('prompt_x_company',
-  db.Column('prompt_id',  db.Integer, db.ForeignKey('prompt.id'),  primary_key=True),
-  db.Column('company_id', db.Integer, db.ForeignKey('company.id'), primary_key=True))
+# prompt_x_company = db.Table('prompt_x_company',
+#   db.Column('prompt_id',  db.Integer, db.ForeignKey('prompt.id'),  primary_key=True),
+#   db.Column('company_id', db.Integer, db.ForeignKey('company.id'), primary_key=True))
 
 #########################################################################################
 # User Model
@@ -54,6 +54,8 @@ class Game(db.Model):
   companies_ready = db.Column(db.Integer, default=0)
   game_state = db.Column(db.Enum("initializing", "new", "runturn", "waiting", "playing", "finished"), default="initializing")
   turn_number = db.Column(db.Integer, default=0)
+  zero_year = db.Column(db.Integer, default=1920)
+  sim_start_date = db.Column(db.String(30), default='2018:10:1:0')
   start_quarter = db.Column(db.Integer, default=4)
   start_year = db.Column(db.Integer, default=2018)
   total_years = db.Column(db.Integer, default=50)
@@ -88,21 +90,23 @@ class Company(db.Model):
 
   # Data
   player_number = db.Column(db.Integer, nullable=False)
+  player_type = db.Column(db.Enum("ai", "human"), default="ai")
   name = db.Column(db.String(30), nullable=False, default='Company #')
   score = db.Column(db.Integer, nullable=False, default=0)
   balance = db.Column(db.Float, nullable=False, default=1000000000)
   quarter_net = db.Column(db.Float, default=0)
   global_bid_policy = db.Column(db.Enum("MC", "LCOE", "Fixed"), default="MC")
   global_maintenance_policy = db.Column(db.Enum("Routine", "Proactive", "Reactive"), default="Routine")
-  state = db.Column(db.Enum("ai", "view", "build", "turn", "ready"), default="ai")
+  state = db.Column(db.Enum("view", "build", "turn", "ready"), default="view")
   cost_operational = db.Column(db.Float, default=0)
   connected_to_game = db.Column(db.Integer, nullable=False, default=0)
 
   # Relational data
-  facilities = db.relationship('Facility')
+  
   game = db.relationship('Game')
   user = db.relationship('User')
-  prompts = db.relationship( 'Prompt', secondary=prompt_x_company, back_populates='companies')
+  facilities = db.relationship('Facility')
+  prompts = db.relationship( 'Prompt')
 
   # Methods
 
@@ -141,8 +145,8 @@ class Facility(db.Model):
   state = db.Column(db.Enum("new", "abandoned", "paused", "building", "active", "inactive"), default="new")
   player_number = db.Column(db.Integer)
   build_turn = db.Column(db.Integer, default=0)
-  start_build_date = db.Column(db.Integer, default=0)
-  start_prod_date = db.Column(db.Integer, default=0)
+  start_build_date = db.Column(db.String(30))
+  start_prod_date = db.Column(db.String(30))
   om_cost = db.Column(db.Float, default=0)
   revenue = db.Column(db.Float,default=0)
   column = db.Column(db.Integer, default=0)
@@ -156,6 +160,7 @@ class Facility(db.Model):
   generators = db.relationship('Generator')
   company = db.relationship('Company')
   game = db.relationship('Game')
+  modifications = db.relationship('FacilityModification')
 
 
   # Methods
@@ -188,8 +193,8 @@ class Generator(db.Model):
   condition = db.Column(db.Float, default=1.0)
   build_turn = db.Column(db.Integer, default=0)
   decom_turn = db.Column(db.Integer, default=0)
-  start_build_date = db.Column(db.Integer, default=0)
-  start_prod_date = db.Column(db.Integer, default=0)
+  start_build_date = db.Column(db.String(30))
+  start_prod_date = db.Column(db.String(30))
   local_bid_policy = db.Column(db.Enum("Company Wide", "MC", "LCOE", "Fixed"), default="Company Wide")
   lobal_maintenance_policy = db.Column(db.Enum("Company Wide", "Routine", "Proactive", "Reactive"), default="Company Wide")
   bid_policy_value = db.Column(db.Float, default=0)
@@ -201,7 +206,7 @@ class Generator(db.Model):
   # Relational Data
   generator_type = db.relationship('GeneratorType')
   facility = db.relationship('Facility')
-  modifications = db.relationship('Modification')
+  modifications = db.relationship('GeneratorModification')
 
   # Methods
 
@@ -222,16 +227,16 @@ class Generator(db.Model):
       f"\tFacility Id: {self.id_facility}\n"
       f"\tFacility: {self.facility}\n"
       f"\tType Id: {self.id_type}\n"
-      f"\tType: {self.type}\n"
+      f"\tType: {self.generator_type}\n"
     )
 
 #########################################################################################
-# Modification Model
-class Modification(db.Model):
+# GeneratorModification Model
+class GeneratorModification(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
   # Foreign keys
-  id_type = db.Column(db.Integer, db.ForeignKey('modification_type.id'), nullable=False)
+  id_type = db.Column(db.Integer, db.ForeignKey('generator_modification_type.id'), nullable=False)
   id_generator = db.Column(db.Integer, db.ForeignKey('generator.id'), nullable=False)
   id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
 
@@ -239,8 +244,65 @@ class Modification(db.Model):
   complete = db.Column(db.Boolean, default=False)
 
   # Relational Data
-  modification_type = db.relationship('ModificationType')
+  modification_type = db.relationship('GeneratorModificationType')
   generators = db.relationship('Generator')
+
+# Allows you to access object properties as an associative array ex: generator['state']
+  def __getitem__(self, key):
+    return getattr(self, key)
+  
+  # Allows you to assign values to object properties as an associative array ex: generator['state'] = "new"
+  def __setitem__(self, key, value):
+    setattr(self, key, value)
+
+  def __repr__(self):
+    return (
+      f"GeneratorModification -\n"
+      f"\tId: {self.id}\n"
+      f"\tType Id: {self.id_type}\n"
+      f"\tGenerator Id: {self.id_generator}\n"
+      f"\tGame Id: {self.id_game}\n"
+      f"\tComplete: {self.complete}\n"
+      f"\tMofication Type: {self.generator_modification_type}\n"
+      f"\tGenerators: {self.generators}\n"
+    )  
+
+#########################################################################################
+# FacilityModification Model
+class FacilityModification(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+
+  # Foreign keys
+  id_type = db.Column(db.Integer, db.ForeignKey('facility_modification_type.id'), nullable=False)
+  id_facility = db.Column(db.Integer, db.ForeignKey('facility.id'), nullable=False)
+  id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
+
+  # Data
+  complete = db.Column(db.Boolean, default=False)
+
+  # Relational Data
+  modification_type = db.relationship('FacilityModificationType')
+  facilities = db.relationship('Facility')
+
+# Allows you to access object properties as an associative array ex: generator['state']
+  def __getitem__(self, key):
+    return getattr(self, key)
+  
+  # Allows you to assign values to object properties as an associative array ex: generator['state'] = "new"
+  def __setitem__(self, key, value):
+    setattr(self, key, value)
+
+  def __repr__(self):
+    return (
+      f"FacilityModification -\n"
+      f"\tId: {self.id}\n"
+      f"\tType Id: {self.id_type}\n"
+      f"\tfacility Id: {self.id_facility}\n"
+      f"\tGame Id: {self.id_game}\n"
+      f"\tComplete: {self.complete}\n"
+      f"\tMofication Type: {self.facility_modification_type}\n"
+      f"\tFacilitys: {self.facilitys}\n"
+    )      
 
 
 
@@ -271,19 +333,19 @@ class Prompt(db.Model):
   # Foreign keys
   id_type = db.Column(db.Integer, db.ForeignKey('prompt_type.id'), nullable=False)
   id_company = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
+  id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)  
 
   # Data
   read = db.Column(db.Boolean, default=False)
   resolved = db.Column(db.Boolean, default=False)
   response = db.Column(db.Integer)
-  description =  db.Column(db.String(300))
+  description = db.Column(db.String(300))
   start = db.Column(db.Integer)
   end = db.Column(db.Integer)
 
   # Relational Data
   prompt_type = db.relationship('PromptType')
-  companies = db.relationship( 'Company', secondary=prompt_x_company, back_populates='prompts')
-
+  companies = db.relationship( 'Company')
 
 #########################################################################################
 # PromptType Model
@@ -319,7 +381,7 @@ class FacilityType(db.Model):
   description = db.Column(db.Text)
 
   # Relational Data
-  modification_types = db.relationship('ModificationType')
+  modification_types = db.relationship('FacilityModificationType')
 
 ###############################################################################################
 # Generator Type Model
@@ -345,9 +407,9 @@ class GeneratorType(db.Model):
 
   # Relational Data
   facility_type = db.relationship('FacilityType')
-  generators = db.relationship('Generator')
   power_type = db.relationship('PowerType')
   resource_type = db.relationship('ResourceType')
+  modification_types = db.relationship('GeneratorModificationType')
 
   # Methods
   def __repr__(self):
@@ -357,13 +419,14 @@ class GeneratorType(db.Model):
       f"Facility Type Id: {self.id_facility_type}\n" +
       f"Power Type Id: {self.id_power_type}\n" +
       f"Power Type : {self.power_type.name}\n" +
-      f"Resource Type: {self.id_resource_type}"
+      f"Resource Type: {self.id_resource_type}\n" +
+      f"Lifespan: {self.lifespan}"
     )
 
 
 ###############################################################################################
-# Modification Type Model
-class ModificationType(db.Model):
+# Facility Modification Type Model
+class FacilityModificationType(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
 # Foreign keys
@@ -383,13 +446,43 @@ class ModificationType(db.Model):
   # Methods
   def __repr__(self):
     return ( 
-      f"ModificationType -->\n"
+      f"FacilityModificationType -->\n"
       f"ID: {self.id}\n"
       f"Name: {self.name}\n"
       f"Value: {self.value}\n"
       f"Facility Type Id: {self.id_facility_type}\n"
       f"Facility Type: {self.facility_type}\n" 
     )
+
+###############################################################################################
+# Generator Modification Type Model
+class GeneratorModificationType(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+
+# Foreign keys
+  id_generator_type = db.Column(db.Integer, db.ForeignKey('generator_type.id'), nullable=False)
+
+  # Data
+  marginal_area = db.Column(db.Float)
+  marginal_cost_build = db.Column(db.Float)
+  marginal_cost_operate = db.Column(db.Float)
+  name = db.Column(db.String(64))
+  description = db.Column(db.String(256))
+  value = db.Column(db.Float)
+
+  # Relational Data
+  generator_type = db.relationship('GeneratorType')
+
+  # Methods
+  def __repr__(self):
+    return ( 
+      f"GeneratorModificationType -->\n"
+      f"ID: {self.id}\n"
+      f"Name: {self.name}\n"
+      f"Value: {self.value}\n"
+      f"Generator Type Id: {self.id_facility_type}\n"
+      f"Genrerator Type: {self.facility_type}\n" 
+    )    
 
 ###############################################################################################
 # Static models. These will not change during gameplay.
@@ -442,10 +535,15 @@ class GeneratorSchema(ma.ModelSchema):
   class Meta:
     model = Generator
 
-# Schema for Modification
-class ModificationSchema(ma.ModelSchema):
+# Schema for FacilityModification
+class FacilityModificationSchema(ma.ModelSchema):
   class Meta:
-    model = Modification    
+    model = FacilityModification    
+
+# Schema for GeneratorModification
+class GeneratorModificationSchema(ma.ModelSchema):
+  class Meta:
+    model = GeneratorModification    
 
 # Schema for City
 class CitySchema(ma.ModelSchema):
@@ -462,10 +560,15 @@ class GeneratorTypeSchema(ma.ModelSchema):
   class Meta:
     model = GeneratorType
 
-# Schema for ModificationType
-class ModificationTypeSchema(ma.ModelSchema):
+# Schema for FacilityModificationType
+class FacilityModificationTypeSchema(ma.ModelSchema):
   class Meta:
-    model = ModificationType   
+    model = FacilityModificationType   
+
+# Schema for GeneratorModificationType
+class GeneratorModificationTypeSchema(ma.ModelSchema):
+  class Meta:
+    model = GeneratorModificationType   
 
 # Schema for PowerType
 class PowerTypeSchema(ma.ModelSchema):

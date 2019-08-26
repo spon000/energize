@@ -27,7 +27,7 @@ define([
           super();
           this._playerSocket = null;
           this._socketCalls = null;
-          this._gameNamespace = '/game' + globalGameId;
+          this._gameRoomName = 'game' + globalGameId;
           this._canvasModel = null;
           this._canvasView = null;
           this._canvasController = null;
@@ -156,25 +156,61 @@ define([
         }
 
         _initialize() {
-          this._playerSocket = socketio.connect('http://' + document.domain + ':' + location.port)
+          this._initCanvas();
+          this._initSocketCallsReceived();
+        }
 
+        _initSocketCallsReceived() {
+          /////////////////////////////////////////////////////////////////////////////////
+          // SocketIO connect to Server via websockets
+
+          /* *************************************************************************** */
+          // Connecting to server. Session ID is returned
+          /* *************************************************************************** */
+          this._playerSocket = socketio.connect('http://' + document.domain + ':' + location.port)
+          console.log("playerSocket = ", this._playerSocket);
+
+          /////////////////////////////////////////////////////////////////////////////////
+          // SocketIO messages: Connection and Disconnection
+
+          /* *************************************************************************** */
+          //
+          /* *************************************************************************** */
           this._playerSocket.on('connect', () => {
             this._socketCalls = new SocketIOCalls(this._playerSocket);
             this._socketCalls.clientConnect(globalGameId);
             console.log("client connected successfully... _socketCalls = ", this._socketCalls);
           });
 
+          /* *************************************************************************** */
+          //
+          /* *************************************************************************** */
           this._playerSocket.on('disconnect', () => {
             this._socketCalls.clientDisconnect(globalGameId);
             console.log("client disconnect successfully... _socketCalls = ", this._socketCalls);
           });
 
-          console.log("playerSocket = ", this._playerSocket);
-          this._initCanvas();
-          this._initSocketCallsReceived();
-        }
 
-        _initSocketCallsReceived() {
+          /////////////////////////////////////////////////////////////////////////////////
+          // SocketIO messages: Game Turn 
+
+          /* *************************************************************************** */
+          // Game turn has finished and a new turn is ready for players.
+          // We need to have all clients for that game reload the page
+          /* *************************************************************************** */
+          this._playerSocket.on('game_turn_complete', (data) => {
+            location.reload();
+          })
+
+          /* *************************************************************************** */
+          // Game turn has finished and a new turn is ready for players.
+          // We need to have all clients for that game reload the page
+          /* *************************************************************************** */
+          this._playerSocket.on('game_turn_interval', (data) => {
+            console.log("game_turn_interval. Data = ", data);
+          })
+
+
 
           // this._gameSocket.on('new_facility', (data) => {
           //   console.log("on('new_facility') data = ", data);
