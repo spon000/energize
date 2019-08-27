@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 from sqlalchemy import func
 from app import db
@@ -14,7 +15,7 @@ from app.game.history import init_history_table
 # Functions
 from app.game.utils import date_to_hours, hours_to_date, date_to_date_str
 # Constants
-from app.game.utils import hours_per_turn
+from app.game.utils import hours_per_turn, hours_per_year
 
 #######################################################################################
 # Main function
@@ -100,6 +101,7 @@ def init_facilities(game):
 
   if num_facilities == 0:
     for index, facility in enumerate(start_facilities):
+      facility_type = FacilityType.query.filter_by(id=facility['id_type']).first()
       new_facility = Facility(
         id_type = facility['id_type'],
         id_game = game.id,
@@ -110,6 +112,9 @@ def init_facilities(game):
         name = "Facility #" + str(index),
         state = facility['state'],
         player_number = facility['player'],
+        build_turn = facility_type.build_time,
+        prod_turn = facility_type.lifespan,
+        decom_turn = facility_type.decom_time,
         column = facility['column'],
         row = facility['row'],
         layer = facility['layer']
@@ -119,20 +124,29 @@ def init_facilities(game):
       db.session.add(new_facility)
   
       # since currently Facility has no lifespan, find longest lifespan of compatible GeneratorTypes
-      lifespan_max = db.session.query(db.func.max(GeneratorType.lifespan)).filter_by(id_facility_type=new_facility.id_type).scalar()
+      # lifespan_max = db.session.query(db.func.max(GeneratorType.lifespan)).filter_by(id_facility_type=new_facility.id_type).scalar()
       
       # draw an age from a Poisson distribution such that "most" generators are about 2/3 through their lifespan
-      age_hours = int(np.random.poisson(lifespan_max * hours_per_turn * 0.66, size=1)[0])
+      age_hours = int(np.random.poisson(facility_type.lifespan * hours_per_turn * 0.66, size=1)[0])
 
       # ensure that the age doesn't exceed the GeneratorType lifespan
-      if age_hours > (lifespan_max * hours_per_turn):
-        age_hours = lifespan_max * hours_per_turn 
+      if age_hours > (facility_type.lifespan * hours_per_turn):
+        age_hours = facility_type.lifespan * hours_per_turn 
 
-      prod_date_hours = date_to_hours(game.zero_year, game.sim_start_date) - age_hours 
+      prod_date_hours = game.sim_start_date - age_hours
+      new_facility.build_turn = 0
+      new_facility.prod_turn = facility_type.lifespan - int(age_hours / hours_per_turn)
 
-      facility_type = FacilityType.query.filter_by(id=new_facility.id_type).first()
-      new_facility.start_prod_date  = hours_to_date(game.zero_year, prod_date_hours)
-      new_facility.start_build_date = hours_to_date(game.zero_year, (prod_date_hours - facility_type.build_time * hours_per_turn))
+      # print(
+      #   f"{'-'*80}\n"
+      #   f"age_hours = {age_hours}\n"
+      #   f"facility lifespan = {facility_type.lifespan}\n"
+      #   f"facility age (in turns)  = {int(age_hours / hours_per_turn)}\n"
+      #   f"facility age (in years) = {int( age_hours / hours_per_year)}\n"
+      # )
+
+      new_facility.start_prod_date  = prod_date_hours
+      new_facility.start_build_date = prod_date_hours - (facility_type.build_time * hours_per_turn)
 
   # Commit (write to database) all the added records.
   db.session.commit()
@@ -146,33 +160,32 @@ def init_generators(game):
 
   if num_generators == 0:
     for generator in start_generators:
+      generator_type = GeneratorType.query.filter_by(id=generator['id_type']).first()
       new_generator = Generator(
         id_type = generator['id_type'],
         id_game = game.id,
         id_facility = generator['id_facility'],
+        build_turn = generator_type.build_time,
+        prod_turn = generator_type.lifespan,
+        decom_turn = generator_type.decom_time,         
         state = generator['state']
       )
 
       # Add record to database cache. Doesn't get written until commit() is invoked.
       db.session.add(new_generator)
 
-      # find the age of the facility, and lifespan of the generator
+      genType_buildTime_hours = generator_type.build_time * hours_per_turn
+      genType_lspan_hours = generator_type.lifespan * hours_per_turn
+
       # draw age from Poisson distribution, ensuring that it does not exceed facility age or generator lifespan
-      facility = Facility.query.filter_by(id=new_generator.id_facility).first()
-      generator_type = GeneratorType.query.filter_by(id=new_generator.id_type).first()
-      genType_buildTime_hours = float(generator_type.build_time) * hours_per_turn
+      age_hours = int(np.random.poisson(genType_lspan_hours * 0.66, size=1)[0])
 
-      # since currently Facility has no lifespan, find longest lifespan of compatible GeneratorTypes
-      lifespan_max = db.session.query(db.func.max(GeneratorType.lifespan)).filter_by(id_facility_type=facility.id_type).scalar()
-
-      if generator_type.lifespan >= lifespan_max:
-        facility_age_hours = date_to_hours(game.zero_year, game.sim_start_date) - date_to_hours(game.zero_year, facility.start_prod_date)
-        age_hours = facility_age_hours
-      else:
-        genType_lspan_hours = float(generator_type.lifespan) * hours_per_turn
-        age_hours = int(np.random.poisson(genType_lspan_hours * 0.66, size=1)[0])
+      if (age_hours > genType_lspan_hours):
+        age_hours = genType_lspan_hours
         
-      prod_date_hours = date_to_hours(game.zero_year, game.sim_start_date) - age_hours
+      prod_date_hours = game.sim_start_date - age_hours
+      new_generator.build_turn = 0
+      new_generator.prod_turn = generator_type.lifespan - int(age_hours / hours_per_turn)
 
       # print(
       #   f"{'-'*80}\n"
@@ -181,8 +194,8 @@ def init_generators(game):
       #   f"gnerator_age_hours = {age_hours}\n"
       # )
 
-      new_generator.start_prod_date  = hours_to_date(game.zero_year, prod_date_hours)
-      new_generator.start_build_date = hours_to_date(game.zero_year, int((prod_date_hours - genType_buildTime_hours)))
+      new_generator.start_prod_date  = prod_date_hours
+      new_generator.start_build_date = prod_date_hours - genType_buildTime_hours
 
   # Commit (write to database) all the added records.
   db.session.commit()

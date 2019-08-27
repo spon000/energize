@@ -3,13 +3,18 @@ from flask import Blueprint, flash, url_for, redirect, render_template, request,
 from flask_login import login_required, current_user
 from flask_socketio import send
 import json
+import math 
 
 from app import db 
 from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType, ResourceType
 from app.models import FacilitySchema, GeneratorSchema, FacilityModificationSchema, GeneratorModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema
 from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, FacilityModificationTypeSchema, GeneratorModificationTypeSchema
 from app.game.init_game import init_game_models
-from app.game.utils import format_date, get_current_game_date, convert_to_money_string, convert_date_to_qtr_year, format_qtr_year
+# Functions from game/utils.py
+from app.game.utils import format_date, convert_to_money_string, calc_start_prod_date, calc_end_prod_date, get_age
+from app.game.utils import get_current_game_date
+# Constants from game/utils.py
+from app.game.utils import hours_per_turn
 from app.game.turn import initialize_turn
 from app.game.turn import calculate_turn
 from app.game.turn import finalize_turn
@@ -388,8 +393,12 @@ def updateFacilityType():
   ftype = request.args.get('type', None)
 
   company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
+  facility_type = FacilityType.query.filter_by(id=int(ftype)).first()
   facility = Facility.query.filter_by(id=fid, id_game=gid).first()
   facility.id_type = int(ftype);
+  facility.build_turn = facility_type.build_time
+  facility.prod_turn = facility_type.lifespan
+  facility.decom_turn = facility_type.decom_time
   db.session.commit()
 
   facility_schema = FacilitySchema()
@@ -411,6 +420,8 @@ def update_facility():
   fid = request.args.get('fid', None)
   facility_updates = json.loads(request.args.get('facility', None))
 
+  bad_key_fields = ['id', 'id_type', 'id_company', 'id_game']
+
   print(f"*"*80)
   print(f"facility = {facility_updates}")
 
@@ -418,7 +429,7 @@ def update_facility():
   facility_update_keys = list(facility_updates.keys())
 
   for fu_key in facility_update_keys:
-    if fu_key != 'id':
+    if fu_key not in bad_key_fields:
       facility[fu_key] = facility_updates[fu_key]
 
   db.session.commit()
@@ -462,6 +473,7 @@ def viewfacility():
 
   gid = request.args.get('gid', None)
   fid = request.args.get('fid', None)
+  game = Game.query.filter_by(id=gid).first()
   facility = Facility.query.filter_by(id=fid, id_game=gid).first()
   facility_capacity = sum(gen.generator_type.nameplate_capacity for gen in facility.generators) or 0
   power_type = facility.generators[0].generator_type.power_type.name if facility.generators else "Undefined"
@@ -469,7 +481,8 @@ def viewfacility():
   return render_template(
     "viewfacility.html", 
     facility=facility, 
-    facility_type=facility.facility_type, 
+    facility_type=facility.facility_type,
+    facility_age = get_age(game, facility.start_prod_date),
     power_type=power_type,
     faccap=facility_capacity
   )
@@ -495,19 +508,21 @@ def new_generators():
 
     # Check to see if key is in dictionary
     if 'id_type' not in gen:
-      gen_type = default_generator_type.id
+      gen_type_id = default_generator_type.id
     else:
-      gen_type = gen['id_type']
+      gen_type_id = gen['id_type']
 
-    currentDate = get_current_game_date(game)
-    currentDateStr = format_qtr_year(currentDate['current_quarter'], currentDate['current_year'])
+    generator_type = GeneratorType.query.filter_by(id=gen_type_id).first()
     defined_gens = list()
 
     generator = Generator(
       id_game=gid,
       id_facility=fid,
-      id_type=gen_type,
-      start_build_date=currentDateStr
+      id_type=generator_type.id,
+      start_build_date=get_current_game_date(game),
+      build_turn=generator_type.build_time,
+      prod_turn=generator_type.lifespan,
+      decom_turn=generator_type.decom_time
     )
     gen_keys = list(gen.keys())
     for key in gen_keys:
@@ -536,17 +551,26 @@ def update_generators():
   gid = request.args.get('gid', None)
   fid = request.args.get('fid', None)
   generator_updates = json.loads(request.args.get('gens', None))
-  
-  # print(f"*"*80)
-  # print(f"generators = {generator_updates}")
+  bad_key_fields = ['id', 'id_game', 'id_facility'] 
 
   updated_generators = []
   for gen in generator_updates:
+    bad_key_fields = ['id', 'id_game', 'id_facility'] 
     generator = Generator.query.filter_by(id=gen['id'], id_game=gid).first()
     generator_update_keys = list(gen.keys())
+
+    if generator.state != "new":
+      bad_key_fields.append('id_type')
+  
     for gu_key in generator_update_keys:
-      if gu_key != 'id':
+      if gu_key not in bad_key_fields:
         generator[gu_key] = gen[gu_key]
+
+        if gu_key == 'id_type':
+          generator_type = GeneratorType.query.filter_by(id=gu_key['id_type']).first()
+          generator.build_turn=generator_type.build_time
+          generator.prod_turn=generator_type.lifespan
+          generator.decom_turn=generator_type.decom_time
   
     db.session.commit()
     generator_schema = GeneratorSchema()
@@ -627,16 +651,27 @@ def facility_types():
 @login_required
 def generator_detail_html():
   gid = request.args.get('gid', None)
+  game = Game.query.filter_by(id=gid).first()
   # print(f"gid = {gid}")
   genid = request.args.get('genid', None)
   # print(f"genid = {genid}")
   generator = Generator.query.filter_by(id=genid, id_game=gid).first()
+  start_prod_date = generator.start_prod_date
+  lifespan_date = generator.end_prod_date
+
+  # if generator.state == "building":
+  #   start_prod_date = calc_start_prod_date(game, generator.build_turn)
+
+  # if generator.state != "decomissioned":
+  #   lifespan_turns = generator.build_turn + 
+  #   life_turns_left = abs(date_to_hours(game))
 
   return render_template(
     "viewgenerator.html", 
     generator=generator,
     format_money=convert_to_money_string,
-    to_qtr_year_string=convert_date_to_qtr_year
+    production_date=format_date(start_prod_date, "Y Q"),
+    # lifespan_date=
   )  
 
 # ###############################################################################  
