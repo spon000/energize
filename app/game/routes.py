@@ -10,11 +10,7 @@ from app.models import User, Game, Company, Facility, Generator, City, FacilityT
 from app.models import FacilitySchema, GeneratorSchema, FacilityModificationSchema, GeneratorModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema
 from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, FacilityModificationTypeSchema, GeneratorModificationTypeSchema
 from app.game.init_game import init_game_models
-# Functions from game/utils.py
-from app.game.utils import format_date, convert_to_money_string, calc_start_prod_date, calc_end_prod_date, get_age
-from app.game.utils import get_current_game_date
-# Constants from game/utils.py
-from app.game.utils import hours_per_turn
+from app.game.utils import format_date, convert_to_money_string, get_age, turns_to_hours, get_current_game_date
 from app.game.turn import initialize_turn
 from app.game.turn import calculate_turn
 from app.game.turn import finalize_turn
@@ -391,6 +387,7 @@ def updateFacilityType():
   gid = request.args.get('gid', None)
   fid = request.args.get('fid', None)
   ftype = request.args.get('type', None)
+ 
 
   company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
   facility_type = FacilityType.query.filter_by(id=int(ftype)).first()
@@ -399,6 +396,9 @@ def updateFacilityType():
   facility.build_turn = facility_type.build_time
   facility.prod_turn = facility_type.lifespan
   facility.decom_turn = facility_type.decom_time
+  facility.start_build_date = get_current_game_date(company.game) + turns_to_hours(1)
+  facility.start_prod_date = get_current_game_date(company.game) + turns_to_hours(facility_type.build_time)
+
   db.session.commit()
 
   facility_schema = FacilitySchema()
@@ -477,12 +477,23 @@ def viewfacility():
   facility = Facility.query.filter_by(id=fid, id_game=gid).first()
   facility_capacity = sum(gen.generator_type.nameplate_capacity for gen in facility.generators) or 0
   power_type = facility.generators[0].generator_type.power_type.name if facility.generators else "Undefined"
+  facility_age = get_age(game, facility.start_prod_date)
+  if facility.state == "new":
+    facility_age = "Ready for Construction"
+  elif facility_age < 0:
+    facility_age = "Under Construction"
+  else:
+    
+    if facility_age == 1:
+      facility_age = str(facility_age) + " year"
+    else:
+      facility_age = str(facility_age) + " years"
 
   return render_template(
     "viewfacility.html", 
     facility=facility, 
     facility_type=facility.facility_type,
-    facility_age = get_age(game, facility.start_prod_date),
+    facility_age = facility_age,
     power_type=power_type,
     faccap=facility_capacity
   )
@@ -652,26 +663,21 @@ def facility_types():
 def generator_detail_html():
   gid = request.args.get('gid', None)
   game = Game.query.filter_by(id=gid).first()
-  # print(f"gid = {gid}")
   genid = request.args.get('genid', None)
-  # print(f"genid = {genid}")
   generator = Generator.query.filter_by(id=genid, id_game=gid).first()
   start_prod_date = generator.start_prod_date
-  lifespan_date = generator.end_prod_date
 
-  # if generator.state == "building":
-  #   start_prod_date = calc_start_prod_date(game, generator.build_turn)
+  if generator.state == "building":
+    start_prod_date = get_current_game_date(game) + turns_to_hours(generator.build_turn) 
 
-  # if generator.state != "decomissioned":
-  #   lifespan_turns = generator.build_turn + 
-  #   life_turns_left = abs(date_to_hours(game))
+  eol_date_hours = get_current_game_date(game) + turns_to_hours(generator.build_turn) + turns_to_hours(generator.prod_turn)
 
   return render_template(
     "viewgenerator.html", 
     generator=generator,
     format_money=convert_to_money_string,
     production_date=format_date(start_prod_date, "Y Q"),
-    # lifespan_date=
+    end_of_life_date=format_date(eol_date_hours, "Y Q"),
   )  
 
 # ###############################################################################  

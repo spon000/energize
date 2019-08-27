@@ -5,76 +5,76 @@
 </style>
 
 <div class="row">
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <label> OM Costs: </label>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6">
     <label>{{ format_money(generator.om_cost) }}</label>
   </div>
 </div>
 <div class="row even-row">
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <label> Revenue: </label>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6">
     <label> {{ format_money(generator.revenue) }}</label>
   </div>
 </div>
 <div class="row">
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <label> Profit: </label>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6">
     <label> {{ format_money(0.0) }}</label>
   </div>
 </div>
 <div class="row even-row">
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <label> Total Nameplate Capacity: </label>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6">
     <label> {{ generator.generator_type.nameplate_capacity }} MW</label>
   </div>
 </div>
 <div class="row">
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <label> Start Production Date: </label>
   </div>
-  <div class="col-md-4">
-    </label>{{ current_date }}</label>
+  <div class="col-md-6">
+    </label>{{ production_date }}</label>
   </div>
 </div>
 <div class="row even-row">
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <label> End of Life Date: </label>
   </div>
-  <div class="col-md-4">
-    </label> </label>
+  <div class="col-md-6">
+    </label> {{ end_of_life_date }} </label>
   </div>
 </div>
 <div class="row">
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <label> Bid Policy: </label>
   </div>
-  <div class="col-md-4">
-    <label> {{ generator.local_bid_policy }} </label>
+  <div class="col-md-6">
+    <label> {{ generator.local_bid_policy }} ({{ generator.facility.company.global_bid_policy }}) </label>
   </div>
 </div>
 
 <div class="row even-row">
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <label> Maintenance Policy: </label>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6">
     <label> Routine </label>
   </div>
 </div>
 
 <div class="row">
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <label> Modifications: </label>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-6">
     <label> </label>
   </div>
 </div>

@@ -109,6 +109,9 @@ def calc_end_prod_date(game, lifespan_turns):
 def get_age(game, start_date):
   return floor((get_current_game_date(game) - start_date) / hours_per_year)
 
+def turns_to_hours(turns):
+  return turns * hours_per_turn
+
 ###################################################################
 # Money utilities
 
