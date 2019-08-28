@@ -70,7 +70,7 @@ start_generators = [
   {'id_type': 10, 'id_facility': 21, 'state': "available", 'build_turn': 0, 'extension': 0},
   {'id_type': 12, 'id_facility': 22, 'state': "available", 'build_turn': 0, 'extension': 0},
   {'id_type': 12, 'id_facility': 22, 'state': "available", 'build_turn': 0, 'extension': 0},
-  {'id_type': 13, 'id_facility': 22, 'state': "available", 'build_turn': 0, 'extension': 0},
+  {'id_type': 12, 'id_facility': 22, 'state': "available", 'build_turn': 0, 'extension': 0},
   {'id_type': 12, 'id_facility': 23, 'state': "available", 'build_turn': 0, 'extension': 0},
   {'id_type': 12, 'id_facility': 23, 'state': "available", 'build_turn': 0, 'extension': 0},
   {'id_type': 12, 'id_facility': 23, 'state': "available", 'build_turn': 0, 'extension': 0},

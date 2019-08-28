@@ -211,10 +211,23 @@ define([
           })
 
 
+          /////////////////////////////////////////////////////////////////////////////////
+          // SocketIO messages: Map Updates
 
-          // this._gameSocket.on('new_facility', (data) => {
-          //   console.log("on('new_facility') data = ", data);
-          // });
+          /* *************************************************************************** */
+          /* *************************************************************************** */
+          this._playerSocket.on('facility_added', (data) => {
+            console.log("facility removed", data);
+          })
+
+          /* *************************************************************************** */
+          // Game turn has finished and a new turn is ready for players.
+          // We need to have all clients for that game reload the page
+          /* *************************************************************************** */
+          this._playerSocket.on('facility_removed', (data) => {
+            console.log("facility removed", data);
+          })
+
         }
 
         _initCanvas() {

@@ -53,21 +53,35 @@
   </div>
 </div>
 <div class="row">
+
   <div class="col-lg-6">
     <label> Bid Policy: </label>
   </div>
+
   <div class="col-md-6">
+    {% if generator.local_bid_policy == 'Company Wide' %}
     <label> {{ generator.local_bid_policy }} ({{ generator.facility.company.global_bid_policy }}) </label>
+    {% else %}
+    <label> {{ generator.local_bid_policy }} </label>
+    {% endif %}
   </div>
+
 </div>
 
 <div class="row even-row">
+
   <div class="col-lg-6">
     <label> Maintenance Policy: </label>
   </div>
+
   <div class="col-md-6">
-    <label> Routine </label>
+    {% if generator.local_maintenance_policy == 'Company Wide' %}
+    <label> {{ generator.local_maintenance_policy }} ({{ generator.facility.company.global_maintenance_policy }}) </label>
+    {% else %}
+    <label> {{ generator.local_maintenance_policy }} </label>
+    {% endif %}
   </div>
+
 </div>
 
 <div class="row">

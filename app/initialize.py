@@ -24,18 +24,19 @@ def initialize_db(app):
   init_table(Game, db)
   init_table(Company, db)
   init_table(City, db)
-  init_table(FacilityModificationType, db)
-  init_table(GeneratorModificationType, db)
-  init_table(Prompt, db)
   init_table(PowerType, db)
   init_table(ResourceType, db)
   init_table(FacilityType, db)
   init_table(GeneratorType, db)
   init_table(PromptType, db)
-  init_table(FacilityModification, db)
-  init_table(GeneratorModification, db)
+  init_table(FacilityModificationType, db)
+  init_table(GeneratorModificationType, db)
+  init_table(Company, db)
   init_table(Facility, db)
   init_table(Generator, db)
+  init_table(Prompt, db)
+  init_table(FacilityModification, db)
+  init_table(GeneratorModification, db)
 
 
 
@@ -71,6 +72,8 @@ def initialize_db(app):
       build_time = facility_type['build_time'],
       decom_time = facility_type['decom_time'],
       minimum_area = facility_type['minimum_area'],
+      maximum_capacity = facility_type['maximum_capacity'],
+      maximum_generators = facility_type['maximum_generators'],
       lifespan = facility_type['lifespan'],
       fixed_cost_build = facility_type['fixed_cost_build'],
       fixed_cost_operate = facility_type['fixed_cost_operate'],
@@ -100,7 +103,6 @@ def initialize_db(app):
       id_resource_type = generator_type['id_resource_type'],
       build_time = generator_type['build_time'],
       decom_time = generator_type['decom_time'],
-      maximum_capacity = generator_type['maximum_capacity'],
       nameplate_capacity = generator_type['nameplate_capacity'],
       heat_rate = generator_type['heat_rate'],
       continuous = generator_type['continuous'],

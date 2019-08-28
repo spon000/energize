@@ -259,6 +259,7 @@ def power_types():
   power_types = PowerType.query.all()
   power_types_schema = PowerTypeSchema(many=True)
   serialized_power_types = power_types_schema.dump(power_types).data
+  
   return jsonify({'power_types': serialized_power_types})
 
 # ###############################################################################  
@@ -287,7 +288,7 @@ def player_facility():
   facility_type_schema = FacilityTypeSchema()
   facility_type_serialized = facility_type_schema.dump(facility_type).data
 
-  generators = Generator.query.filter_by(id_facility=fid, id_game=gid).all()
+  generators = Generator.query.filter_by(id_facility=facility.id, id_game=gid).all()
   generators_schema = GeneratorSchema(many=True)
   generators_serialized = generators_schema.dump(generators).data
 
@@ -298,10 +299,6 @@ def player_facility():
   generator_types = GeneratorType.query.filter_by(id_facility_type=facility_type.id).all()
   generator_types_schema = GeneratorTypeSchema(many=True)
   generator_types_serialized = generator_types_schema.dump(generator_types).data
-
-  # gen_type_list = [gen_type.id for gen_type in generator_types]
-  # print("-"*80)
-  # print(gen_type_list)
 
   power_types = [gen_type.power_type for gen_type in generator_types]
   power_type_schema = PowerTypeSchema(many=True)
@@ -475,6 +472,8 @@ def viewfacility():
   fid = request.args.get('fid', None)
   game = Game.query.filter_by(id=gid).first()
   facility = Facility.query.filter_by(id=fid, id_game=gid).first()
+  print(f"*"*80)
+  print(f"{facility}")
   facility_capacity = sum(gen.generator_type.nameplate_capacity for gen in facility.generators) or 0
   power_type = facility.generators[0].generator_type.power_type.name if facility.generators else "Undefined"
   facility_age = get_age(game, facility.start_prod_date)
@@ -575,10 +574,12 @@ def update_generators():
   
     for gu_key in generator_update_keys:
       if gu_key not in bad_key_fields:
+        print(f"*"*80)
+        print(f"gu_key = '{gu_key}'")
         generator[gu_key] = gen[gu_key]
 
         if gu_key == 'id_type':
-          generator_type = GeneratorType.query.filter_by(id=gu_key['id_type']).first()
+          generator_type = GeneratorType.query.filter_by(id=gen['id_type']).first()
           generator.build_turn=generator_type.build_time
           generator.prod_turn=generator_type.lifespan
           generator.decom_turn=generator_type.decom_time

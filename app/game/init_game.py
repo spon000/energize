@@ -160,11 +160,12 @@ def init_generators(game):
 
   if num_generators == 0:
     for generator in start_generators:
+      facility = Facility.query.filter_by(fid=generator['id_facility'],id_game=game.id).first()
       generator_type = GeneratorType.query.filter_by(id=generator['id_type']).first()
       new_generator = Generator(
         id_type = generator['id_type'],
         id_game = game.id,
-        id_facility = generator['id_facility'],
+        id_facility = facility.id,
         build_turn = generator_type.build_time,
         prod_turn = generator_type.lifespan,
         decom_turn = generator_type.decom_time,         

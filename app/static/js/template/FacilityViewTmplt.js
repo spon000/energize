@@ -154,6 +154,8 @@ define([], function () {
         
           /* Position the tooltip */
           position: fixed;
+          margin-top: -70px;
+          margin-left: -70px;
           z-index: 1000;
         }
         
@@ -221,6 +223,12 @@ define([], function () {
     verifyNewDialog: `
       <div class='verify-close'>
         <p class='highlight'> Are you sure you want to remove this facility? </p>
+      </div>
+    `,
+    verifyDecomDialog: `
+      <div class='verify-close'>
+        <p> Going into the Decomission function will apply all of the changes you made to the facility and generators. </p>
+        <p class='highlight'> Do you want to continue? </p>
       </div>
     `,
     generatorNameLink: `

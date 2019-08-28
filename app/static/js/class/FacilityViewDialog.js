@@ -22,7 +22,7 @@ define([
     return (
       class FacilityViewDialog {
         constructor(facilityId, facilityTypeList = null, closeHandler = null) {
-          console.log("facilityTypeList =", facilityTypeList);
+          console.log("facilityId : facilityTypeList =", facilityId + " : " + facilityTypeList);
           // Dialog 
           this._dialog = null;
           this._facilityId = facilityId;
@@ -43,7 +43,7 @@ define([
           this._facilityModified = false;
           this._facilityPreviousSelected = facilityTypeList ? true : false;
           this._decomissionFacilityOn = false;
-          this._genListTable = null;
+          this._generatorListTable = null;
           this._qtrsPerYear = 4;
 
 
@@ -70,6 +70,11 @@ define([
           this._bidPolicyOptions = ["Company Wide", "MC", "LCOE", "Fixed"];
           this._maintPolicyOptions = ["Company Wide", "Routine", "Proactive", "Reactive"];
 
+          // Ugh. Find a better way than this.
+          this._createTable = false
+          this._changeHeader = false
+          // End Ugh.
+
           this._updatedFacility = {};
           this._updatedGenerator = {};
           this._updatedGenerators = [];
@@ -88,9 +93,20 @@ define([
           // Load all needed data.
           this._modelData = new ModelData();
 
-          Promise.all([
+          this._getFacilityData().then((results) => {
+            this._massageFacilityData();
+            this._initialize();
+            this._initWindow();
+
+            return this.openDialog();
+          });
+        }
+
+        /* *********************************************************************************** */
+        _getFacilityData() {
+          return Promise.all([
             this._modelData.getCurrentDate(),
-            this._modelData.getPlayerFacility(facilityId)
+            this._modelData.getPlayerFacility(this._facilityId)
           ]).then((data) => {
             // console.log("loaded data = ", data);
             this._currentDate = data[0]['currentDate'];
@@ -108,20 +124,11 @@ define([
             this._powerTypes = fdata['power_types'];
             this._resourceTypes = fdata['resource_types'];
             this._modificationTypes = fdata['modification_types'];
-
-            this._newFacility = this._facility.state == "new" ? true : false;
-            if (this._newFacility)
-              this._setBack();
-
-            this._initialize();
-            this._initWindow();
-            return this.openDialog();
           });
         }
 
         /* *********************************************************************************** */
-        _initialize() {
-          // Add extra property to facility type object.
+        _massageFacilityData() {
           this._facilityType["simpletype"] = this._facilityType.maintype.split(" ")[0];
           this._facility["new_facility"] = this._facility.state == "new" ? true : false;
           this._facility["company_name"] = this._company.name;
@@ -137,20 +144,26 @@ define([
 
           // Add Generator Type record to each Generator record. And check if it's a new generator
           this._generators = this._generators.map(g => {
-            g['modified'] = false;
-            // g['new_generator'] = g.state == "new" ? true : false;
-            let gentype = this._generatorTypes.find(gt => g.generator_type === gt.id)
+            let gentype = this._generatorTypes.find(gt => g.generator_type == gt.id)
             g['gentype_details'] = gentype;
             return g;
           });
 
-          // Add total nameplace capacity of all available generators to facility object.
-          this._facility['total_capacity'] = this._generators.reduce(((g_total, g_curr) => {
-            return g_total + (g_curr.state == "available" ? g_curr.gentype_details.nameplate_capacity : 0)
-          }), 0);
-
           // console.log('this._generators = ', this._generators);
           // console.log("this._facility = ", this._facility)
+
+          // Add total nameplace capacity of all available generators to facility object.
+          this._facility['total_capacity'] = this._generators.reduce(((g_total, g_curr) => {
+            return g_total + (g_curr.state == "available" ? g_curr.gentype_details['nameplate_capacity'] : 0)
+          }), 0);
+        }
+
+        /* *********************************************************************************** */
+        _initialize() {
+          this._newFacility = this._facility.state == "new" ? true : false;
+
+          if (this._newFacility)
+            this._setBack();
         }
 
         /* *********************************************************************************** */
@@ -240,10 +253,8 @@ define([
         /* *********************************************************************************** */
         _createGeneratorList() {
           let compiledTemplate = Handlebars.compile(FacilityViewTmplt.generatorViewList);
-          let templateParms = {
-            generators: this._generators,
-            facility: this._facility
-          }
+          let templateParms = {}
+
           this._facilityViewGeneratorListHtml = this._addHtml($(compiledTemplate(templateParms)),
             this._elementIdGeneratorList, this._facilityViewWindowHtml);
         }
@@ -318,24 +329,54 @@ define([
         /* *********************************************************************************** */
         _subGeneratorClick(evt) {
           let scope = evt.data;
-          let generatorLinks = $(".generator-name-link[state='available']");
+          let element = evt.target;
+          console.log("---> _subGeneratorClick decomissionOn = ", scope._decomissionFacilityOn);
 
-          scope._decomissionFacilityOn = !scope._decomissionFacilityOn;
+          // This is ugly. Need to figure out a better way.
+          if (!scope._decomissionFacilityOn) {
+            if (scope._facilityModified) {
+              scope._openVerifyDialog("decom", scope, false, (scope) => {
+                scope._decomissionFacilityOn = true;
+                $("#vfd-footer-apply-btn").click();
+                scope._changeGeneratorListHeader(element, scope._decomissionFacilityOn);
+              });
+            }
+            else {
+              scope._decomissionFacilityOn = true
+              $("#vfd-footer-apply-btn").click();
+              scope._generatorListTable = scope._createGeneratorListTable();
+              scope._createTableEvents();
+              scope._changeGeneratorListHeader(element, scope._decomissionFacilityOn);
+            }
+          }
+          else {
+            scope._decomissionFacilityOn = false;
+            $("#vfd-footer-apply-btn").click();
+            scope._generatorListTable = scope._createGeneratorListTable();
+            scope._createTableEvents();
+            scope._changeGeneratorListHeader(element, scope._decomissionFacilityOn);
+          }
 
-          if (scope._decomissionFacilityOn) {
-            $(evt.target).addClass("down");
+          scope._generatorListTable = scope._createGeneratorListTable();
+          scope._createTableEvents();
+        }
+
+        _changeGeneratorListHeader(element, decomissionOn) {
+
+          console.log("_changeGeneratorListHeader decomissionOn = ", decomissionOn);
+
+          if (decomissionOn) {
+            $(element).addClass("down");
             $(".vfd-gen-list-header").toggleClass("list-color decom-color");
             $(".gen-header-detail.list").hide();
             $(".gen-header-detail.decom").show();
           }
           else {
-            $(evt.target).removeClass("down");
+            $(element).removeClass("down");
             $(".vfd-gen-list-header").toggleClass("list-color decom-color");
             $(".gen-header-detail.list").show();
             $(".gen-header-detail.decom").hide();
           }
-
-          console.log("generatorLinks = ", scope._decomissionFacilityOn, generatorLinks);
         }
 
         /* *********************************************************************************** */
@@ -406,7 +447,7 @@ define([
           if (genIndex > -1)
             scope._updatedGenerators[genIndex]['local_maintenance_policy'] = value;
           else
-            scope._updatedGenerators.push({ 'id': genId, 'local_maintnenace_policy': value });
+            scope._updatedGenerators.push({ 'id': genId, 'local_maintenance_policy': value });
 
           console.log("_maintPolicyOptionChange(): ", genId, value, scope._updatedGenerators);
           scope._turnOnApply(scope);
@@ -416,6 +457,7 @@ define([
         _applyUpdates(evt) {
           let scope = evt.data;
           console.log("_updatedFacility", scope._updatedFacility);
+          console.log("_updatedGenerators", scope._updatedGenerators);
 
           if (scope._updatedFacility !== {}) {
             scope._modelData.updateFacility(scope._facilityId, scope._updatedFacility).then((facility) => {
@@ -428,9 +470,16 @@ define([
             scope._modelData.updateGenerators(scope._facilityId, scope._updatedGenerators).then((generators) => {
               console.log("_applyUpdates() Generators were updated", generators);
               scope._updatedGenerators = [];
-            })
+              scope._getFacilityData().then((results) => {
+                scope._massageFacilityData();
+                scope._generatorListTable = scope._createGeneratorListTable();
+                scope._createTableEvents();
+              });
+            });
           }
 
+          // scope._generatorListTable = scope._createGeneratorListTable();
+          // scope._createTableEvents();
           scope._turnOffApply(scope)
         }
 
@@ -441,7 +490,7 @@ define([
           let scope = evt.data
           let msgType = scope._facilityModified ? "mod" : "none";
 
-          scope._openVerifyDialog(msgType, scope)
+          scope._openVerifyDialog(msgType, scope, true)
         }
 
         /* *********************************************************************************** */
@@ -449,7 +498,7 @@ define([
           let scope = evt.data;
           let msgType = scope._facilityPreviousSelected ? "mod" : "none";
 
-          scope._openVerifyDialog(msgType, scope, (scope) => {
+          scope._openVerifyDialog(msgType, scope, true, (scope) => {
             evtEmitter.emit("changefacility", {
               facilityId: scope._facilityId,
               facilityTypeList: scope._facilityTypeList
@@ -461,7 +510,7 @@ define([
         _removeFacility(evt) {
           let scope = evt.data;
 
-          scope._openVerifyDialog("del", scope, (scope) => {
+          scope._openVerifyDialog("del", scope, true, (scope) => {
             console.log("delete facility. id = ", scope._facilityId);
             evtEmitter.emit("deletefacility", {
               facilityId: scope._facilityId
@@ -542,7 +591,7 @@ define([
 
               // Show the generator list if the facility is owned or has been created by the player.
               if (this._ownedFacility) {
-                this._generatorListTable = this._generatorListTable();
+                this._generatorListTable = this._createGeneratorListTable();
               }
 
               // Setup Listener events
@@ -575,16 +624,22 @@ define([
         }
 
         /* *********************************************************************************** */
-        _openVerifyDialog(msgType, scope, closeFunction = null) {
+        _openVerifyDialog(msgType, scope, closeParentDialog, closeFunction = null) {
           let htmlWarning = ""
 
-          if (msgType == "del")
-            htmlWarning = Handlebars.compile(FacilityViewTmplt.verifyNewDialog)();
-          else if (msgType == "mod")
-            htmlWarning = Handlebars.compile(FacilityViewTmplt.verifyChangeDialog)();
-          else {
-            $(scope._dialog).dialog("close");
-            return
+          switch (msgType) {
+            case "del":
+              htmlWarning = Handlebars.compile(FacilityViewTmplt.verifyNewDialog)();
+              break
+            case "mod":
+              htmlWarning = Handlebars.compile(FacilityViewTmplt.verifyChangeDialog)();
+              break
+            case "decom":
+              htmlWarning = Handlebars.compile(FacilityViewTmplt.verifyDecomDialog)();
+              break
+            default:
+              $(scope._dialog).dialog("close");
+              return
           }
 
           $("#vfd-verify-dialog").empty()
@@ -600,7 +655,7 @@ define([
             close: (evt, ui) => {
               $('.vfd-title').show();
             },
-            title: "Warning: facility changes will be lost.",
+            title: "Warning: Are you sure?",
             width: 400,
             height: 275,
             position: {},
@@ -611,9 +666,11 @@ define([
                 text: "Yes",
                 click: function (evt) {
                   $(this).dialog("close")
+                  let scope = $(this).dialog("option", "scope");
                   if (closeFunction)
                     closeFunction(scope)
-                  $(scope._dialog).dialog("close");
+                  if (closeParentDialog)
+                    $(scope._dialog).dialog("close");
                 }
               },
               {
@@ -751,8 +808,13 @@ define([
         //////////////////////////////////////////////////////////////////////////
         // Create the generator list table
         /* *********************************************************************************** */
-        _generatorListTable() {
+        _createGeneratorListTable() {
           const generator_table_data = [];
+
+          this._getFacilityData().then((results) => {
+            this._massageFacilityData();
+          });
+
           console.log("_generatorListTable() this._generators = ", this._generators);
           this._generators.forEach((gen, index) => {
             let profit = "rgb(255, 0, 0)" //getProfit(gen);
@@ -772,7 +834,7 @@ define([
               age: age,
               cond: condition,
               bidp: gen.local_bid_policy,
-              maintp: gen.local_maint_policy,
+              maintp: gen.local_maintenance_policy,
               state: gen.state
             });
           })
@@ -825,14 +887,16 @@ define([
                 formatter: this._bidPolicy_cell,
                 // onRendered: () => { console.log("bid policy rendered") },
                 formatterParams: {
-                  bidPolicyOptions: this._bidPolicyOptions
+                  bidPolicyOptions: this._bidPolicyOptions,
+                  decomissionOn: this._decomissionFacilityOn
                 }
               },
               {
                 title: "Maint Policy", field: "maintp", align: "center",
                 formatter: this._maintPolicy_cell,
                 formatterParams: {
-                  maintPolicyOptions: this._maintPolicyOptions
+                  maintPolicyOptions: this._maintPolicyOptions,
+                  decomissionOn: this._decomissionFacilityOn
                 }
               },
               { title: "State", field: "state", visible: false }
@@ -860,6 +924,8 @@ define([
 
           return html;
         }
+
+        /* *********************************************************************************** */
         _capacity_cell(cell, formatterParams) {
           let html = ""
 
@@ -882,7 +948,8 @@ define([
         _bidPolicy_cell(cell, formatterParams) {
           let html = ""
 
-          if (cell.getData().state != "decommissioned" && cell.getData().state != "decommissioning") {
+          // if (cell.getData().state != "decommissioned" && cell.getData().state != "decommissioning") {
+          if (!this._decomissionFacilityOn) {
             let templateParms = {
               genId: cell.getData().id,
               bidp_opts: formatterParams.bidPolicyOptions,
@@ -901,7 +968,8 @@ define([
         _maintPolicy_cell(cell, formatterParams) {
           let html = ""
 
-          if (cell.getData().state != "decommissioned" && cell.getData().state != "decommissioning") {
+          // if (cell.getData().state != "decommissioned" && cell.getData().state != "decommissioning") {
+          if (!this._decomissionFacilityOn) {
             let templateParms = {
               genId: cell.getData().id,
               maintp_opts: formatterParams.maintPolicyOptions,
@@ -916,7 +984,7 @@ define([
           return html;
         }
 
-
+        /* *********************************************************************************** */
         _profit_cell(cell, formatterParams) {
           let templateParms = {
             state: cell.getData().state,
@@ -927,6 +995,7 @@ define([
           return html;
         }
 
+        /* *********************************************************************************** */
         _age_cell(cell, formatterParams) {
           let templateParms = {
             state: cell.getData().state,

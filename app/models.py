@@ -121,15 +121,18 @@ class Company(db.Model):
     setattr(self, key, value)
 
   def __repr__(self):
-    return f"Company( \
-      'company name: {self.name}\n', \
-      'score: {self.score}\n', \
-      'company id: {self.id}\n', \
-      'game id: {self.id_game}\n', \
-      'player num: {self.player_number}\n', \
-      'user id: {self.id_user}\n', \
-      'connected: {self.connected_to_game}\n', \
-    )"
+    return (
+      f"Company -\n"
+      f"\tId: {self.id}\n"
+      f"\tGame Id: {self.id_game}\n"
+      f"\tUser Id: {self.id_user}\n"
+      f"\tPlayer Num: {self.player_number}\n"
+      f"\tPlayer Type: {self.player_type}\n"
+      f"\tName: {self.name}\n"
+      f"\tState: {self.state}\n"
+      f"\tBalance: {self.balance}\n"
+    )
+
 
 #########################################################################################
 # Facility Model
@@ -179,7 +182,16 @@ class Facility(db.Model):
     setattr(self, key, value)
 
   def __repr__(self):
-    return f"Facility('{self.name}', '{self.id_type}', '{self.player_number}', '{self.state}')"
+    return (
+      f"Facility -\n"
+      f"\tId: {self.id}\n"
+      f"\tGame Id: {self.id_game}\n"
+      f"\tCompany Id: {self.id_company}\n"
+      f"\tState: {self.state}\n"
+      f"\tType Id: {self.id_type}\n"
+      f"\tType: {self.facility_type}\n"
+      f"\tGenerators: {self.generators}\n\n"
+    )
 
 #########################################################################################
 # Generator Model
@@ -203,7 +215,7 @@ class Generator(db.Model):
   start_prod_date = db.Column(db.Integer, default=0)
   end_prod_date = db.Column(db.Integer, default=0)
   local_bid_policy = db.Column(db.Enum("Company Wide", "MC", "LCOE", "Fixed"), default="Company Wide")
-  lobal_maintenance_policy = db.Column(db.Enum("Company Wide", "Routine", "Proactive", "Reactive"), default="Company Wide")
+  local_maintenance_policy = db.Column(db.Enum("Company Wide", "Routine", "Proactive", "Reactive"), default="Company Wide")
   bid_policy_value = db.Column(db.Float, default=0)
   om_cost = db.Column(db.Float, default=0)
   revenue = db.Column(db.Float, default=0)
@@ -380,6 +392,8 @@ class FacilityType(db.Model):
   name = db.Column(db.String(25))
   build_time = db.Column(db.Integer)
   lifespan = db.Column(db.Integer)
+  maximum_capacity = db.Column(db.Integer)
+  maximum_generators = db.Column(db.Integer)
   decom_time = db.Column(db.Integer)
   minimum_area = db.Column(db.Float)
   fixed_cost_build = db.Column(db.Float)
@@ -404,7 +418,6 @@ class GeneratorType(db.Model):
   
   # Data
   nameplate_capacity = db.Column(db.Integer, nullable=False) 
-  maximum_capacity = db.Column(db.Integer, nullable=False)
   build_time = db.Column(db.Integer)
   decom_time = db.Column(db.Integer)
   heat_rate = db.Column(db.Float)

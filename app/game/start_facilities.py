@@ -1,10 +1,10 @@
 start_facilities = [
+  {'id_type': 1, 'fid': 1,  'state': "active", 'player': 1, 'column': 7,   'row': 9, 'layer': 2},                                 
   {'id_type': 1, 'fid': 2,  'state': "active", 'player': 1, 'column': 20,  'row': 102, 'layer': 2},
   {'id_type': 6, 'fid': 3,  'state': "active", 'player': 1, 'column': 22,   'row': 7, 'layer': 2},
   {'id_type': 6, 'fid': 4,  'state': "active", 'player': 1, 'column': 26,   'row': 41, 'layer': 2},
   {'id_type': 5, 'fid': 5,  'state': "active", 'player': 1, 'column': 79,   'row': 6, 'layer': 2},
   {'id_type': 7, 'fid': 6,  'state': "active", 'player': 1, 'column': 23,   'row': 35, 'layer': 2},
-  {'id_type': 1, 'fid': 1,  'state': "active", 'player': 1, 'column': 7,   'row': 9, 'layer': 2},                                 
   {'id_type': 3, 'fid': 7,  'state': "active", 'player': 1, 'column': 43,   'row': 63, 'layer': 2},
   {'id_type': 3, 'fid': 8,  'state': "active", 'player': 1, 'column': 46,   'row': 69, 'layer': 2},
   {'id_type': 3, 'fid': 9,  'state': "active", 'player': 1, 'column': 41,   'row': 58, 'layer': 2},  
@@ -53,27 +53,8 @@ start_facilities = [
   {'id_type': 4, 'fid': 52, 'state': "active", 'player': 5, 'column': 215,   'row': 64, 'layer': 2},
   {'id_type': 4, 'fid': 53, 'state': "active", 'player': 5, 'column': 215,   'row': 85, 'layer': 2},
   {'id_type': 4, 'fid': 54, 'state': "active", 'player': 5, 'column': 207,   'row': 102, 'layer': 2},
-  {'id_type': 4, 'fid': 55, 'state': "active", 'player': 5, 'column': 185,   'row': 115, 'layer': 2}      
-]             
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  {'id_type': 4, 'fid': 55, 'state': "active", 'player': 5, 'column': 185,   'row': 115, 'layer': 2}     
+]
 
 
 

@@ -132,8 +132,9 @@ def run_turn(game, mods):
       file.write(f"hr({hr})... \n")
       state = iso(mods, state, file)
       state['i'] += 1
+  
 
-  roll_for_events(game,db,mods,state)
+  # roll_for_events(game,db,mods,state)
 
   file.close()
   return state
