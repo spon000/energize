@@ -23,7 +23,7 @@ define([
 ) {
     return (
       class Game extends EventEmitter {
-        constructor(gid) {
+        constructor(gameId, playerNum) {
           super();
           this._playerSocket = null;
           this._socketCalls = null;
@@ -33,9 +33,8 @@ define([
           this._canvasController = null;
           this._topMenu = new TopMenu();
           this._elementIdCanvas = "gamecanvas"
-          this._gameId = gid;
-
-          this._phaserGame = null;
+          this._gameId = gameId;
+          this._playerNumber = playerNum;
 
           this._initialize();
           this._setWindowEvents();
@@ -203,8 +202,7 @@ define([
           })
 
           /* *************************************************************************** */
-          // Game turn has finished and a new turn is ready for players.
-          // We need to have all clients for that game reload the page
+          //
           /* *************************************************************************** */
           this._playerSocket.on('game_turn_interval', (data) => {
             console.log("game_turn_interval. Data = ", data);
@@ -212,20 +210,33 @@ define([
 
 
           /////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////
+          /////////////////////////////////////////////////////////////////////////////////
           // SocketIO messages: Map Updates
 
           /* *************************************************************************** */
+          // New facility has been added. Update player map.
           /* *************************************************************************** */
-          this._playerSocket.on('facility_added', (data) => {
-            console.log("facility removed", data);
+          this._playerSocket.on('new_facility', (data) => {
+            console.log("websocket: new_facility", data);
+            evtEmitter.emit("updateMapAddFacility", { facility: data.facility });
           })
 
           /* *************************************************************************** */
-          // Game turn has finished and a new turn is ready for players.
-          // We need to have all clients for that game reload the page
+          // A newly created facility has been deleted. Update player map.
           /* *************************************************************************** */
-          this._playerSocket.on('facility_removed', (data) => {
-            console.log("facility removed", data);
+          this._playerSocket.on('delete_facility', (data) => {
+            console.log("websocket: delete_facility", data);
+            evtEmitter.emit("updateMapDeleteFacility", { facility: data.facility });
+          })
+
+          // /* *************************************************************************** */
+          // // A newly created facility has been updated (type). Update player map.
+          // /* *************************************************************************** */
+          this._playerSocket.on('update_facility', (data) => {
+            console.log("websocket: update_facility", data);
+            evtEmitter.emit("updateMapUpdateFacility", { facility: data.facility });
           })
 
         }

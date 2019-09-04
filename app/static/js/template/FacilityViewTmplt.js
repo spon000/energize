@@ -92,85 +92,128 @@ define([], function () {
         </div>
       </div>
     `,
-    generatorListHeader: `
-      <div class='vfd-gen-list-header list-color'>
-        <div class='vfd-gen-list-header-content'>
-        {{#if owned}}
-          <label class="gen-header-detail list"> Generator List (Click on an available generator name for more details) </label>
-          <label class="gen-header-detail decom" style="display:none;"> Generator Decom (Click on an available generator name to decomission it) </label>
-          {{#if oldFacility}}
-            <div class="gen-header-btn"> 
-              <a id="vfd-sub-gen-btn"> &#x2796 </a> 
-              <span class="tooltip-text"> Decommission </br> Generator</span>
-            </div>
-          {{/if}}
-            <div class="gen-header-btn"> 
-              <a id="vfd-add-gen-btn"> &#x2795 </a> 
-              <span class="tooltip-text"> Add New </br> Generator</span>
-            </div>
-        {{/if}}
-        </div>
-      </div>
 
+    generatorListTabs: `
       <style>
-        .gen-header-btn {
-          border-radius: 4px;
-          background: #ccc;
-          cursor: pointer;
-          border-top: solid 2px #eaeaea;
-          border-left: solid 2px #eaeaea;
-          border-bottom: solid 2px #777;
-          border-right: solid 2px #777;
-          padding: 0;
-          user-select: none;
-          cursor: default;
+        #generator-list-tab-menu {
+          width: 100%;
+          margin-top:10px;
         }
 
-        #vfd-sub-gen-btn {
-          padding: 3px 6px;
+        .generator-list-tabs {
+          margin-bottom: 0;
+          padding-left: 20px;
+        }
+
+        .generator-list-tabs li {
+          list-style:none;
+          display:inline;
+          padding:
+        }
+
+        .generator-list-tabs label {
+          padding:5px 10px;
+          margin-bottom: 0;
+          display:inline-block;
+          border-radius: 10px 10px 0 0;
+          background:#666;
+          color:#fff;
+        }
+
+        .generator-list-tabs label.active {
+          background:#BCDBEA;
+          font-weight: bold;
+          color:#000;
+        }    
+        
+        .vfd-list-table {
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+
+        .table-display-none {
+          display: none;
+        }
+
+        .element-hidden {
+          visibility: hidden;
+        }
+
+        .element-hidden button {
+          visibility: hidden;
+        }
+      </style>
+
+      
+      <br/>
+      {{#if owned}}
+        <div id="generator-list-tab-menu">
+      {{else}}
+        <div id="generator-list-tab-menu" class="element-hidden">
+      {{/if}}
+          <ul class="generator-list-tabs">
+            <li class="generator-list-tab" type="list"><label id="vfd-gen-list-tab" class="active">Add/Change</label></li>
+            <li class="generator-list-tab" type="mods"><label id="vfd-modify-list-tab">Modifications</label></li>
+          <!--  <li class="generator-list-tab" type="decom"><label id="vfd-decom-list-tab">Decomissioned</label></li>  -->
+          </ul>
+        </div>
+    `,
+
+    generatorViewList: `
+      <style>
+        .gen-list-bottom-btn {
+          margin-top: 2px;
+          justify-content: left;
         }
 
         #vfd-add-gen-btn {
-          padding: 3px 6px;
+          background:repeating-linear-gradient(45deg, rgba(1, 1, 1, .3), rgba(1, 1, 1, .3) 10px, rgba(245, 203, 66, .3) 10px, rgba(245, 203, 66, .3) 20px);
         }
 
-        .gen-header-btn .down {
-          border-radius: 4px;
-          background: #bbb;
-          border-top: solid 2px #777;
-          border-left: solid 2px #777;
-          border-bottom: solid 2px #eaeaea;
-          border-right: solid 2px #eaeaea;
-          padding: 0;
+        #modify-list-table {
+          float:left;
+          width: 50%;
         }
 
-        .gen-header-btn .tooltip-text {
-          display: none;
-          background-color: black;
-          color: #fff;
-          text-align: center;
-          border-radius: 6px;
-          padding: 5px 3px;
-        
-          /* Position the tooltip */
-          position: fixed;
-          margin-top: -70px;
-          margin-left: -70px;
-          z-index: 1000;
+        #generator-mod-list-table {
+          height: 250px;
+          margin-left: 10px;
+          border-style: solid;
+          border-width: 2px;
         }
-        
-        .gen-header-btn:hover .tooltip-text {
-          display: inline;
+
+        .modded-generator-checkbox-list {
+          margin-top: 30px;
+          margin-left: 30px;
         }
-        
       </style>
-    `,
-    generatorViewList: `
-      <div id="vfd-gen-list">
-        <div id="vfd-gen-list-table"></div>
+
+      <div class="vfd-list-table">
+        <div id="vfd-gen-list-table" class="list-table"></div>
+      <!--  <div id="vfd-decom-list-table" class="list-table table-display-none"></div> -->
+        <div id="vfd-modify-list-table" class="list-table table-display-none">
+          <div id="modify-list-table" class=""></div>
+          <div id="generator-mod-list-table" class=""></div>
+        </div>
       </div>
-      <p/>
+
+      {{#if owned}}
+      <div class="gen-list-bottom-btn"> 
+      {{else}}
+      <div class="gen-list-bottom-btn element-hidden"> 
+      {{/if}}
+      <button id="vfd-add-gen-btn">Build Generator</button> 
+      </div>      
     `,
+
+    listOfModdedGenerators: `
+    <ul class="modded-generator-checkbox-list">
+      <li> <input type="checkbox" class="modification-generator" modid=""/>Generator ??? </li>
+      <li> <input type="checkbox" class="modification-generator" modid=""/>Generator ??? </li>
+      <li> <input type="checkbox" class="modification-generator" modid=""/>Generator ??? </li>
+    </ul>
+    `,
+
     facilityViewFooter: `
       <style>
         .center-block {
@@ -193,8 +236,10 @@ define([], function () {
             <button id="vfd-footer-close-btn"> Close </button>             
 
             {{#if_eq state "new"}}
-              <div class="vfd-btn-divider"></div>
-              <button id="vfd-footer-remove-btn"> Remove </button>
+              {{#if facilityOwned}}
+                <div class="vfd-btn-divider"></div>
+                <button id="vfd-footer-remove-btn"> Remove </button>
+              {{/if}}
             {{/if_eq}}
 
             {{#if facilitySelected}}
@@ -227,7 +272,8 @@ define([], function () {
     `,
     verifyDecomDialog: `
       <div class='verify-close'>
-        <p> Going into the Decomission function will apply all of the changes you made to the facility and generators. </p>
+        <p>  Checking this box will start the decomissioning process for this generator on the next turn. 
+              It will no longer be available to your facility. </p>
         <p class='highlight'> Do you want to continue? </p>
       </div>
     `,
@@ -301,6 +347,15 @@ define([], function () {
           {{/if_eq}}
         {{/each}}
         </select>
+      </div>
+    `,
+    checkboxDecom: `
+      <div class="decom-checkbox">
+      {{#if decom_start}}
+        <input type="checkbox" class="decom-checkbox" genid="{{genId}}" name="decom_start{{genid}}" checked>
+      {{else}}
+        <input type="checkbox" class="decom-checkbox" genid="{{genId}}" name="decom_start{{genid}}">
+      {{/if}}
       </div>
     `,
     colorBox: `

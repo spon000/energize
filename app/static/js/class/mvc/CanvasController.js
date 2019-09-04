@@ -207,8 +207,8 @@ define([
             case "dblclick":
               break;
             case "wheel":
-              if (!scope._dragging)
-                scope._canvasView.wheelMapZoom(evt);
+              // if (!scope._dragging)
+              //   scope._canvasView.wheelMapZoom(evt);
               break;
             case "mouseleave":
               scope._dragging = false;
@@ -373,10 +373,49 @@ define([
           evtEmitter.on("deletefacility", (data) => {
             this._onDeleteFacility(data.facilityId);
           });
+
+          evtEmitter.on("updateMapDeleteFacility", (data) => {
+            console.log("deleting facility marker...")
+            this._updateMapDeleteFacility(data.facility)
+          });
+
+          evtEmitter.on("updateMapAddFacility", (data) => {
+            console.log("adding facility marker...")
+            this._updateMapAddFacility(data.facility)
+          });
+
+          evtEmitter.on("updateMapUpdateFacility", (data) => {
+            console.log("updating facility marker...")
+            this._updateMapUpdateFacility(data.facility)
+          });
+
         }
+
 
         ////////////////////////////////////////////////////////////////////////////////
         // evtEmitter events
+
+        _updateMapAddFacility(facility) {
+          this._canvasModel.facilityLayer.createFacilityTile(facility);
+          if (facility.player_number == globalPlayerNumber)
+            this._canvasModel.playerMarkerLayer.createMarkerTile(facility);
+
+          this._setFacilityEvents(this._canvasView.getTileMap("facilities"));
+        }
+
+        _updateMapDeleteFacility(facility) {
+          this._canvasModel.facilityLayer.removeFacilityTile(facility.id);
+          if (facility.player_number == globalPlayerNumber)
+            this._canvasModel.playerMarkerLayer.removeMarkerTile(facility.id);
+
+          this._setFacilityEvents(this._canvasView.getTileMap("facilities"));
+        }
+
+        _updateMapUpdateFacility(facility) {
+          console.log("_updateMapUpdateFacility() = ", facility);
+          this._canvasModel.facilityLayer.updateFacilityTile(facility.id, facility.facility_type);
+          this._setFacilityEvents(this._canvasView.getTileMap("facilities"));
+        }
 
         _onChangeFacility(facilityId, facilityTypeList) {
           let colRow = this._canvasModel.facilityLayer.getTileColRow(facilityId);
@@ -389,8 +428,8 @@ define([
 
           modelData.addFacility(col, row).then((facData) => {
             let facility = facData.facility;
-            this._canvasModel.facilityLayer.createFacilityTile(facility);
-            this._canvasModel.playerMarkerLayer.createMarkerTile(facility);
+            // this._canvasModel.facilityLayer.createFacilityTile(facility);
+            // this._canvasModel.playerMarkerLayer.createMarkerTile(facility);
             let facilitySelectDialog = new FacilitySelectDialog(facilityTypeList, facility.id, (evt) => {
               this._dialogStatus = "popup";
             });
@@ -401,8 +440,8 @@ define([
           let modelData = new ModelData();
 
           modelData.deleteFacility(facilityId).then((results) => {
-            this._canvasModel.facilityLayer.removeFacilityTile(facilityId);
-            this._canvasModel.playerMarkerLayer.removeMarkerTile(facilityId);
+            // this._canvasModel.facilityLayer.removeFacilityTile(facilityId);
+            // this._canvasModel.playerMarkerLayer.removeMarkerTile(facilityId);
             this._dialogStatus = "viewing";
             // console.log("this._dialogStatus = ", this._dialogStatus);
           });
@@ -416,13 +455,15 @@ define([
           if (facilityTypeId) {
             modelData.updateFacilityType(facilityId, facilityTypeId).then((facData) => {
               let facility = facData.facility;
-              this._canvasModel.facilityLayer.updateFacilityTile(facility.id, facilityTypeId);
+
+              // !!!!! THis is temporary it needs to go in Game.js !!!!!!
+              // this._canvasModel.facilityLayer.updateFacilityTile(facility.id, facilityTypeId);
               modelData.addGenerators(facility.id, facilityTypeId).then((results) => {
                 // console.log("modelData.addGenerators results = ", results);
                 let facilityViewDialog = new FacilityViewDialog(results.facility.id, facilityTypeList, (evt) => {
                   this._dialogStatus = "popup";
                 });
-                this._setFacilityEvents(this._canvasView.getTileMap("facilities"));
+                // this._setFacilityEvents(this._canvasView.getTileMap("facilities"));
               });
             });
           }

@@ -29,7 +29,7 @@ define([
               title: "Company Portfolio",
               scope: scope,
               width: 750,
-              height: 650,
+              height: 700,
               position: {},
               modal: true,
               open: (evt, ui) => {

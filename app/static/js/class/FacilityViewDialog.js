@@ -34,9 +34,9 @@ define([
           this._selectFacilityType = false;
 
           // Parameters
-          this._width = 850;
-          this._height = 650;
-          this._unOwnedHeight = 360;
+          this._width = 855;
+          this._height = 670;
+          this._unOwnedHeight = 375;
           this._isModel = true;
           this._position = {};
           this._title = "Facility Viewer";
@@ -44,6 +44,8 @@ define([
           this._facilityPreviousSelected = facilityTypeList ? true : false;
           this._decomissionFacilityOn = false;
           this._generatorListTable = null;
+          this._generatorDecomTable = null;
+          this._generatorModsTable = null;
           this._qtrsPerYear = 4;
 
 
@@ -55,14 +57,18 @@ define([
           this._elementIdFacilityInfo = "facility-info-window";
           this._elementIdGeneratorListHeader = "generator-list-header";
           this._elementIdGeneratorList = "generator-list-window";
+          this._elementIdGeneratorMods = "generator-modify-window";
           this._elementIdFacilityFooter = "facility-footer-window";
-          this._elementIdGenListTable = "vfd-gen-list-table"
+          this._elementIdGenListTable = "vfd-gen-list-table";
+          this._elementIdModListTable = "modify-list-table";
+          this._elementIdGenModListTable = "generator-mod-list-table";
 
           this._currentDate = null;
           this._company = null;
           this._facility = null;
           this._generators = null;
           this._generatorTypes = null;
+          this._generatorModificationTypes = null;
           this._facilityType = null;
           this._powerTypes = null;
           this._resourceTypes = null;
@@ -88,6 +94,8 @@ define([
           this._facilityViewFacilityInfoHtml = "";
           this._facilityViewGenListHeaderHtml = "";
           this._facilityViewGeneratorListHtml = "";
+          this._facilityModifyGeneratorListHtml = "";
+
           this._facilityViewFooterHtml = "";
 
           // Load all needed data.
@@ -124,11 +132,25 @@ define([
             this._powerTypes = fdata['power_types'];
             this._resourceTypes = fdata['resource_types'];
             this._modificationTypes = fdata['modification_types'];
+            this._generatorModificationTypes = fdata['modification_types'];
+
+            console.log("fdata = ", fdata);
           });
         }
 
         /* *********************************************************************************** */
-        _massageFacilityData() {
+        _massageFacilityData(action = "list") {
+
+          switch (action) {
+            case "list":
+              break;
+            case "decom":
+              break;
+            case "modification":
+              break;
+            default:
+          }
+
           this._facilityType["simpletype"] = this._facilityType.maintype.split(" ")[0];
           this._facility["new_facility"] = this._facility.state == "new" ? true : false;
           this._facility["company_name"] = this._company.name;
@@ -139,17 +161,20 @@ define([
             let resType = this._resourceTypes.find(rt => gt.resource_type === rt.id)
             gt['pt'] = powerType;
             gt['rt'] = resType;
+
             return gt;
           });
 
           // Add Generator Type record to each Generator record. And check if it's a new generator
-          this._generators = this._generators.map(g => {
+          this._generators = this._generators.map((g, index) => {
             let gentype = this._generatorTypes.find(gt => g.generator_type == gt.id)
             g['gentype_details'] = gentype;
+            g['generator_number'] = index + 1;
+
             return g;
           });
 
-          // console.log('this._generators = ', this._generators);
+          console.log('this._generators = ', this._generators);
           // console.log("this._facility = ", this._facility)
 
           // Add total nameplace capacity of all available generators to facility object.
@@ -186,8 +211,10 @@ define([
           this._createTitle();
           this._createFacilityPowerPic();
           this._createFacilityInfo();
-          this._createGeneratorListHeader();
+          this._createGenListTabBox();
+          // this._createGeneratorListHeader();
           this._createGeneratorList();
+          // this._createModifyList();
           this._createFooter();
         }
 
@@ -238,26 +265,50 @@ define([
             this._elementIdFacilityInfo, this._facilityViewWindowHtml);
         }
 
-        /* *********************************************************************************** */
-        _createGeneratorListHeader() {
-          let compiledTemplate = Handlebars.compile(FacilityViewTmplt.generatorListHeader);
+        _createGenListTabBox() {
+          let compiledTemplate = Handlebars.compile(FacilityViewTmplt.generatorListTabs);
           let templateParms = {
             owned: this._ownedFacility,
-            oldFacility: !this._newFacility
+            // oldFacility: !this._newFacility
           }
           this._facilityViewGenListHeaderHtml = this._addHtml($(compiledTemplate(templateParms)),
             this._elementIdGeneratorListHeader, this._facilityViewWindowHtml);
         }
 
+        /* *********************************************************************************** */
+        // _createGeneratorListHeader() {
+        //   let compiledTemplate = Handlebars.compile(FacilityViewTmplt.generatorListHeader);
+        //   let templateParms = {
+        //     owned: this._ownedFacility,
+        //     oldFacility: !this._newFacility
+        //   }
+        //   this._facilityViewGenListHeaderHtml = this._addHtml($(compiledTemplate(templateParms)),
+        //     this._elementIdGeneratorListHeader, this._facilityViewWindowHtml);
+        // }
+
 
         /* *********************************************************************************** */
         _createGeneratorList() {
           let compiledTemplate = Handlebars.compile(FacilityViewTmplt.generatorViewList);
-          let templateParms = {}
+          let templateParms = {
+            owned: this._ownedFacility
+          }
 
           this._facilityViewGeneratorListHtml = this._addHtml($(compiledTemplate(templateParms)),
             this._elementIdGeneratorList, this._facilityViewWindowHtml);
         }
+
+        /* *********************************************************************************** */
+        // _createModifyList() {
+        //   let compiledTemplate = Handlebars.compile(FacilityViewTmplt.generatorModifyList);
+        //   let templateParms = {
+        //     owned: this._ownedFacility
+        //   }
+
+        //   this._facilityModifyGeneratorListHtml = this._addHtml($(compiledTemplate(templateParms)),
+        //     this._elementIdGeneratorMods, this._facilityViewWindowHtml);
+        // }
+
 
         /* *********************************************************************************** */
         _createFooter() {
@@ -293,7 +344,10 @@ define([
 
           $("#vfd-facility-name-input").change(this, this._editFacilityName);
 
-          this._createTableEvents();
+          $("#" + this._elementIdAnchor).on("click", ".generator-list-tab", this, this._changeTab);
+
+
+          this._createGenTableEvents();
         }
 
         /* *********************************************************************************** */
@@ -302,15 +356,17 @@ define([
         }
 
         /* *********************************************************************************** */
-        _createTableEvents() {
+        _createGenTableEvents() {
           $(".vfd-generator-name").on("click", this, this._generatorNameAction);
           $(".capacity-selectbox").on("change", this, this._capacityOptionChange);
           $(".bidpolicy-selectbox").on("change", this, this._bidPolicyOptionChange);
           $(".maintpolicy-selectbox").on("change", this, this._maintPolicyOptionChange);
+          $(".decom-checkbox").on("change", this, this._startDecomCheckBox);
         }
 
         /* *********************************************************************************** */
         _deleteTableEvents() {
+
 
         }
 
@@ -327,57 +383,55 @@ define([
         }
 
         /* *********************************************************************************** */
-        _subGeneratorClick(evt) {
+        // Generator Decom Checkbox event
+        /* *********************************************************************************** */
+        _startDecomCheckBox(evt) {
           let scope = evt.data;
-          let element = evt.target;
-          console.log("---> _subGeneratorClick decomissionOn = ", scope._decomissionFacilityOn);
+          let genId = $(evt.currentTarget).attr('genid');
 
-          // This is ugly. Need to figure out a better way.
-          if (!scope._decomissionFacilityOn) {
-            if (scope._facilityModified) {
-              scope._openVerifyDialog("decom", scope, false, (scope) => {
-                scope._decomissionFacilityOn = true;
-                $("#vfd-footer-apply-btn").click();
-                scope._changeGeneratorListHeader(element, scope._decomissionFacilityOn);
-              });
-            }
-            else {
-              scope._decomissionFacilityOn = true
-              $("#vfd-footer-apply-btn").click();
-              scope._generatorListTable = scope._createGeneratorListTable();
-              scope._createTableEvents();
-              scope._changeGeneratorListHeader(element, scope._decomissionFacilityOn);
-            }
-          }
-          else {
-            scope._decomissionFacilityOn = false;
-            $("#vfd-footer-apply-btn").click();
-            scope._generatorListTable = scope._createGeneratorListTable();
-            scope._createTableEvents();
-            scope._changeGeneratorListHeader(element, scope._decomissionFacilityOn);
-          }
+          console.log("decom checkbox clicked evt =", evt);
 
-          scope._generatorListTable = scope._createGeneratorListTable();
-          scope._createTableEvents();
+          if (evt.currentTarget.checked) {
+            scope._openVerifyDialog("decom", scope, false, (yes) => {
+              if (yes)
+                scope._addGeneratorUpdateToModifyList(scope, genId, { 'decom_start': true });
+              else
+                $(evt.currentTarget).prop('checked', false);
+            });
+          }
+          else
+            scope._addGeneratorUpdateToModifyList(scope, genId, { 'decom_start': false });
         }
 
-        _changeGeneratorListHeader(element, decomissionOn) {
+        /* *********************************************************************************** */
+        // Generator Decom Checkbox event
+        /* *********************************************************************************** */
+        _changeTab(evt) {
+          console.log("_changeTab() ", evt);
+          let scope = evt.data;
+          let tabType = $(evt.currentTarget).attr("type");
 
-          console.log("_changeGeneratorListHeader decomissionOn = ", decomissionOn);
-
-          if (decomissionOn) {
-            $(element).addClass("down");
-            $(".vfd-gen-list-header").toggleClass("list-color decom-color");
-            $(".gen-header-detail.list").hide();
-            $(".gen-header-detail.decom").show();
-          }
-          else {
-            $(element).removeClass("down");
-            $(".vfd-gen-list-header").toggleClass("list-color decom-color");
-            $(".gen-header-detail.list").show();
-            $(".gen-header-detail.decom").hide();
+          $(".generator-list-tab label").removeClass("active");
+          $(evt.currentTarget).find("label").addClass("active");
+          $(".list-table").addClass("table-display-none")
+          switch (tabType) {
+            case "list":
+              $(".gen-list-bottom-btn").removeClass("element-hidden");
+              $("#vfd-gen-list-table").removeClass("table-display-none");
+              break;
+            case "mods":
+              $(".gen-list-bottom-btn").addClass("element-hidden");
+              $("#vfd-modify-list-table").removeClass("table-display-none");
+              break;
+            case "decom":
+              $(".gen-list-bottom-btn").addClass("element-hidden");
+              $("#vfd-gen-decom-table").removeClass("table-display-none");
+              break;
           }
         }
+
+
+
 
         /* *********************************************************************************** */
         // Generator list events
@@ -395,14 +449,7 @@ define([
             case "remove":
               scope._delGenerator(genId, scope)
               break;
-            case "decomission":
-              scope._decomissionGenerator(genId, scope)
-              break
           }
-          console.log("testing", link, genId)
-
-          // let genTable = scope._generatorListTable();
-
         }
 
         /* *********************************************************************************** */
@@ -410,15 +457,8 @@ define([
           let scope = evt.data
           let genId = $("select", this).first().attr("genid");
           let genTypeId = $("option:selected", this).first().attr("gtid");
-          let genIndex = scope._updatedGenerators.findIndex(gen => gen.id == genId)
 
-          if (genIndex > -1)
-            scope._updatedGenerators[genIndex]['id_type'] = genTypeId;
-          else
-            scope._updatedGenerators.push({ 'id': genId, 'id_type': genTypeId });
-
-          console.log("_capacityOptionChange(): ", genId, genTypeId, scope._updatedGenerators);
-          scope._turnOnApply(scope);
+          scope._addGeneratorUpdateToModifyList(scope, genId, { 'id_type': genTypeId });
         }
 
         /* *********************************************************************************** */
@@ -426,15 +466,8 @@ define([
           let scope = evt.data
           let genId = $("select", this).first().attr("genid");
           let value = $("option:selected", this).first().val();
-          let genIndex = scope._updatedGenerators.findIndex(gen => gen.id == genId)
 
-          if (genIndex > -1)
-            scope._updatedGenerators[genIndex]['local_bid_policy'] = value;
-          else
-            scope._updatedGenerators.push({ 'id': genId, 'local_bid_policy': value });
-
-          console.log("_bidPolicyOptionChange(): ", genId, value, scope._updatedGenerators);
-          scope._turnOnApply(scope);
+          scope._addGeneratorUpdateToModifyList(scope, genId, { 'local_bid_policy': value });
         }
 
         /* *********************************************************************************** */
@@ -442,14 +475,23 @@ define([
           let scope = evt.data
           let genId = $("select", this).first().attr("genid");
           let value = $("option:selected", this).first().val();
+
+          scope._addGeneratorUpdateToModifyList(scope, genId, { 'local_maintenance_policy': value });
+        }
+
+        /* *********************************************************************************** */
+        _addGeneratorUpdateToModifyList(scope, genId, keyValues = {}) {
           let genIndex = scope._updatedGenerators.findIndex(gen => gen.id == genId)
 
-          if (genIndex > -1)
-            scope._updatedGenerators[genIndex]['local_maintenance_policy'] = value;
-          else
-            scope._updatedGenerators.push({ 'id': genId, 'local_maintenance_policy': value });
+          if (genIndex <= -1)
+            // Push returns length of new array so the index for this generator will be length -1
+            genIndex = scope._updatedGenerators.push({ 'id': genId }) - 1;
 
-          console.log("_maintPolicyOptionChange(): ", genId, value, scope._updatedGenerators);
+          Object.keys(keyValues).forEach((key) => {
+            scope._updatedGenerators[genIndex][key] = keyValues[key];
+          });
+
+          console.log("_addGeneratorUpdateToModifyList(): ", scope._updatedGenerators);
           scope._turnOnApply(scope);
         }
 
@@ -470,16 +512,11 @@ define([
             scope._modelData.updateGenerators(scope._facilityId, scope._updatedGenerators).then((generators) => {
               console.log("_applyUpdates() Generators were updated", generators);
               scope._updatedGenerators = [];
-              scope._getFacilityData().then((results) => {
-                scope._massageFacilityData();
-                scope._generatorListTable = scope._createGeneratorListTable();
-                scope._createTableEvents();
-              });
+              scope._refreshGeneratorListTable(scope);
+              scope._refreshModifyListTable(scope);
             });
           }
 
-          // scope._generatorListTable = scope._createGeneratorListTable();
-          // scope._createTableEvents();
           scope._turnOffApply(scope)
         }
 
@@ -498,11 +535,13 @@ define([
           let scope = evt.data;
           let msgType = scope._facilityPreviousSelected ? "mod" : "none";
 
-          scope._openVerifyDialog(msgType, scope, true, (scope) => {
-            evtEmitter.emit("changefacility", {
-              facilityId: scope._facilityId,
-              facilityTypeList: scope._facilityTypeList
-            });
+          scope._openVerifyDialog(msgType, scope, true, (yes) => {
+            if (yes) {
+              evtEmitter.emit("changefacility", {
+                facilityId: scope._facilityId,
+                facilityTypeList: scope._facilityTypeList
+              });
+            }
           });
         }
 
@@ -510,11 +549,13 @@ define([
         _removeFacility(evt) {
           let scope = evt.data;
 
-          scope._openVerifyDialog("del", scope, true, (scope) => {
+          scope._openVerifyDialog("del", scope, true, (yes) => {
             console.log("delete facility. id = ", scope._facilityId);
-            evtEmitter.emit("deletefacility", {
-              facilityId: scope._facilityId
-            });
+            if (yes) {
+              evtEmitter.emit("deletefacility", {
+                facilityId: scope._facilityId
+              });
+            }
           });
         }
 
@@ -592,6 +633,7 @@ define([
               // Show the generator list if the facility is owned or has been created by the player.
               if (this._ownedFacility) {
                 this._generatorListTable = this._createGeneratorListTable();
+                this._generatorModsTable = this._createGeneratorModsTable();
               }
 
               // Setup Listener events
@@ -665,10 +707,10 @@ define([
               {
                 text: "Yes",
                 click: function (evt) {
-                  $(this).dialog("close")
+                  $(this).dialog("close");
                   let scope = $(this).dialog("option", "scope");
                   if (closeFunction)
-                    closeFunction(scope)
+                    closeFunction(true);
                   if (closeParentDialog)
                     $(scope._dialog).dialog("close");
                 }
@@ -677,6 +719,8 @@ define([
                 text: "No",
                 click: function (evt) {
                   $(this).dialog("close");
+                  if (closeFunction)
+                    closeFunction(false);
                 }
               }
             ]
@@ -800,22 +844,239 @@ define([
 
         //////////////////////////////////////////////////////////////////////////
         //
-        // Generator list table functions 
+        // Generator table functions 
         //
         //////////////////////////////////////////////////////////////////////////
 
 
+
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        // Create the decomission list table
+        /* *********************************************************************************** */
+        // _createGeneratorDecomissionTable() {
+        //   const generator_table_data = [];
+
+        //   this._getFacilityData().then((results) => {
+        //     this._massageFacilityData();
+        //   });
+
+        //   console.log("._generatorDecomTable() this._generators = ", this._generators);
+        //   this._generators.forEach((gen, index) => {
+
+
+        //     generator_table_data.push({
+        //       fid: gen.id_facility,
+        //       id: gen.id,
+        //       name: "generator " + this._padZeroes((index + 1), 2),
+        //       cap: gen.gentype_details.nameplate_capacity,
+        //       dtime: decom_time,
+        //       dcost: decom_cost,
+        //       state: gen.state
+        //     });
+        //   });
+
+        //   const generatorTableDef = {
+        //     height: 250,
+        //     layout: "fitDataFill",
+        //     data: generator_table_data,
+        //     groupBy: ["state"],
+        //     columns: [
+        //       {
+        //         title: "Name", field: "name", width: 110, align: "center",
+        //         formatter: this._name_cell,
+        //         formatterParams: {
+        //           scope: this
+        //         },
+        //       },
+        //       {
+        //         title: "Capacity", field: "cap", align: "center",
+        //         formatter: this._capacity_cell,
+        //         formatterParams: {
+        //           gen_types: this._generatorTypes
+        //         }
+        //       },
+        //       {
+        //         title: "Total Profit", field: "cond", width: 100,
+        //         formatter: this._condition_cell,
+        //         formatterParams: {
+        //           scope: this
+        //         }
+        //       },
+        //       {
+        //         title: "Status", field: "status", width: 80,
+        //         formatter: this._status,
+        //         formatterParams: {
+        //           scope: this
+        //         }
+        //       },
+
+
+        //       {
+        //         title: "Decomission Time", field: "prof", width: 80,
+        //         formatter: this._decom_time,
+        //         formatterParams: {
+        //           scope: this
+        //         }
+        //       },
+        //       {
+        //         title: "Decomission Cost (per quarter)", field: "age", width: 80,
+        //         formatter: this._decom_cost,
+        //         formatterParams: {
+        //           scope: this
+        //         }
+        //       },
+
+        //       { title: "State", field: "state", visible: false }
+        //     ]
+        //   }
+
+        //   return new Tabulator("#" + this._elementIdGenListTable, generatorTableDef);
+
+
+
+        // }
+
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+
+        //////////////////////////////////////////////////////////////////////////
+        // Refresh the generator list table
+        /* *********************************************************************************** */
+        _refreshModifyListTable(scope) {
+          scope._getFacilityData().then((results) => {
+            scope._massageFacilityData();
+            scope._generatorListTable = scope._createGeneratorModsTable();
+            scope._createModTableEvents();
+          });
+        }
+
+        //////////////////////////////////////////////////////////////////////////
+        // Create the modification tables
+        /* *********************************************************************************** */
+        _createGeneratorModsTable(reloadData = false) {
+          const modifications_table_data = [];
+
+          if (reloadData) {
+            this._getFacilityData().then((results) => {
+              this._massageFacilityData();
+              console.log("_createGeneratorModsTable() this._generators = ", this._generators);
+            });
+          }
+
+          this._generatorModificationTypes.forEach((genModType, index) => {
+            modifications_table_data.push({
+              name: genModType.name,
+              build_cost: genModType.marginal_cost_build,
+              operate_cost: genModType.marginal_cost_operate
+            });
+          });
+
+
+          const ModificationsTableDef = {
+            height: 250,
+            layout: "fitDataFill",
+            data: modifications_table_data,
+            columns: [
+              {
+                title: "Name", field: "name", width: 135, align: "left",
+                // formatter: this._name_cell,
+                formatterParams: {
+                  scope: this
+                },
+              },
+              {
+                title: "Build Cost", field: "build_cost", width: 135, align: "center",
+                // formatter: this._capacity_cell,
+                formatterParams: {
+                  gen_types: this._generatorTypes
+                }
+              },
+              {
+                title: "Operating Cost", field: "operate_cost", width: 135, align: "center",
+                // formatter: this._profit_cell,
+                formatterParams: {
+                  scope: this
+                }
+              },
+            ]
+          }
+          // console.log("this =", this);
+          // this._createListOfModdedGenerators();
+          return new Tabulator("#" + this._elementIdModListTable, ModificationsTableDef);
+        }
+
+        //////////////////////////////////////////////////////////////////////////
+        // 
+        /* *********************************************************************************** */
+        _createModdedGeneratorsTable() {
+          const modded_gen_table_data = [];
+
+          this._generators.forEach((gen, index) => {
+            modded_gen_table_data.push({
+              name: gen.generator_number,
+              build_cost: genModType.marginal_cost_build,
+              operate_cost: genModType.marginal_cost_operate
+            });
+          });
+
+
+          const ModificationsTableDef = {
+            height: 250,
+            layout: "fitDataFill",
+            data: modifications_table_data,
+            columns: [
+              {
+                title: "", field: "", width: 135, align: "center",
+                // formatter: this._capacity_cell,
+                formatterParams: {
+                }
+              },
+              {
+                title: "Name", field: "name", width: 135, align: "left",
+                // formatter: this._name_cell,
+                formatterParams: {
+                  scope: this
+                },
+              },
+            ]
+          }
+
+        }
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////
+
+        //////////////////////////////////////////////////////////////////////////
+        // Refresh the generator list table
+        /* *********************************************************************************** */
+        _refreshGeneratorListTable(scope) {
+          scope._getFacilityData().then((results) => {
+            scope._massageFacilityData();
+            scope._generatorListTable = scope._createGeneratorListTable();
+            scope._createGenTableEvents();
+          });
+        }
+
         //////////////////////////////////////////////////////////////////////////
         // Create the generator list table
         /* *********************************************************************************** */
-        _createGeneratorListTable() {
+        _createGeneratorListTable(reloadData = false) {
           const generator_table_data = [];
 
-          this._getFacilityData().then((results) => {
-            this._massageFacilityData();
-          });
+          if (reloadData) {
+            this._getFacilityData().then((results) => {
+              this._massageFacilityData();
+            });
+          }
 
-          console.log("_generatorListTable() this._generators = ", this._generators);
+          console.log("_createGeneratorListTable() this._generators = ", this._generators);
           this._generators.forEach((gen, index) => {
             let profit = "rgb(255, 0, 0)" //getProfit(gen);
             let condition = "rgb(250, 218, 94)" //getCondition(gen);
@@ -825,19 +1086,22 @@ define([
             let conditionColor = condition.color;
             let ageColor = age.color;
 
-            generator_table_data.push({
-              fid: gen.id_facility,
-              id: gen.id,
-              name: "generator " + this._padZeroes((index + 1), 2),
-              cap: gen.gentype_details.nameplate_capacity,
-              prof: profit,
-              age: age,
-              cond: condition,
-              bidp: gen.local_bid_policy,
-              maintp: gen.local_maintenance_policy,
-              state: gen.state
-            });
-          })
+            if (gen.state != "decomissioning" || gen.state != "decomissioned") {
+              generator_table_data.push({
+                fid: gen.id_facility,
+                id: gen.id,
+                name: "generator " + this._padZeroes((gen.generator_number), 2),
+                cap: gen.gentype_details.nameplate_capacity,
+                prof: profit,
+                age: age,
+                cond: condition,
+                bidp: gen.local_bid_policy,
+                maintp: gen.local_maintenance_policy,
+                decom: gen.decom_start,
+                state: gen.state
+              });
+            }
+          });
 
           const generatorTableDef = {
             height: 250,
@@ -846,7 +1110,7 @@ define([
             groupBy: ["state"],
             columns: [
               {
-                title: "Name", field: "name", width: 110, align: "center",
+                title: "Name", field: "name", width: 107, align: "center",
                 formatter: this._name_cell,
                 // onRendered: () => { console.log("capacity rendered") },
                 formatterParams: {
@@ -862,21 +1126,21 @@ define([
                 }
               },
               {
-                title: "Profit", field: "prof", width: 80,
+                title: "Profit", field: "prof", width: 90,
                 formatter: this._profit_cell,
                 formatterParams: {
                   scope: this
                 }
               },
               {
-                title: "Age", field: "age", width: 80,
+                title: "Age", field: "age", width: 90,
                 formatter: this._age_cell,
                 formatterParams: {
                   scope: this
                 }
               },
               {
-                title: "Condition", field: "cond", width: 100,
+                title: "Condition", field: "cond", width: 90,
                 formatter: this._condition_cell,
                 formatterParams: {
                   scope: this
@@ -887,6 +1151,7 @@ define([
                 formatter: this._bidPolicy_cell,
                 // onRendered: () => { console.log("bid policy rendered") },
                 formatterParams: {
+                  scope: this,
                   bidPolicyOptions: this._bidPolicyOptions,
                   decomissionOn: this._decomissionFacilityOn
                 }
@@ -895,8 +1160,16 @@ define([
                 title: "Maint Policy", field: "maintp", align: "center",
                 formatter: this._maintPolicy_cell,
                 formatterParams: {
+                  scope: this,
                   maintPolicyOptions: this._maintPolicyOptions,
                   decomissionOn: this._decomissionFacilityOn
+                }
+              },
+              {
+                title: "Decom", field: "decom", align: "center",
+                formatter: this._decom_cell,
+                formatterParams: {
+                  scope: this,
                 }
               },
               { title: "State", field: "state", visible: false }
@@ -946,10 +1219,11 @@ define([
 
         /* *********************************************************************************** */
         _bidPolicy_cell(cell, formatterParams) {
+          let scope = formatterParams.scope;
           let html = ""
 
           // if (cell.getData().state != "decommissioned" && cell.getData().state != "decommissioning") {
-          if (!this._decomissionFacilityOn) {
+          if (!scope._decomissionFacilityOn) {
             let templateParms = {
               genId: cell.getData().id,
               bidp_opts: formatterParams.bidPolicyOptions,
@@ -966,10 +1240,11 @@ define([
 
         /* *********************************************************************************** */
         _maintPolicy_cell(cell, formatterParams) {
+          let scope = formatterParams.scope;
           let html = ""
 
           // if (cell.getData().state != "decommissioned" && cell.getData().state != "decommissioning") {
-          if (!this._decomissionFacilityOn) {
+          if (!scope._decomissionFacilityOn) {
             let templateParms = {
               genId: cell.getData().id,
               maintp_opts: formatterParams.maintPolicyOptions,
@@ -986,6 +1261,7 @@ define([
 
         /* *********************************************************************************** */
         _profit_cell(cell, formatterParams) {
+          let scope = formatterParams.scope;
           let templateParms = {
             state: cell.getData().state,
             color: cell.getValue()
@@ -997,6 +1273,7 @@ define([
 
         /* *********************************************************************************** */
         _age_cell(cell, formatterParams) {
+          let scope = formatterParams.scope;
           let templateParms = {
             state: cell.getData().state,
             color: cell.getValue()
@@ -1005,32 +1282,35 @@ define([
 
           return html;
         }
-
-        _condition_cell(cell, formatterParams) {
-          let templateParms = {
-            state: cell.getData().state,
-            color: cell.getValue()
-          }
-          let html = Handlebars.compile(FacilityViewTmplt.colorBox)(templateParms);
-
-          return html;
-        }
-
-
 
         /* *********************************************************************************** */
-        _checkbox_cell(cell, formatterParams) {
-          let html = ""
-
-          if (cell.getData().state == "new") {
-            html = `<button class="vfd-remove-gen-button"> - </button>`
+        _condition_cell(cell, formatterParams) {
+          let scope = formatterParams.scope;
+          let templateParms = {
+            state: cell.getData().state,
+            color: cell.getValue()
           }
-          else {
-            html = `<input type='checkbox' class='generator-list-checkbox'>`
-          }
+          let html = Handlebars.compile(FacilityViewTmplt.colorBox)(templateParms);
 
-          return html
+          return html;
         }
+
+        /* *********************************************************************************** */
+        _decom_cell(cell, formatterParams) {
+          let scope = formatterParams.scope;
+          let html = "";
+          let state = cell.getData().state;
+          let templateParms = {
+            genId: cell.getData().id,
+            decom_start: cell.getValue(),
+          }
+
+          if (state == "available" || state == "unavailble")
+            html = Handlebars.compile(FacilityViewTmplt.checkboxDecom)(templateParms);
+
+          return html;
+        }
+
 
         /* *********************************************************************************** */
         _color_cell() {
@@ -1083,8 +1363,7 @@ define([
             scope._generatorListTable.addRow(newGen).then((row) => row.scrollTo());
             // console.log("this._generatorListTable = ", scope._generatorListTable);
             scope._generators.push(newGen);
-            scope._createTableEvents()
-            // $(".vfd-generator-name").on("click", scope, scope._generatorNameAction);
+            scope._createGenTableEvents(true);
           });
         }
 
@@ -1105,11 +1384,6 @@ define([
               row.delete();
             });
           }
-        }
-
-        /* *********************************************************************************** */
-        _decomissionGenerator(genId, scope) {
-
         }
 
         /* *********************************************************************************** */

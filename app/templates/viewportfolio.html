@@ -1,26 +1,201 @@
 <style>
+  #portfolio-content {
+    display: grid;
+    grid-gap: 5px;
+    grid-template-columns: 350px 350px;
+    grid-template-rows: 120px 30px 120px 30px 240px;
+  }
+
+  .grid-box {
+    background-color: lightcyan;
+    color: black;
+  }
+
+  /* ******************************************************************* 
+   * Summary style        
+   ******************************************************************* */
+  #portfolio-summary {
+    grid-column: 1;
+    grid-row: 1;
+    background-color: #efefef;
+    color: black;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+  }
+
+  #portfolio-summary div {
+    margin-top: 30px;
+  }
+
+  #portfolio-summary .row {
+    margin: 0;
+    padding: 0;
+    height: 20px;
+  }
+
+  #portfolio-summary .field {
+    font-size: 15px;
+    font-weight: bold;
+    padding-left: 0;
+  }
+
+  #portfolio-summary .value {
+    font-size: 14px;
+    padding-left: 0;
+  }
+
+
+
+
+  /* ******************************************************************* 
+   * Graph style        
+   ******************************************************************* */
+  #portfolio-graph {
+    grid-column: 1;
+    grid-row: 2 / span 2;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+  }
+
+  /* ******************************************************************* 
+   * Metrics style        
+   ******************************************************************* */
+  #portfolio-metrics {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+  }
+
+  /* ******************************************************************* 
+   * Options style        
+   ******************************************************************* */
+  #portfolio-options {
+    grid-column: 2;
+    grid-row: 3;
+    background-color: #fff;
+    color: black;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+  }
+
+  #portfolio-options select {
+    background-color: lightgray;
+    width: 250px;
+  }
+
+
+  /* ******************************************************************* 
+   * Facility list heading style        
+   ******************************************************************* */
+  #portfolio-facility-list-heading {
+    background-color: #fff;
+    grid-column: 1 / span 2;
+    grid-row: 4;
+    border-bottom-width: 1px;
+    border-top-width: 1px;
+    border-left-width: 0px;
+    border-right-width: 0px;
+    border-style: solid;
+
+  }
+
+  #portfolio-facility-list-heading label {
+    margin-left: 10px;
+    font-size: 115%;
+    font-weight: bold;
+
+  }
+
+
+  /* ******************************************************************* 
+   * Facility list heading style        
+   ******************************************************************* */
+  #portfolio-facility-list-table {
+    grid-column: 1 / span 2;
+    grid-row: 5;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+  }
 </style>
 
-<div id="portfolio-title"></div>
+
 <div id="portfolio-content">
 
-  <div id="portfolio-top-half">
+  <div id="portfolio-summary" class="grid-box">
+    <div class="container">
 
-    <div id="portfolio-top-left">
-      <div id="portfolio-summary"></div>
-      <div id="portfolio-graph"></div>
+      <div class="row">
+        <label class="field col-lg-8">Operating Budget:</label>
+        <label class="value col-lg-4">{{ format_money(company.balance) }}</label>
+      </div>
+
+      <div class="row">
+        <label class="field col-lg-8">Company Assets:</label>
+        <label class="value col-lg-4">{{ format_money(0) }}</label>
+      </div>
+
+      <div class="row">
+        <label class="field col-lg-8">Total Nameplate Capacity:</label>
+        <label class="value col-lg-4">1000 GW</label>
+      </div>
+
     </div>
-
-    <div id="portfolio-top-right">
-      <div id="portfolio-metrics"></div>
-      <div id="portfolio-options"></div>
-    </div>
-
   </div>
 
-  <div id="portfolio-bottom-half">
-    <div id="portfolio-facility-list-heading"></div>
-    <div id="portfolio-facility-list-table"></div>
+  <div id="portfolio-metrics" class="grid-box">
+    <label>Game metrics</label>
   </div>
+
+
+  <div id="portfolio-graph" class="grid-box"><label>graph</label></div>
+
+  <div id="portfolio-options" class="grid-box">
+    <div class="container">
+
+      <div class="row">
+        <label>Company-wide electricity bid policy:</label>
+      </div>
+      <div class="row">
+        <select>
+          {% for bid_option in bid_options %}
+          <!---->
+          {% if bid_option == company.global_bid_policy %}
+          <option value="{{bid_option}}" selected>{{ bid_option}}</option>
+          {% else %}
+          <option value="{{bid_option}}">{{ bid_option}}</option>
+          {% endif %}
+          <!---->
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="row">
+        <label>Company-wide maintenance policy:</label>
+      </div>
+      <div class="row">
+        <select>
+          {% for maint_option in maint_options %}
+          <!---->
+          {% if maint_option == company.global_maintenance_policy %}
+          <option value="{{maint_option}}" selected>{{ maint_option}}</option>
+          {% else %}
+          <option value="{{maint_option}}">{{ maint_option}}</option>
+          {% endif %}
+          <!---->
+          {% endfor %}
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="portfolio-facility-list-heading" class="grid-box"><label>Facility List (Click on a facility name for more details)</label></div>
+  <div id="portfolio-facility-list-table" class="grid-box"><label>Facility list-table</label></div>
 
 </div>

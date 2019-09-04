@@ -63,28 +63,17 @@ facility_modification_types = [
   {'id_facility_type':  6,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
   {'id_facility_type':  7,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
   {'id_facility_type':  8,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_facility_type':  9,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
 ]
 
 generator_modification_types = [
-  {'id_generator_type':  1,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  2,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  3,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  4,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  5,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  6,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  7,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  8,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  9,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  10, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  11, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  12, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  13, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  14, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  15, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  16, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  17, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
-  {'id_generator_type':  18, 'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},                     
+  {'id_facility_type':  1,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  2,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  3,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  4,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  5,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  6,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  7,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
+  {'id_facility_type':  8,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
 ]
 
 

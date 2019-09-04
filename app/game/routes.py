@@ -5,17 +5,18 @@ from flask_socketio import send
 import json
 import math 
 
+from sqlalchemy import func
 from app import db 
 from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType, ResourceType
 from app.models import FacilitySchema, GeneratorSchema, FacilityModificationSchema, GeneratorModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema
-from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, FacilityModificationTypeSchema, GeneratorModificationTypeSchema
+from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, FacilityModificationTypeSchema, GeneratorModificationType, GeneratorModificationTypeSchema
 from app.game.init_game import init_game_models
 from app.game.utils import format_date, convert_to_money_string, get_age, turns_to_hours, get_current_game_date
 from app.game.turn import initialize_turn
 from app.game.turn import calculate_turn
 from app.game.turn import finalize_turn
 from app.game.modifiers import load_modifiers
-from app.game.sio_outgoing import game_turn_complete
+from app.game.sio_outgoing import game_turn_complete, shout_new_facility, shout_update_facility, shout_delete_facility
 
 game = Blueprint('game', __name__)
 #################################################################################  
@@ -308,7 +309,7 @@ def player_facility():
   resource_type_schema = ResourceTypeSchema(many=True)
   resource_type_serialized = resource_type_schema.dump(resource_types).data
 
-  generator_modification_types = [gen_type.modification_types for gen_type in generator_types]
+  generator_modification_types = GeneratorModificationType.query.filter_by(id_facility_type=facility.id_type).all()
   generator_modification_types_schema = GeneratorModificationTypeSchema(many=True)
   generator_modification_types_serialized = generator_modification_types_schema.dump(generator_modification_types).data
 
@@ -352,7 +353,7 @@ def new_facility():
   col = request.args.get('col', None)
 
   company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
-
+ 
   newFacility = Facility(
     id_game=gid, 
     id_type=9, 
@@ -367,9 +368,11 @@ def new_facility():
   newFacility.name = newFacility.name + str(newFacility.id)
   db.session.commit()
   
-
   facility_schema = FacilitySchema()
   facility_serialized = facility_schema.dump(newFacility).data
+
+  # Broadcast to other players so their maps will be updated.
+  shout_new_facility(gid, facility_serialized)
 
   return jsonify({
     'facility': facility_serialized
@@ -401,7 +404,10 @@ def updateFacilityType():
   facility_schema = FacilitySchema()
   facility_serialized = facility_schema.dump(facility).data
 
-  print(f"hello {facility_serialized}")
+  # print(f"hello {facility_serialized}")
+
+  # Broadcast to other players so their maps will be updated.
+  shout_update_facility(gid, facility_serialized)
 
   return jsonify({
     'facility': facility_serialized
@@ -419,8 +425,8 @@ def update_facility():
 
   bad_key_fields = ['id', 'id_type', 'id_company', 'id_game']
 
-  print(f"*"*80)
-  print(f"facility = {facility_updates}")
+  # print(f"*"*80)
+  # print(f"facility = {facility_updates}")
 
   facility = Facility.query.filter_by(id=fid, id_game=gid).first()
   facility_update_keys = list(facility_updates.keys())
@@ -453,11 +459,17 @@ def deleteFacility():
       db.session.delete(gen)
 
   facility = Facility.query.filter_by(id=fid, id_game=gid).first()
-  db.session.delete(facility)
+  facility_schema = FacilitySchema()
+  facility_serialized = facility_schema.dump(facility).data
 
+  db.session.delete(facility)
   db.session.commit()
 
+  # Broadcast to other players so their maps will be updated.
+  shout_delete_facility(gid, facility_serialized)
+
   return jsonify({
+    'facility': facility_serialized,
     'status': 'deleted'
   })
 
@@ -603,8 +615,8 @@ def delete_generator():
   genId = request.args.get('genid', None)
 
   generator = Generator.query.filter_by(id=genId, id_game=gid).first()
-  print(f"*"*80)
-  print(f"{generator}")
+  # print(f"*"*80)
+  # print(f"{generator}")
   db.session.delete(generator)
   db.session.commit()
 
@@ -688,9 +700,29 @@ def generator_detail_html():
 @login_required
 def portfolio_html():
   gid = request.args.get('gid', None)
+  company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
+  facilities = Facility.query.filter_by(id_game=gid, id_company=company.id, state="active").all()
+
+  # generators = list()
+  # generators += (facility.generators for facility in facilities)
+
+  # print(f"*"*80)
+  # print(f"generator[0] = {generators[0]}")
+  # # print(f"generator[0].generator_type = {generators[0].generator_type}")
+
+  # # capacity_list = list(gen.generator_type.nameplate_capacity for gen in generators)
+  # total_capacity = sum(list(gen.generator_type.nameplate_capacity for gen in generators))
+
+  # print(f"*"*80)
+  # print(f"Total Capacity = {total_capacity}")
+
 
   return render_template(
-    "viewportfolio.html", 
+    "viewportfolio.html",
+    format_money=convert_to_money_string,
+    company=company,
+    bid_options=["MC", "LCOE", "Fixed"],
+    maint_options=["Routine", "Proactive", "Reactive"]
   )    
  
 # ###############################################################################  
@@ -710,7 +742,7 @@ def runturn():
   # Have server inform each client in game room game.id 
   # that the turn is over. This should cause each client 
   # to refresh.
-  game_turn_complete(game)
+  game_turn_complete(gid)
  
   return redirect(url_for('game.loadgame' , gid=gid))
   

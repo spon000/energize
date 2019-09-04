@@ -204,13 +204,14 @@ class Generator(db.Model):
   id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
 
   # Data
-  state = db.Column(db.Enum("new", "building", "paused", "available", "unavailable", "decommissioning", "decommissioned"), default="new")
+  state = db.Column(db.Enum("new", "building", "paused", "available", "unavailable", "start_decom", "decommissioning", "decommissioned"), default="new")
   state_note = db.Column(db.String(30))
   duty_cycles = db.Column(db.Float, default=0)
   condition = db.Column(db.Float, default=1.0)
   build_turn = db.Column(db.Integer, default=0)
   prod_turn = db.Column(db.Integer, default=0)
   decom_turn = db.Column(db.Integer, default=0)
+  decom_start = db.Column(db.Boolean, default=False)
   start_build_date = db.Column(db.Integer, default=0)
   start_prod_date = db.Column(db.Integer, default=0)
   end_prod_date = db.Column(db.Integer, default=0)
@@ -246,7 +247,6 @@ class Generator(db.Model):
       f"\tFacility Id: {self.id_facility}\n"
       f"\tFacility: {self.facility}\n"
       f"\tType Id: {self.id_type}\n"
-      f"\tType: {self.generator_type}\n"
     )
 
 #########################################################################################
@@ -404,7 +404,8 @@ class FacilityType(db.Model):
   description = db.Column(db.Text)
 
   # Relational Data
-  modification_types = db.relationship('FacilityModificationType')
+  facility_modification_types = db.relationship('FacilityModificationType')
+  generator_modifcation_types = db.relationship('GeneratorModificationType')
 
 ###############################################################################################
 # Generator Type Model
@@ -432,7 +433,7 @@ class GeneratorType(db.Model):
   facility_type = db.relationship('FacilityType')
   power_type = db.relationship('PowerType')
   resource_type = db.relationship('ResourceType')
-  modification_types = db.relationship('GeneratorModificationType')
+  # modification_types = db.relationship('GeneratorModificationType')
 
   # Methods
   def __repr__(self):
@@ -483,7 +484,7 @@ class GeneratorModificationType(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
 # Foreign keys
-  id_generator_type = db.Column(db.Integer, db.ForeignKey('generator_type.id'), nullable=False)
+  id_facility_type = db.Column(db.Integer, db.ForeignKey('facility_type.id'), nullable=False)
 
   # Data
   marginal_area = db.Column(db.Float)
@@ -494,7 +495,7 @@ class GeneratorModificationType(db.Model):
   value = db.Column(db.Float)
 
   # Relational Data
-  generator_type = db.relationship('GeneratorType')
+  facility_type = db.relationship('FacilityType')
 
   # Methods
   def __repr__(self):

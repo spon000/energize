@@ -116,7 +116,7 @@ def initialize_db(app):
 
   for generator_modification_type in generator_modification_types:
     gmt = GeneratorModificationType(
-      id_generator_type = generator_modification_type['id_generator_type'],
+      id_facility_type = generator_modification_type['id_facility_type'],
       name = generator_modification_type['name'],
       value = generator_modification_type['value'],
       marginal_cost_build = generator_modification_type['marginal_cost_build'],
