@@ -317,9 +317,30 @@ define([
       }
 
       _moveMap(deltaX, deltaY) {
-        this._tileMaps.forEach((tileMap) => {
-          tileMap.moveTileMap(deltaX, deltaY, canvasData.canvasConfig.width, canvasData.canvasConfig.height);
-        });
+        // console.log("stageX : stageY = ", this._stage.x + " : " + this._stage.y);
+        // console.log("deltaXY = ", deltaX + " : " + deltaY);
+        let newXY = this._checkMapBounds(deltaX, deltaY)
+        // console.log("deltaXY = ", newXY.x + " : " + newXY.y);
+
+        this._stage.x = newXY.x
+        this._stage.y = newXY.y
+
+        // this._tileMaps.forEach((tileMap) => {
+        //   tileMap.moveTileMap(deltaX, deltaY, canvasData.canvasConfig.width, canvasData.canvasConfig.height);
+        // });
+      }
+
+      _checkMapBounds(dx, dy) {
+        let deltaWidth = (canvasData.terrainMapConfig.width * canvasData.canvasConfig.scaleMap[this._zoomLevel].x) - this._width;
+        let deltaHeight = (canvasData.terrainMapConfig.height * canvasData.canvasConfig.scaleMap[this._zoomLevel].y) - this._height;
+        let newXY = new Dim2(this._stage.x + dx, this._stage.y + dy);
+
+        if ((this._stage.x + dx) < -deltaWidth) newXY.x = -deltaWidth;
+        if ((this._stage.x + dx) > 0) newXY.x = 0;
+        if ((this._stage.y + dy) < -deltaHeight) newXY.y = -deltaHeight;
+        if ((this._stage.y + dy) > 0) newXY.y = 0;
+
+        return newXY;
       }
 
       _updateCanvas(evt) {
@@ -332,6 +353,16 @@ define([
       _getTileMapIndex(tileMapName) {
         return this._tileMaps.findIndex((tileMap) => (tileMap.name === tileMapName));
       }
+
+
+
+
+
+      /////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
     });
 });

@@ -107,7 +107,7 @@ define([
             ),
             false
           );
-          imageMapContext.putImageData(terrainTileSprite.image, x * 25, y * 25);
+          // imageMapContext.putImageData(terrainTileSprite.image, x * 25, y * 25);
         }
       }
     }
@@ -127,7 +127,7 @@ define([
 
     // image on server
     let terrainImage = document.createElement('img')
-    terrainImage.src = '../static/img/world-map-6000x3000.png';
+    terrainImage.src = '../static/img/world-map-2400x1200.png';
     terrainImage.onload = () => {
       let terrainBitmap = new createjs.Bitmap(terrainImage);
       terrainTileMap.addBitmapToContainer(terrainBitmap);

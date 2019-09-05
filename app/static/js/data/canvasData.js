@@ -5,7 +5,7 @@ define([
 ], function (Dim2) {
   return ({
     "canvasConfig": {
-      "scaleMap": [new Dim2(.2, .2), new Dim2(.4, .4), new Dim2(1, 1)],
+      "scaleMap": [new Dim2(.5, .5), new Dim2(1, 1), new Dim2(2, 2)],
       // "scaleMap": [new Dim2(.5, .5), new Dim2(1, 1)],
       "initialZoomLevel": 0,
       "initialOriginX": 0,
@@ -13,10 +13,10 @@ define([
       "width": 1200,
       "height": 600
     },
-    "phaserConfig": {
-      "width": 1200,
-      "height": 600,
-      "parent": "map-view"
+    "terrainMapConfig": {
+      "path": "/static/img/world-map-2400x1200.png",
+      "width": 2400,
+      "height": 1200,
     },
     "terrainImageConfig": {
       "name": "terrainBitmap",
