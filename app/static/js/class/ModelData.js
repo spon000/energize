@@ -124,8 +124,14 @@ define([
         });
       }
 
-      getGenerators(facility) {
-
+      getPlayerGenerators() {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.playerGenerators.path)
+          loaded.then((results) => {
+            // console.log("resultes = ", results);
+            resolve(results)
+          })
+        });
       }
 
       getGeneratorDetailHtml(genId) {

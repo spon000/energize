@@ -60,7 +60,7 @@ define([], function () {
 
             <div class="row">
               <h6 class="col-lg-5" style="font-weight: bold;"> Capacity: </h6>
-              <label class="col-lg-4"> {{ facility.total_capacity }} MWh </label>
+              <label class="col-lg-4"> {{ facility.total_capacity }} MW </label>
             </div>
 
             <div class="row">

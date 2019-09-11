@@ -50,7 +50,7 @@ define([
       _initPortfolioBtn() {
         $('#' + this._portfolioButtonId).click(this, (evt) => {
           let pvd = new PortfolioViewDialog();
-          console.log("pvd = ", pvd);
+          // console.log("pvd = ", pvd);
         });
       }
 

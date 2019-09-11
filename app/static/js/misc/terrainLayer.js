@@ -107,7 +107,7 @@ define([
             ),
             false
           );
-          imageMapContext.putImageData(terrainTileSprite.image, x * 25, y * 25);
+          // imageMapContext.putImageData(terrainTileSprite.image, x * 25, y * 25);
         }
       }
     }

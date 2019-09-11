@@ -8,6 +8,7 @@ requirejs.config({
   //the paths config could be for a directory.
   paths: {
     // Core libraries
+    chart: "lib/chart/Chart.bundle.min",
     jquery: "lib/jquery/jquery.3.3.1.min",
     jqueryui: "lib/jquery-ui/jquery-ui.min",
     // "bootstrap.bundle.4.1.1.min" contains needed popper.js library.
@@ -120,6 +121,9 @@ requirejs.config({
     },
     tabulator: {
       exports: "Tabulator"
+    },
+    chart: {
+      exports: "chart"
     }
   }
 });

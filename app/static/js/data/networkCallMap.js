@@ -37,6 +37,10 @@ define([
       name: "playerFacilities",
       path: "/playerfacilities" + gid
     },
+    "playerGenerators": {
+      name: "playerGenerators",
+      path: "/playergenerators" + gid
+    },
     "playerCompany": {
       name: "playerCompany",
       path: "/playercompany" + gid

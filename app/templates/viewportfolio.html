@@ -142,18 +142,31 @@
 
       <div class="row">
         <label class="field col-lg-8">Total Nameplate Capacity:</label>
-        <label class="value col-lg-4">1000 GW</label>
+        <label id="pfs-total-company-capacity" class="value col-lg-4">1000 GW</label>
       </div>
 
     </div>
   </div>
 
   <div id="portfolio-metrics" class="grid-box">
-    <label>Game metrics</label>
+    <div class="container">
+
+      <div class="row">
+        <label class="col-md-12">Company-Wide "health" metrics</label>
+      </div>
+
+      <div class="row">
+        <label class="col-md-4 align-items-center">Environmental</label>
+        <label class="col-md-4 align-items-center">Societal</label>
+        <label class="col-md-4 align-items-center">Technological</label>
+      </div>
+
+    </div>
   </div>
 
-
-  <div id="portfolio-graph" class="grid-box"><label>graph</label></div>
+  <div id="portfolio-graph" class="grid-box">
+    <canvas id="portfolio-graph-chart" width="340" height="145"></canvas>
+  </div>
 
   <div id="portfolio-options" class="grid-box">
     <div class="container">
@@ -196,6 +209,6 @@
   </div>
 
   <div id="portfolio-facility-list-heading" class="grid-box"><label>Facility List (Click on a facility name for more details)</label></div>
-  <div id="portfolio-facility-list-table" class="grid-box"><label>Facility list-table</label></div>
+  <div id="portfolio-facility-list-table" class="grid-box"><label></label></div>
 
 </div>

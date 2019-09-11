@@ -121,6 +121,9 @@ def turns_to_hours(turns):
 def convert_to_money_string(value):
   return '${:,}'.format(int(value))
 
+def add_commas_to_number(value):
+  return '{:,}'.format(int(value))
+
 
 
 

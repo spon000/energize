@@ -4,17 +4,16 @@
       <div class="col-lg">
         <label> Population: </label>
       </div>
-      {# <div class="col-md"></div> #}
       <div class="col-md">
-        <label>{{ city.population }}</label>
+        <label>{{ commaNumber(city.population) }}</label>
       </div>
     </div>
-    <div class="row">    
+    <div class="row">
       <div class="col-lg">
         <label> Consumes: </label>
       </div>
       <div class="col-md">
-        <label> {{ city.daily_consumption }} KW </label>
+        <label> {{ commaNumber(city.daily_consumption) }} MW </label>
       </div>
     </div>
   </div>

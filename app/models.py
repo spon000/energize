@@ -188,9 +188,9 @@ class Facility(db.Model):
       f"\tGame Id: {self.id_game}\n"
       f"\tCompany Id: {self.id_company}\n"
       f"\tState: {self.state}\n"
-      f"\tType Id: {self.id_type}\n"
-      f"\tType: {self.facility_type}\n"
-      f"\tGenerators: {self.generators}\n\n"
+      f"\tType Id: {self.id_type}\n\n"
+      # f"\tType: {self.facility_type}\n"
+      # f"\tGenerators: {self.generators}\n\n"
     )
 
 #########################################################################################
@@ -388,7 +388,7 @@ class FacilityType(db.Model):
 
   # Data
   maintype = db.Column(db.String(15), nullable=False)
-  subtype = db.Column(db.String(10))
+  subtype = db.Column(db.String(15))
   name = db.Column(db.String(25))
   build_time = db.Column(db.Integer)
   lifespan = db.Column(db.Integer)
@@ -437,15 +437,16 @@ class GeneratorType(db.Model):
 
   # Methods
   def __repr__(self):
-    return ( 
-      f"GeneratorType -->\n" +
-      f"ID: {self.id}\n" +
-      f"Facility Type Id: {self.id_facility_type}\n" +
-      f"Power Type Id: {self.id_power_type}\n" +
-      f"Power Type : {self.power_type.name}\n" +
-      f"Resource Type: {self.id_resource_type}\n" +
-      f"Lifespan: {self.lifespan}"
-    )
+    return (
+      f"GeneratorType -\n"
+      f"\tID: {self.id}\n"
+      f"\tFacility Type Id: {self.id_facility_type}\n"
+      f"\tPower Type Id: {self.id_power_type}\n"
+      f"\tPower Type : {self.power_type.name}\n"
+      f"\tResource Type: {self.id_resource_type}\n"
+      f"\tLifespan: {self.lifespan}\n\n"
+    )      
+
 
 
 ###############################################################################################

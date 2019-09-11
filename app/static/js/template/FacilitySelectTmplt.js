@@ -46,7 +46,7 @@ define([], function () {
               <td class="td-label">Capitol Cost:
                 <p>This reflects the change in cost associated with capacity and market fluctuations.</p>
               </td>
-              <td class="td-value">{{fixedCost}} MW</td>
+              <td class="td-value">{{fixedCost}} /MW</td>
             </tr>
 
             <tr>

@@ -11,7 +11,7 @@ from app.models import User, Game, Company, Facility, Generator, City, FacilityT
 from app.models import FacilitySchema, GeneratorSchema, FacilityModificationSchema, GeneratorModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema
 from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, FacilityModificationTypeSchema, GeneratorModificationType, GeneratorModificationTypeSchema
 from app.game.init_game import init_game_models
-from app.game.utils import format_date, convert_to_money_string, get_age, turns_to_hours, get_current_game_date
+from app.game.utils import format_date, convert_to_money_string, get_age, turns_to_hours, get_current_game_date, add_commas_to_number
 from app.game.turn import initialize_turn
 from app.game.turn import calculate_turn
 from app.game.turn import finalize_turn
@@ -263,6 +263,35 @@ def power_types():
   
   return jsonify({'power_types': serialized_power_types})
 
+
+# ###############################################################################  
+#
+# ###############################################################################
+# @game.route("/playergenerators", methods=["GET"])
+# @login_required
+# def player_generators():
+#   gid = request.args.get('gid', None)
+#   company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
+#   facilities = Facility.query.filter_by(id_game=gid, id_company=company.id)
+  
+#   facility_capacities = list()
+#   for facility in facilities:
+#     elegible_generators = list(filter(lambda generator : generator.state != 'available', facility.generators))
+#     print("*"*80)
+#     print(elegible_generators)
+#     print("\n")
+
+#     facility_capacities.append({
+#       "facility_id": str(facility.id),
+#       "facility_capacity": str((sum(list(gen.generator_type.nameplate_capacity for gen in elegible_generators)))),
+#     })
+
+#   print("*"*80)
+#   print(facility_capacities)
+#   print("\n")
+ 
+#   return jsonify(facility_capacities)
+
 # ###############################################################################  
 #
 # ###############################################################################
@@ -339,8 +368,19 @@ def player_facilities():
   facilities = Facility.query.filter_by(id_game=gid, id_company=company.id).all()
   facilities_schema = FacilitySchema(many=True)
   facilities_serialized = facilities_schema.dump(facilities).data
- 
-  return jsonify({'facilities': facilities_serialized})
+
+  facility_capacities = list()
+  for facility in facilities:
+    elegible_generators = list(filter(lambda generator : generator.state == 'available' or generator.state == 'unavailable', facility.generators))
+    facility_capacities.append({
+      "facility_id": str(facility.id),
+      "facility_capacity": str((sum(list(gen.generator_type.nameplate_capacity for gen in elegible_generators)))),
+    })
+
+  return jsonify({
+    'facilities': facilities_serialized,
+    'facility_capacities': facility_capacities
+  })
 
 # ###############################################################################  
 #
@@ -484,8 +524,8 @@ def viewfacility():
   fid = request.args.get('fid', None)
   game = Game.query.filter_by(id=gid).first()
   facility = Facility.query.filter_by(id=fid, id_game=gid).first()
-  print(f"*"*80)
-  print(f"{facility}")
+  # print(f"*"*80)
+  # print(f"{facility}")
   facility_capacity = sum(gen.generator_type.nameplate_capacity for gen in facility.generators) or 0
   power_type = facility.generators[0].generator_type.power_type.name if facility.generators else "Undefined"
   facility_age = get_age(game, facility.start_prod_date)
@@ -586,8 +626,8 @@ def update_generators():
   
     for gu_key in generator_update_keys:
       if gu_key not in bad_key_fields:
-        print(f"*"*80)
-        print(f"gu_key = '{gu_key}'")
+        # print(f"*"*80)
+        # print(f"gu_key = '{gu_key}'")
         generator[gu_key] = gen[gu_key]
 
         if gu_key == 'id_type':
@@ -632,10 +672,7 @@ def viewcity():
   city_id = request.args.get('cid', None)
   city = City.query.get(city_id)
 
-  
-
-  return render_template("viewcity.html", city=city)
-
+  return render_template("viewcity.html", commaNumber=add_commas_to_number, city=city)
 
 # ###############################################################################  
 #
