@@ -4,7 +4,8 @@ define([
   "Dim2",
   "easeljs",
   "canvasData",
-], function ($, $UI, Dim2, createjs, canvasData) {
+  "evtEmitter",
+], function ($, $UI, Dim2, createjs, canvasData, evtEmitter) {
 
   return (
     class CanvasView {
@@ -22,6 +23,8 @@ define([
         // Based on tile dimensions. Each tile will be calculated with the current scale.
         this._scaleMap = canvasData.canvasConfig.scaleMap;
         this._tileMaps = [];
+
+        this._setEventEmitters();
       }
 
       //////////////////////////////////////////////////////////////
@@ -277,6 +280,19 @@ define([
       ///////////////////////////////////////////////////////////////////
       // Private Methods
 
+
+      _setEventEmitters() {
+        evtEmitter.on('zoomIn', () => {
+          console.log("zoomingIn!")
+          this.zoomLevel += 1
+        });
+        evtEmitter.on('zoomOut', () => this.zoomLevel -= 1);
+        evtEmitter.on('moveMapDown', () => this._moveMap(0, -100));
+        evtEmitter.on('moveMapUp', () => this._moveMap(0, 100));
+        evtEmitter.on('moveMapLeft', () => this._moveMap(100, 0));
+        evtEmitter.on('moveMapRight', () => this._moveMap(-100, 0));
+      }
+
       _zoomMap() {
         this._tileMaps.forEach(tileMap => {
           tileMap.setScale(this._scaleMap[this._zoomLevel].x, this._scaleMap[this._zoomLevel].y);
@@ -332,6 +348,12 @@ define([
       _getTileMapIndex(tileMapName) {
         return this._tileMaps.findIndex((tileMap) => (tileMap.name === tileMapName));
       }
+
+      /* ********************************************************************************** */
+      //
+      /* ********************************************************************************** */
+
+
 
     });
 });

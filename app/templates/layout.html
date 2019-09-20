@@ -29,16 +29,15 @@
       <div id="game">
         <div id="game-top-menu" class="top-menu">
           <a id="portfolio-btn" class="company-btn push-up" href="#">{{ company.name }}<br/> <label> (portfolio) </label></a>
-          {# <a class="budget-btn no-hover" href="#"></a> #}
           <a class="budget-btn push-up" href="#">Balance: <label> {{ format_money(company.balance) }} </label> </a>
           <a class="market-btn push-up" href="#"> World Market</a>
           <a class="social-btn" href="#"> Social</a>
-          <a class="q-report-btn push-up" href="#"> Quarterly Report</a>
+          <a id="quarterly-report-btn" class="q-report-btn push-up" href="#"> Quarterly Report</a>
           <a class="turn-btn push-up" href="#"> {{ current_game_date }}
             <br/>
             <label> Turn: {{ game.turn_number }} </label>
           </a>
-          <a class="next-turn-btn push-up no-hover stop" href="#" id="next-btn">Next Turn</a>
+          {% block turn_button %} {% endblock turn_button %}
           <div>
             <!-- Grid Column place holder -->
           </div>
@@ -53,12 +52,7 @@
           {% block middle_content %} {% endblock middle_content %}
         </div>
 
-        <div class="user-messages">
-          <div class="">
-            {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
-            <h4 class="alert alert-{{ category }}"> {{ message }} </h4>
-            {% endfor %} {% endif %} {% endwith %}
-          </div>
+        <div id="game-user-messages">
         </div>
       </div>
     </body>

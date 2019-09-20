@@ -33,7 +33,7 @@ def creategame():
       game = Game(name=form.gamename.data)
       db.session.add(game)
       db.session.commit()
-      company = Company(name=form.companyname.data, id_user=current_user.id, player_number=0, connected_to_game=0)
+      company = Company(name=form.companyname.data, id_user=current_user.id, player_number=0)
       db.session.add(company)
       db.session.commit()
       current_user.current_company = company.id
@@ -59,8 +59,8 @@ def joingame():
   if games:
     for game in games:
       # User.id=1 is a dummy user that is assciated will all dummy companies not yet assigned to a player.
-      open_company = Company.query.filter(game.id == Company.id_game, game.game_state == 'new', Company.id_user == 1).first()
-      user_company = Company.query.filter(game.id == Company.id_game, game.game_state == 'new', Company.id_user == current_user.id).first()
+      open_company = Company.query.filter(game.id == Company.id_game, game.state == 'new', Company.id_user == 1).first()
+      user_company = Company.query.filter(game.id == Company.id_game, game.state == 'new', Company.id_user == current_user.id).first()
 
       if not user_company and open_company:
         available_games.append(game)
@@ -81,7 +81,7 @@ def joingame():
       game_companies = Company.query.filter(Company.id_game == game_id, Company.id_user != 1)
 
       if game_companies.count() < joining_game.companies_max:
-        company = Company(name=form.companyname.data, id_user=current_user.id, player_number=0, connected_to_game=0)
+        company = Company(name=form.companyname.data, id_user=current_user.id, player_number=0)
         db.session.add(company)
         db.session.commit()
         current_user.current_company = company.id

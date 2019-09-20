@@ -1,6 +1,9 @@
-.user-messages {
+#game-user-messages {
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 6px;
   width: 1200px;
   height: 200px;
   background-color: lightgoldenrodyellow;
-  overflow: auto;
+  overflow-y: scroll;
 }

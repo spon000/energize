@@ -45,9 +45,6 @@
     padding-left: 0;
   }
 
-
-
-
   /* ******************************************************************* 
    * Graph style        
    ******************************************************************* */
@@ -69,6 +66,24 @@
     border-width: 1px;
     border-radius: 5px;
   }
+
+  .portfolio-metrics-title {
+    margin-left: 50px;
+  }
+
+  .portfolio-sub-metric {
+    display: inline-block;
+    width: 100px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .societal-link {
+    margin-left: 20px;
+  }
+
 
   /* ******************************************************************* 
    * Options style        
@@ -96,8 +111,8 @@
     background-color: #fff;
     grid-column: 1 / span 2;
     grid-row: 4;
-    border-bottom-width: 1px;
-    border-top-width: 1px;
+    border-bottom-width: -3px;
+    border-top-width: -3px;
     border-left-width: 0px;
     border-right-width: 0px;
     border-style: solid;
@@ -152,17 +167,26 @@
     <div class="container">
 
       <div class="row">
-        <label class="col-md-12">Company-Wide "health" metrics</label>
+        <label class="portfolio-metrics-title">Company-Wide "health" metrics</label>
       </div>
-
       <div class="row">
-        <label class="col-md-4 align-items-center">Environmental</label>
-        <label class="col-md-4 align-items-center">Societal</label>
-        <label class="col-md-4 align-items-center">Technological</label>
+        <div class="portfolio-sub-metric">
+          <img src="{{ url_for('static', filename='img/icons/environmental.png') }}" alt="Environmental" />
+          <a href="#" class="">Environmental</a>
+        </div>
+        <div class="portfolio-sub-metric">
+          <img src="{{ url_for('static', filename='img/icons/societal.png') }}" alt="Societal" />
+          <a href="#" class="societal-link">Societal</a>
+        </div>
+        <div class="portfolio-sub-metric">
+          <img src="{{ url_for('static', filename='img/icons/technology.png') }}" alt="Technology" />
+          <a href="#" class="">Technological</a>
+        </div>
       </div>
 
     </div>
   </div>
+
 
   <div id="portfolio-graph" class="grid-box">
     <canvas id="portfolio-graph-chart" width="340" height="145"></canvas>

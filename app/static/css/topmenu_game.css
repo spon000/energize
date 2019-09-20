@@ -23,6 +23,12 @@
   text-decoration: none;
 }
 
+.no-hover {
+  background-color: yellow;
+  color: red;
+  text-decoration: none;
+}
+
 .top-menu .company-btn  label {
   font-size: 12px;  
 }
@@ -59,6 +65,41 @@
   color: black;
   text-decoration: none;
 }
+
+
+#next-turn-button {
+  padding: 0;
+  margin: 0;
+  font-size: 11px;
+}
+
+#next-turn-btn label {
+  margin-bottom: 2px;
+}
+
+a.playing {
+  background-color: #228b22;
+  color: #f2f2f2;
+  text-decoration: none;
+}
+
+a.waiting {
+  background-color: #968022 ;
+  color: #f2f2f2;
+  text-decoration: none;
+}
+
+a.running {
+  background-color: #cc3300;
+  color: #f2f2f2;
+  text-decoration: none;
+}
+
+a.next-turn-btn {
+
+}
+
+
 
 
   

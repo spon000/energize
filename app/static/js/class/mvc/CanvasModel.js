@@ -123,6 +123,7 @@ define([
 
           loaded.then((results) => {
             // Convert results array into an object for easier access to data.
+
             let resources = ResourceLoader.resourcesToObject(results);
             let terrainTileMap = terrainLayer(
               resources[canvasData.terrainImageConfig.name].data,
@@ -130,7 +131,7 @@ define([
               canvasData.terrainImageConfig,
               canvasData.terrainSpriteConfig
             );
-            console.log("terrainTileMap = ", terrainTileMap);
+            // console.log("terrainTileMap = ", terrainTileMap);
             resolve(terrainTileMap);
           });
         });

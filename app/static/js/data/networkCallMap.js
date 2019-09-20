@@ -100,6 +100,10 @@ define([
     "portfolioHtml": {
       name: "portfolioHtml",
       path: "/portfoliohtml" + gid
-    }
+    },
+    "quarterlyHtml": {
+      name: "quarterlyHtml",
+      path: "/quarterlyhtml" + gid
+    },
   });
 });				

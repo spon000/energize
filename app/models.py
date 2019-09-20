@@ -52,7 +52,7 @@ class Game(db.Model):
   companies_max = db.Column(db.Integer, nullable=False, default=5)
   companies_joined = db.Column(db.Integer, default=0)
   companies_ready = db.Column(db.Integer, default=0)
-  game_state = db.Column(db.Enum("initializing", "new", "runturn", "waiting", "playing", "finished"), default="initializing")
+  state = db.Column(db.Enum("initializing", "new", "runturn", "waiting", "playing", "finished"), default="initializing")
   turn_number = db.Column(db.Integer, default=0)
   zero_year = db.Column(db.Integer, default=1920)
 
@@ -79,7 +79,12 @@ class Game(db.Model):
     setattr(self, key, value)
 
   def __repr__(self):
-    return f"Game('{self.name}', '{self.companies_max}', '{self.generators}')"
+    return (
+      f"Game -\n"
+      f"\tId: {self.id}\n"
+      f"\tName: {self.name}\n"
+      f"\tState: {self.state}\n"
+    )
 
 #########################################################################################
 # Company Model
@@ -99,9 +104,9 @@ class Company(db.Model):
   quarter_net = db.Column(db.Float, default=0)
   global_bid_policy = db.Column(db.Enum("MC", "LCOE", "Fixed"), default="MC")
   global_maintenance_policy = db.Column(db.Enum("Routine", "Proactive", "Reactive"), default="Routine")
-  state = db.Column(db.Enum("view", "build", "turn", "ready"), default="view")
+  state = db.Column(db.Enum("view", "build", "ready"), default="view")
   cost_operational = db.Column(db.Float, default=0)
-  connected_to_game = db.Column(db.Integer, nullable=False, default=0)
+  joined_game = db.Column(db.Boolean, default=False)
 
   # Relational data
   

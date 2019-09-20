@@ -26,6 +26,7 @@ define([
             generators.push({ state: "new" })
 
           let serializedGenerators = JSON.stringify(generators);
+
           const loaded = $.get(networkCallMap.addGenerators.path + "fid=" + fid + "&ftid=" + fTypeId + "&gens=" + serializedGenerators);
           loaded.then((results) => {
             // console.log("addGenerators resultes = ", results);
@@ -48,8 +49,10 @@ define([
 
       updateFacility(fid, facility) {
         return new Promise(resolve => {
-          let serializedFacility = JSON.stringify(facility);
-          const loaded = $.get(networkCallMap.updateFacility.path + "fid=" + fid + "&facility=" + serializedFacility)
+          let serializedFacility = encodeURIComponent(JSON.stringify(facility));
+
+          console.log("serializedFacility = ", serializedFacility);
+          const loaded = $.get(networkCallMap.updateFacility.path + "fid=" + fid + "&facility=" + serializedFacility);
 
           loaded.then((results) => {
             // console.log("updateFacilityType resultes = ", results);
@@ -182,6 +185,16 @@ define([
       getPortfolioHtml() {
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.portfolioHtml.path)
+          loaded.then((results) => {
+            // console.log("resultes = ", results);
+            resolve(results)
+          });
+        });
+      }
+
+      getQuarterlyHtml() {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.quarterlyHtml.path)
           loaded.then((results) => {
             // console.log("resultes = ", results);
             resolve(results)

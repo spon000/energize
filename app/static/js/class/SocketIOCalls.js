@@ -1,41 +1,45 @@
 define([
   "jquery",
   "socketio",
-  "evtEmitter"
+  "evtEmitter",
 ], function ($, socketio, evtEmitter) {
   return (
     class SocketIOCalls {
-      constructor(socket) {
-        this._playerSocket = socket;
+      constructor() {
+        this._playerSocket = null;
       }
 
-      // Sending to server
-      clientConnect(gid) {
-        this._playerSocket.emit('client_connect', { gid: gid })
+      initializeSocket(domain, port) {
+        this._playerSocket = socketio.connect('http://' + domain + ':' + port)
+        this._onMessages = [];
+        // console.log("playerSocket = ", this._playerSocket);
       }
 
-      clientDisconnect(gid) {
-        this._playerSocket.emit('client_disconnect', { gid: gid })
+      sendMessageEmit(msg, data) {
+        data = JSON.stringify(data);
+        // console.log("sendMessageEmit() data = ", data);
+        this._playerSocket.emit(msg, data)
       }
 
-      newFacility(gid, row, column) {
-        console.log("calling newFacility() ee = ", evtEmitter);
-        evtEmitter.emit('new_facility', {
-          gid: parseInt(gid),
-          row: row,
-          column: column
-        }, (fdata) => {
-          console.log("fdata = ", fdata)
+      sendMessageReturn(msg, data, callback = null) {
+        data = JSON.stringify(data);
+        // console.log("data = ", data);
+        this._playerSocket.emit(msg, data, callback)
+      }
+
+      listenForMessage(msg, events, data = {}) {
+        this._playerSocket.on(msg, (results) => {
+          let listEvents = [].concat(events);
+          data['socketio_data'] = results;
+          // console.log("listenForMessage()... recevied msg: ", msg);
+          // console.log("data = ", data);
+          if (data['socketio_data']) {
+            if (data['socketio_data'].socketio_players.includes(globalPlayerNumber))
+              listEvents.forEach((event) => evtEmitter.emit(event, data))
+          }
+          else
+            listEvents.forEach((event) => evtEmitter.emit(event, data))
         });
-        // return fdata;
-      }
-
-      _buildFacility(data) {
-
-      }
-
-      _nextTurn(data) {
-
       }
 
     });

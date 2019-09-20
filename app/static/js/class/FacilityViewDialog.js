@@ -21,8 +21,8 @@ define([
   Tabulator) {
     return (
       class FacilityViewDialog {
-        constructor(facilityId, facilityTypeList = null, closeHandler = null) {
-          console.log("facilityId : facilityTypeList =", facilityId + " : " + facilityTypeList);
+        constructor(facilityId, facilityTypeList = null, closeHandler = null, editable = true) {
+          // console.log("facilityId : facilityTypeList =", facilityId + " : " + facilityTypeList);
           // Dialog 
           this._dialog = null;
           this._facilityId = facilityId;
@@ -134,7 +134,7 @@ define([
             this._modificationTypes = fdata['modification_types'];
             this._generatorModificationTypes = fdata['modification_types'];
 
-            console.log("fdata = ", fdata);
+            // console.log("fdata = ", fdata);
           });
         }
 
@@ -174,7 +174,7 @@ define([
             return g;
           });
 
-          console.log('this._generators = ', this._generators);
+          // console.log('this._generators = ', this._generators);
           // console.log("this._facility = ", this._facility)
 
           // Add total nameplace capacity of all available generators to facility object.
@@ -249,7 +249,7 @@ define([
 
         /* *********************************************************************************** */
         _createFacilityInfo() {
-          console.log("this._modificationTypes = ", this._modificationTypes)
+          // console.log("this._modificationTypes = ", this._modificationTypes)
           let compiledTemplate = Handlebars.compile(FacilityViewTmplt.facilityViewInfo);
           let templateParms = {
             owned: this._ownedFacility,
@@ -389,7 +389,7 @@ define([
           let scope = evt.data;
           let genId = $(evt.currentTarget).attr('genid');
 
-          console.log("decom checkbox clicked evt =", evt);
+          // console.log("decom checkbox clicked evt =", evt);
 
           if (evt.currentTarget.checked) {
             scope._openVerifyDialog("decom", scope, false, (yes) => {
@@ -407,7 +407,7 @@ define([
         // Generator Decom Checkbox event
         /* *********************************************************************************** */
         _changeTab(evt) {
-          console.log("_changeTab() ", evt);
+          // console.log("_changeTab() ", evt);
           let scope = evt.data;
           let tabType = $(evt.currentTarget).attr("type");
 
@@ -491,7 +491,7 @@ define([
             scope._updatedGenerators[genIndex][key] = keyValues[key];
           });
 
-          console.log("_addGeneratorUpdateToModifyList(): ", scope._updatedGenerators);
+          // console.log("_addGeneratorUpdateToModifyList(): ", scope._updatedGenerators);
           scope._turnOnApply(scope);
         }
 
@@ -501,14 +501,14 @@ define([
           console.log("_updatedFacility", scope._updatedFacility);
           console.log("_updatedGenerators", scope._updatedGenerators);
 
-          if (scope._updatedFacility !== {}) {
+          if (Object.keys(scope._updatedFacility).length > 0) {
             scope._modelData.updateFacility(scope._facilityId, scope._updatedFacility).then((facility) => {
               console.log("_applyUpdates() Facility was updated", facility);
               scope._updatedFacility = {};
             })
           }
 
-          if (scope._updatedGenerators !== []) {
+          if (scope._updatedGenerators.length > 0) {
             scope._modelData.updateGenerators(scope._facilityId, scope._updatedGenerators).then((generators) => {
               console.log("_applyUpdates() Generators were updated", generators);
               scope._updatedGenerators = [];
@@ -550,7 +550,7 @@ define([
           let scope = evt.data;
 
           scope._openVerifyDialog("del", scope, true, (yes) => {
-            console.log("delete facility. id = ", scope._facilityId);
+            // console.log("delete facility. id = ", scope._facilityId);
             if (yes) {
               evtEmitter.emit("deletefacility", {
                 facilityId: scope._facilityId
@@ -624,10 +624,13 @@ define([
             // Stuff to do after dialog is opened...
             open: (evt, ui) => {
               // Hide 'X' button
-              $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+              // console.log("facilityViewDialog() evt = ", evt)
+              $(evt.target).find(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+              // $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
 
               // add <input type=text> to title bar. We have to do it after dialog is created
               // or user wont be able to left click text box for focus.
+              $(evt.target).find('.ui-dialog-titlebar').after(this._title);
               $('.ui-dialog-titlebar').after(this._title);
 
               // Show the generator list if the facility is owned or has been created by the player.
@@ -850,95 +853,7 @@ define([
 
 
 
-        //////////////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////////////
-        // Create the decomission list table
-        /* *********************************************************************************** */
-        // _createGeneratorDecomissionTable() {
-        //   const generator_table_data = [];
 
-        //   this._getFacilityData().then((results) => {
-        //     this._massageFacilityData();
-        //   });
-
-        //   console.log("._generatorDecomTable() this._generators = ", this._generators);
-        //   this._generators.forEach((gen, index) => {
-
-
-        //     generator_table_data.push({
-        //       fid: gen.id_facility,
-        //       id: gen.id,
-        //       name: "generator " + this._padZeroes((index + 1), 2),
-        //       cap: gen.gentype_details.nameplate_capacity,
-        //       dtime: decom_time,
-        //       dcost: decom_cost,
-        //       state: gen.state
-        //     });
-        //   });
-
-        //   const generatorTableDef = {
-        //     height: 250,
-        //     layout: "fitDataFill",
-        //     data: generator_table_data,
-        //     groupBy: ["state"],
-        //     columns: [
-        //       {
-        //         title: "Name", field: "name", width: 110, align: "center",
-        //         formatter: this._name_cell,
-        //         formatterParams: {
-        //           scope: this
-        //         },
-        //       },
-        //       {
-        //         title: "Capacity", field: "cap", align: "center",
-        //         formatter: this._capacity_cell,
-        //         formatterParams: {
-        //           gen_types: this._generatorTypes
-        //         }
-        //       },
-        //       {
-        //         title: "Total Profit", field: "cond", width: 100,
-        //         formatter: this._condition_cell,
-        //         formatterParams: {
-        //           scope: this
-        //         }
-        //       },
-        //       {
-        //         title: "Status", field: "status", width: 80,
-        //         formatter: this._status,
-        //         formatterParams: {
-        //           scope: this
-        //         }
-        //       },
-
-
-        //       {
-        //         title: "Decomission Time", field: "prof", width: 80,
-        //         formatter: this._decom_time,
-        //         formatterParams: {
-        //           scope: this
-        //         }
-        //       },
-        //       {
-        //         title: "Decomission Cost (per quarter)", field: "age", width: 80,
-        //         formatter: this._decom_cost,
-        //         formatterParams: {
-        //           scope: this
-        //         }
-        //       },
-
-        //       { title: "State", field: "state", visible: false }
-        //     ]
-        //   }
-
-        //   return new Tabulator("#" + this._elementIdGenListTable, generatorTableDef);
-
-
-
-        // }
 
         //////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////
@@ -952,7 +867,7 @@ define([
           scope._getFacilityData().then((results) => {
             scope._massageFacilityData();
             scope._generatorListTable = scope._createGeneratorModsTable();
-            scope._createModTableEvents();
+            // scope._createModTableEvents();
           });
         }
 
@@ -965,7 +880,7 @@ define([
           if (reloadData) {
             this._getFacilityData().then((results) => {
               this._massageFacilityData();
-              console.log("_createGeneratorModsTable() this._generators = ", this._generators);
+              // console.log("_createGeneratorModsTable() this._generators = ", this._generators);
             });
           }
 
@@ -1076,7 +991,7 @@ define([
             });
           }
 
-          console.log("_createGeneratorListTable() this._generators = ", this._generators);
+          // console.log("_createGeneratorListTable() this._generators = ", this._generators);
           this._generators.forEach((gen, index) => {
             let profit = "rgb(255, 0, 0)" //getProfit(gen);
             let condition = "rgb(250, 218, 94)" //getCondition(gen);
@@ -1323,7 +1238,7 @@ define([
 
         /* *********************************************************************************** */
         _addGenerator(scope) {
-          console.log("_addGenerator()...", scope);
+          // console.log("_addGenerator()...", scope);
           // scope._turnOnApply(scope);
 
           // fid: gen.id_facility,
@@ -1358,7 +1273,7 @@ define([
             genRow.getGroup().hide();
 
           scope._modelData.addGenerators(scope._facility.id, scope._facilityType.id).then((results) => {
-            console.log("addGenerators results = ", results)
+            // console.log("addGenerators results = ", results)
             newGen.id = results.generators[0].id;
             scope._generatorListTable.addRow(newGen).then((row) => row.scrollTo());
             // console.log("this._generatorListTable = ", scope._generatorListTable);
@@ -1369,7 +1284,7 @@ define([
 
         /* *********************************************************************************** */
         _delGenerator(genId, scope) {
-          console.log("delGenerator genId = ", genId);
+          // console.log("delGenerator genId = ", genId);
           let newGeneratorRows = scope._generatorListTable.rowManager.rows.reduce((total, row) => {
             return (row.getData().state == "new" ? total + 1 : total)
           }, 0);
@@ -1379,7 +1294,7 @@ define([
           }
           else {
             let row = scope._generatorListTable.rowManager.rows.find(row => row.getData().id == genId);
-            console.log("row = ", row);
+            // console.log("row = ", row);
             scope._modelData.delGenerator(genId).then((results) => {
               row.delete();
             });

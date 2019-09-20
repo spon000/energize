@@ -1,12 +1,13 @@
 define([
   "jquery",
   "easeljs",
+  "grassTileDefs",
   "ProgressBar",
-  "TileMap",
-  "Tile",
   "TerrainMap",
-  "grassTileDefs"
-], function ($, createjs, ProgressBar, TileMap, Tile, TerrainMap, grassTileDefs) {
+  "Tile",
+  "TileMap",
+  "tileTypeArray",
+], function ($, createjs, grassTileDefs, ProgressBar, TerrainMap, Tile, TileMap, tileTypeArray) {
 
   const init = (terrainMapImage, terrainTilesImage, terrainImageConfig, terrainSpriteConfig) => {
     // let progressBar = new ProgressBar()
@@ -42,13 +43,13 @@ define([
     // let imageMapCanvas = new OffscreenCanvas(6000, 3000)
     let imageMapContext = imageMapCanvas.getContext("2d");
 
-    let tilesetCanvas = document.createElement('canvas');
-    tilesetCanvas.setAttribute("width", "500");
-    tilesetCanvas.setAttribute("height", "500");
-    // let tilesetCanvas = new OffscreenCanvas(500, 500)
-    let tilesetContext = tilesetCanvas.getContext("2d");
-    let tilesetImage = terrainSpriteSheet.getFrame(0).image;
-    tilesetContext.drawImage(tilesetImage, 0, 0);
+    // let tilesetCanvas = document.createElement('canvas');
+    // tilesetCanvas.setAttribute("width", "500");
+    // tilesetCanvas.setAttribute("height", "500");
+    // // let tilesetCanvas = new OffscreenCanvas(500, 500)
+    // let tilesetContext = tilesetCanvas.getContext("2d");
+    // let tilesetImage = terrainSpriteSheet.getFrame(0).image;
+    // tilesetContext.drawImage(tilesetImage, 0, 0);
 
     let terrainTileMap = new TileMap(
       terrainImageConfig.height,
@@ -80,26 +81,26 @@ define([
         //   console.log("progressBar.barWidth = ", progressBar.barWidth);
         // }
 
-        let terrainTileSprite = _matchTile(
-          y,
-          x,
-          terrainSpriteSheet,
-          terrainMap,
-          tilesetContext
-        );
+        // let terrainTileSprite = _matchTile(
+        //   y,
+        //   x,
+        //   terrainSpriteSheet,
+        //   terrainMap,
+        //   tilesetContext
+        // );
 
         // Uncomment to get copy of terrain tilemap in a 2D array 
         // let tileNumber = terrainTileSprite.tileProperties.tileRow * terrainSpriteConfig.frameCols + terrainTileSprite.tileProperties.tileIndex;
         // tileMapArray[y].push(tileNumber);
         // tileTypeArray[y].push(terrainTileSprite.tileProperties.tileType);
 
-        if (terrainTileSprite) {
+        if (true /*terrainTileSprite*/) {
           terrainTileMap.setTile(
             y,
             x,
             new Tile(
               0,
-              terrainTileSprite.type,
+              tileTypeArray[y][x], // terrainTileSprite.type,
               terrainSpriteConfig.width,
               terrainSpriteConfig.height,
               null
@@ -150,26 +151,26 @@ define([
   }
 
   // local vars and functions...
-  const _matchTile = (row, column, spriteSheet, terrainMap, tilesetContext) => {
-    let tileType = terrainMap.getTerrainType(row, column);
-    let tileProperties = _getTilePropertyIndexes(terrainMap, tileType, row, column);
-    if (tileProperties) {
-      // let sprite = _getSpriteFromSheet(tileProperties.tileRow, tileProperties.tileIndex, spriteSheet);
-      let image = _getImageFromSheet(tileProperties.tileRow, tileProperties.tileIndex, tilesetContext);
-      return {
-        type: tileProperties.tileType,
-        tileProperties: tileProperties,
-        sprite: null,
-        image: image,
-        // sprite: _getSpriteFromSheet(
-        //   tileProperties.tileRow,
-        //   tileProperties.tileIndex,
-        //   spriteSheet
-        // )
-      };
-    }
-    return null;
-  }
+  // const _matchTile = (row, column, spriteSheet, terrainMap, tilesetContext) => {
+  //   let tileType = terrainMap.getTerrainType(row, column);
+  //   let tileProperties = _getTilePropertyIndexes(terrainMap, tileType, row, column);
+  //   if (tileProperties) {
+  //     // let sprite = _getSpriteFromSheet(tileProperties.tileRow, tileProperties.tileIndex, spriteSheet);
+  //     // let image = _getImageFromSheet(tileProperties.tileRow, tileProperties.tileIndex, tilesetContext);
+  //     return {
+  //       type: tileProperties.tileType,
+  //       tileProperties: tileProperties,
+  //       sprite: null,
+  //       image: null,
+  //       // sprite: _getSpriteFromSheet(
+  //       //   tileProperties.tileRow,
+  //       //   tileProperties.tileIndex,
+  //       //   spriteSheet
+  //       // )
+  //     };
+  //   }
+  //   return null;
+  // }
 
   const _getTilePropertyIndexes = (terrainMap, tileType, row, column) => {
     switch (tileType) {

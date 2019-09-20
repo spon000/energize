@@ -58,7 +58,7 @@ def initialize_db(app):
   # game = Game(
   #   name = 'Dummy Game',
   #   companies_max = 1000,
-  #   game_state = 'finished'
+  #   state = 'finished'
   # )
 
   # db.session.add(game)

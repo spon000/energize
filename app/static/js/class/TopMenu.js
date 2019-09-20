@@ -1,128 +1,142 @@
 define([
   "jquery",
-  "Component",
-  "gameStore",
-  "TopMenuBuild",
-  "ResourceLoader",
-  "networkCallMap",
-  "PortfolioViewDialog"
-], function ($, Component, gameStore, TopMenuBuild, ResourceLoader, networkCallMap, PortfolioViewDialog) {
-  return (
-    class TopMenu extends Component {
+  "evtEmitter",
+  "msgBox",
+  "PortfolioViewDialog",
+  "QuarterlyReportViewDialog",
+  "webSocketCalls"
+], function (
+  $,
+  evtEmitter,
+  msgBox,
+  PortfolioViewDialog,
+  QuarterlyReportViewDialog,
+  webSocketCalls
+) {
+    return class TopMenu {
       constructor() {
-        super({
-          gameStore,
-        });
-
-        // const tmb = new TopMenuBuild();
-
-        // tmb.render();
-
-        this._facilityButtonId = "build-facility-btn";
-        this._nextTurnButtonId = "next-btn";
+        this._buildFacilityButtonId = "build-facility-btn";
+        this._nextTurnButtonId = "next-turn-button";
         this._portfolioButtonId = "portfolio-btn";
-        this._buildStatus = "build";
+        this._quarterlyRptButtonId = "quarterly-report-btn";
 
-        this._getCompanyData().then((company) => {
-          this._setBuildBtnStatus(company.state);
-          this._setBuildBtnEvent();
+        this._initializeEmitEvents();
+        this._setClickEvents();
+      }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////
+      //
+      //
+      //
+      //
+
+      /* ************************************************************************************** */
+      //
+      /* ************************************************************************************** */
+      _initializeEmitEvents() {
+        evtEmitter.on("build_facility_btn", () =>
+          $("#" + this._buildFacilityButtonId).click()
+        );
+        evtEmitter.on("next_turn_btn", () =>
+          $("#" + this._nextTurnButtonId).click()
+        );
+        evtEmitter.on("portfolio_btn", () =>
+          $("#" + this._portfolioButtonId).click()
+        );
+        evtEmitter.on("quarterly_report_btn", () =>
+          $("#" + this._quarterlyRptButtonId).click()
+        );
+        evtEmitter.on("set_build_status", data =>
+          this._setBuildBtnStatus(data.socketio_data.company_state)
+        );
+        evtEmitter.on("set_turn_status", data =>
+          this._setNextTurnBtnStatus(data.socketio_data.game_state)
+        );
+      }
+
+      /* ************************************************************************************** */
+      //
+      /* ************************************************************************************** */
+      _setClickEvents() {
+        $("#" + this._buildFacilityButtonId).click(this, evt => {
+          this._buttonBuildFacility(evt);
         });
-
-        this._setNextBtnEvent();
-        this._initPortfolioBtn();
-      }
-
-      // Getters...
-      buildStatus() {
-        return this._buildStatus;
-      }
-
-      clickBuildButton() {
-        $('#' + this._facilityButtonId).click();
-      }
-
-      _setNextBtnEvent() {
-        $('#' + this._nextTurnButtonId).click(this, (evt) => {
-          $.post(networkCallMap.companyTable.path + "pcstate=turn", (data) => { console.log("successful POST", data) });
+        $("#" + this._nextTurnButtonId).click(this, evt => {
+          this._buttonNextTurn(evt);
+        });
+        $("#" + this._portfolioButtonId).click(this, evt => {
+          this._buttonViewPortfolio(evt);
+        });
+        $("#" + this._quarterlyRptButtonId).click(this, evt => {
+          this._buttonViewQuarterlyRpt(evt);
         });
       }
 
-      _initPortfolioBtn() {
-        $('#' + this._portfolioButtonId).click(this, (evt) => {
-          let pvd = new PortfolioViewDialog();
-          // console.log("pvd = ", pvd);
+      /* ************************************************************************************** */
+      //
+      /* ************************************************************************************** */
+      _checkPlayerNumber() { }
+
+      /* ************************************************************************************** */
+      //
+      /* ************************************************************************************** */
+      _buttonBuildFacility() {
+        webSocketCalls.sendMessageEmit("player_build_facility_button", {
+          gameId: globalGameId
         });
       }
 
-      _getCompanyData() {
-        return new Promise(resolve => {
-          const loaded = ResourceLoader.loadResources([
-            { name: networkCallMap.companyTable.name, type: "ajax", path: networkCallMap.companyTable.path }
-          ]);
-          loaded.then((results) => {
-            let resultsObj = ResourceLoader.resourcesToObject(results);
-            resolve(resultsObj.companyTable.data.player_company);
-          });
+      /* ************************************************************************************** */
+      //
+      /* ************************************************************************************** */
+      _buttonNextTurn() {
+        webSocketCalls.sendMessageEmit("player_next_turn_button", {
+          gameId: globalGameId
         });
       }
 
-      _setBuildBtnStatus(state = "view") {
+      /* ************************************************************************************** */
+      //
+      /* ************************************************************************************** */
+      _buttonViewPortfolio() {
+        let pvd = new PortfolioViewDialog();
+      }
+
+      /* ************************************************************************************** */
+      //
+      /* ************************************************************************************** */
+      _buttonViewQuarterlyRpt() {
+        let qrvd = new QuarterlyReportViewDialog();
+      }
+
+      /* ************************************************************************************** */
+      //
+      /* ************************************************************************************** */
+      _setBuildBtnStatus(state) {
+        // console.log("setBuildBtnStatus() state = ", state);
         if (state === "view") {
-          $('#' + this._facilityButtonId).removeClass(["building", "no-hover"]);
-          $.post(networkCallMap.companyTable.path + "pcstate=" + state, (data) => { console.log("successful POST", data) });
-          this._buildStatus = "view";
-        }
-        else if (state === "build") {
-          $('#' + this._facilityButtonId).addClass(["building", "no-hover"]);
-          $.post(networkCallMap.companyTable.path + "pcstate=" + state, (data) => { console.log("successful POST", data) });
-          this._buildStatus = "build";
-        }
-        else if (state === "turn") {
-          $('#' + this._facilityButtonId).addClass(["no-hover"]);
-          $('#' + this._facilityButtonId).removeClass(["building"]);
-          this._buildStatus = "turn";
+          $("#" + this._buildFacilityButtonId).removeClass([
+            "building",
+            "no-hover"
+          ]);
+          let msg = `You are in "Viewing" mode.`;
+          msgBox.postMessage({ msg: msg });
+        } else if (state === "build") {
+          $("#" + this._buildFacilityButtonId).addClass(["building", "no-hover"]);
+          let msg = `You are in "Build" mode.`;
+          msgBox.postMessage({ msg: msg });
+        } else if (state === "ready") {
+          $("#" + this._buildFacilityButtonId).addClass(["no-hover"]);
+          $("#" + this._buildFacilityButtonId).removeClass(["building"]);
         }
       }
 
-      _setBuildBtnEvent() {
-        $('#' + this._facilityButtonId).click(this, (evt) => {
-          // console.log("evt = ", evt)
-          const scope = evt.data;
-          const loaded = ResourceLoader.loadResources([
-            { name: networkCallMap.companyTable.name, type: "ajax", path: networkCallMap.companyTable.path }
-          ]);
-          loaded.then((results) => {
-            let resultsObj = ResourceLoader.resourcesToObject(results);
-            //console.log("resultsObj = ", resultsObj)
-            const state = resultsObj.companyTable.data.player_company.state;
-            if (state === "view")
-              scope._setBuildBtnStatus("build")
-            else if (state === "build")
-              scope._setBuildBtnStatus("view")
-            else if (state === "turn")
-              scope._setBuildBtnStatus("turn")
-            else
-              return;
-          });
+      _setNextTurnBtnStatus(state) {
+        console.log("setNextTurnBtnStatus() state = ", state);
+        webSocketCalls.sendMessageReturn("get_turn_button", { gameId: globalGameId }, (data) => {
+          $("#" + this._nextTurnButtonId).replaceWith(data);
+          console.log("_setNextTurnBtnStatus() callback... data = ", data)
         });
       }
-
-      // _setBuildStatus() {
-      //   $('#' + this._facilityButtonId).addClass(["building", "no-hover"]);
-      //   $.post(networkCallMap.companyTable.path + "pcstate=build", (data) => { console.log("successful POST", data) });
-      //   this._buildStatus = "build";
-      // }
-
-      // _setViewStatus() {
-      //   $('#' + this._facilityButtonId).removeClass(["building", "no-hover"]);
-      //   $.post(networkCallMap.companyTable.path + "pcstate=view", (data) => { console.log("successful POST", data) });
-      //   this._buildStatus = "view";
-      // }
-
-      // _setTurnStatus() {
-      //   $('#' + this._facilityButtonId).addClass(["no-hover"]);
-      //   $('#' + this._facilityButtonId).removeClass(["building"]);
-      //   this._buildStatus = "turn";
-      // }
-    });
-});
+    };
+  });

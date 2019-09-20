@@ -1,0 +1,11 @@
+ 
+ {% if (company.state == 'view' or company.state == 'build') %} 
+   <a id="next-turn-button" href="#" class='playing'>Ready <br/> Next Turn <br/>{{game.turn_number}} >>> {{(game.turn_number + 1)}} </a>
+ {% elif company.state == 'ready' and game.state != 'runturn' %} 
+   <a id="next-turn-button" href="#" class='waiting'>Waiting <br/> Next Turn <br/> {{game.turn_number}} >>> {{(game.turn_number + 1)}} </a>
+ {% elif company.state == 'ready' and game.state == 'runturn' %}
+   <a id="next-turn-button" href="#" class='running'>Running <br/> Next Turn <br/> {{game.turn_number}} >>> {{(game.turn_number + 1)}} </a>
+ {% else %}
+   <a id="next-turn-button" href="#" class='next-turn-btn playing'>Ready <br/> Next Turn <br/> {{(game.turn_number)}} >>> {{(game.turn_number + 1)}} </a>
+ {% endif %}
+

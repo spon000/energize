@@ -7,6 +7,7 @@ define([
   "evtEmitter",
   "ModelData",
   "Tabulator",
+  "FacilityViewDialog",
 ], function (
   $,
   JQUI,
@@ -15,6 +16,7 @@ define([
   evtEmitter,
   ModelData,
   Tabulator,
+  FacilityViewDialog,
   ) {
 
     let = typeChartColors = {
@@ -48,12 +50,29 @@ define([
             this._facilityCapacities = data[0].facility_capacities;
             this._facilityTypes = data[1].facility_types;
             this._portfolioDialogHtml = data[2];
-            console.log("ready to open dialog...", data);
+            // console.log("ready to open dialog...", data);
 
             this._openPortfolioDialog(this, this._createGraphAndTable)
           });
         }
 
+
+
+        /* *********************************************************************************** */
+        // Initialize functions
+        /* *********************************************************************************** */
+        _getDialogData() {
+          return Promise.all([
+            this._modelData.getPlayerFacilities(),
+            this._modelData.getFacilityTypes(),
+            this._modelData.getPortfolioHtml()
+          ]).then((data) => data)
+            .then((data) => data)
+            .then((data) => data);
+        }
+
+
+        /* *********************************************************************************** */
         _createFacilityChartData() {
           let typesCount = this._facilityTypes.reduce((typesCount, facilityType) => {
             let typeCount = this._facilities.reduce((typeCount, facility) => {
@@ -79,31 +98,25 @@ define([
           return typesCount
         }
 
-        _getDialogData() {
-          return Promise.all([
-            this._modelData.getPlayerFacilities(),
-            this._modelData.getFacilityTypes(),
-            this._modelData.getPortfolioHtml()
-          ]).then((data) => data)
-            .then((data) => data)
-            .then((data) => data);
-        }
 
+        /* *********************************************************************************** */
         _createGraphAndTable(scope) {
           let ownedTypes = scope._createFacilityChartData();
           // console.log("types = ", ownedTypes);
           scope._createChartOfOwnedFacilityTypes(ownedTypes);
-          scope._createTotalCompanyCapacity()
-          scope._createFacilityListTable()
+          scope._createTotalCompanyCapacity();
+          scope._createFacilityListTable();
+          scope._createEvents();
         }
 
 
+        /* *********************************************************************************** */
         _createTotalCompanyCapacity() {
           let capString = this._getTotalCompanyCapacity() + " GW";
           $("#" + this._elementIdTotalCompanyCapacity).html(capString);
-          // document.getElementById("pfs-total-company-capacity").innerHtml = capString;
         }
 
+        /* *********************************************************************************** */
         _createChartOfOwnedFacilityTypes(ownedTypes) {
           // let chartContext = document.getElementById(this._elementIdPortfolioChart).getContext();
           let chart = new Chart(document.getElementById(this._elementIdPortfolioChart), {
@@ -135,11 +148,21 @@ define([
           $(this._portfolioDialog).find(this._elementIdPortfolioChart).append(chart);
         }
 
+        /* *********************************************************************************** */
+        _createEvents() {
+          $(".portfolio-facility-name-link").on("click", this, this._viewFacility);
+
+        }
 
         /* *********************************************************************************** */
         // Event functions
         /* *********************************************************************************** */
-
+        _viewFacility(evt) {
+          console.log("_viewFacility() evt = ", evt);
+          let scope = evt.data;
+          let fid = $(evt.currentTarget).attr("fid");
+          let facilityViewDialog = new FacilityViewDialog(fid);
+        }
 
         /* *********************************************************************************** */
         // Create dialog box
@@ -175,8 +198,6 @@ define([
             })
           });
         }
-
-
 
 
         /* *********************************************************************************** */
@@ -217,7 +238,7 @@ define([
         _createFacilityListTable() {
           const facility_table_data = [];
 
-          console.log("_createFacilityListTable() this._facilities = ", this._facilities);
+          // console.log("_createFacilityListTable() this._facilities = ", this._facilities);
           this._facilities.forEach((facility, index) => {
             let profit = "rgb(255, 0, 0)" //getProfit(gen);
             let condition = "rgb(250, 218, 94)" //getCondition(gen);
@@ -303,7 +324,7 @@ define([
         }
 
         _name_cell(cell, formatterParams) {
-          return `<a href="#" class="portfolio-facility-name-link fid="${cell.getData().fid}"> ${cell.getValue()} </a>`
+          return `<a href="#" class="portfolio-facility-name-link" fid="${cell.getData().fid}"> ${cell.getValue()} </a>`
         }
 
         _color_cell(cell, formatterParams) {

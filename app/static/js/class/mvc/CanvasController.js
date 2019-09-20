@@ -6,6 +6,7 @@ define([
   "FacilitySelectDialog",
   "FacilityViewDialog",
   "ModelData",
+  "msgBox",
   "ProgressBar",
   "SocketIOCalls",
   "evtEmitter",
@@ -19,6 +20,7 @@ define([
   FacilitySelectDialog,
   FacilityViewDialog,
   ModelData,
+  msgBox,
   ProgressBar,
   SocketIOCalls,
   evtEmitter,
@@ -167,6 +169,8 @@ define([
                         evtEmitter.emit("buildfacility", { col: colRow.x, row: colRow.y, facilityTypeList: facilityListObj.facilityList })
                       }
                       else {
+                        let msg = `Problem building: ${facilityListObj.message}.`
+                        msgBox.postMessage({ 'msg': msg, });
                         console.log("can't build: " + facilityListObj.message);
                       }
                     }
@@ -321,7 +325,7 @@ define([
           else {
             return ({
               "facilityList": null,
-              "message": "You can't build a facility on this terrain"
+              "message": "Can't build a facility on this terrain"
             });
           }
         }
@@ -374,21 +378,20 @@ define([
             this._onDeleteFacility(data.facilityId);
           });
 
-          evtEmitter.on("updateMapDeleteFacility", (data) => {
-            console.log("deleting facility marker...")
-            this._updateMapDeleteFacility(data.facility)
+          evtEmitter.on("map_new_facility", (data) => {
+            console.log("adding facility marker...", data)
+            this._updateMapAddFacility(data.socketio_data.facility)
           });
 
-          evtEmitter.on("updateMapAddFacility", (data) => {
-            console.log("adding facility marker...")
-            this._updateMapAddFacility(data.facility)
+          evtEmitter.on("map_update_facility", (data) => {
+            console.log("updating facility marker...", data)
+            this._updateMapUpdateFacility(data.socketio_data.facility)
           });
 
-          evtEmitter.on("updateMapUpdateFacility", (data) => {
-            console.log("updating facility marker...")
-            this._updateMapUpdateFacility(data.facility)
+          evtEmitter.on("map_delete_facility", (data) => {
+            console.log("deleting facility marker...", data)
+            this._updateMapDeleteFacility(data.socketio_data.facility)
           });
-
         }
 
 
@@ -428,8 +431,8 @@ define([
 
           modelData.addFacility(col, row).then((facData) => {
             let facility = facData.facility;
-            // this._canvasModel.facilityLayer.createFacilityTile(facility);
-            // this._canvasModel.playerMarkerLayer.createMarkerTile(facility);
+            this._canvasModel.facilityLayer.createFacilityTile(facility);
+            this._canvasModel.playerMarkerLayer.createMarkerTile(facility);
             let facilitySelectDialog = new FacilitySelectDialog(facilityTypeList, facility.id, (evt) => {
               this._dialogStatus = "popup";
             });
@@ -440,15 +443,15 @@ define([
           let modelData = new ModelData();
 
           modelData.deleteFacility(facilityId).then((results) => {
-            // this._canvasModel.facilityLayer.removeFacilityTile(facilityId);
-            // this._canvasModel.playerMarkerLayer.removeMarkerTile(facilityId);
+            this._canvasModel.facilityLayer.removeFacilityTile(facilityId);
+            this._canvasModel.playerMarkerLayer.removeMarkerTile(facilityId);
             this._dialogStatus = "viewing";
             // console.log("this._dialogStatus = ", this._dialogStatus);
           });
         }
 
         _onUpdateFacility(facilityId, facilityTypeList, facilityTypeId) {
-          console.log("facilityId : facilityTypeList : facilityTypeId = " + facilityId + " : " + facilityTypeList + " : " + facilityTypeId);
+          // console.log("facilityId : facilityTypeList : facilityTypeId = " + facilityId + " : " + facilityTypeList + " : " + facilityTypeId);
           let modelData = new ModelData();
           this._dialogStatus = "popup";
 
@@ -457,7 +460,7 @@ define([
               let facility = facData.facility;
 
               // !!!!! THis is temporary it needs to go in Game.js !!!!!!
-              // this._canvasModel.facilityLayer.updateFacilityTile(facility.id, facilityTypeId);
+              this._canvasModel.facilityLayer.updateFacilityTile(facility.id, facilityTypeId);
               modelData.addGenerators(facility.id, facilityTypeId).then((results) => {
                 // console.log("modelData.addGenerators results = ", results);
                 let facilityViewDialog = new FacilityViewDialog(results.facility.id, facilityTypeList, (evt) => {

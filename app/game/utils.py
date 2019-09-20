@@ -123,19 +123,7 @@ def convert_to_money_string(value):
 
 def add_commas_to_number(value):
   return '{:,}'.format(int(value))
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
 
 
 

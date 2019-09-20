@@ -1,246 +1,75 @@
 define([
   "jquery",
-  "socketio",
   "CanvasController",
   "CanvasModel",
   "CanvasView",
-  "EventEmitter",
   "evtEmitter",
+  "Keys",
+  "msgBox",
   "TopMenu",
-  "SocketIOCalls",
-  "gameStore"
+  "webSocketCalls",
 ], function (
   $,
-  socketio,
   CanvasController,
   CanvasModel,
   CanvasView,
-  EventEmitter,
   evtEmitter,
+  Keys,
+  msgBox,
   TopMenu,
-  SocketIOCalls,
-  gameStore
-) {
+  webSocketCalls,
+  ) {
     return (
-      class Game extends EventEmitter {
+      class Game {
         constructor(gameId, playerNum) {
-          super();
-          this._playerSocket = null;
-          this._socketCalls = null;
           this._gameRoomName = 'game' + globalGameId;
           this._canvasModel = null;
           this._canvasView = null;
           this._canvasController = null;
-          this._topMenu = new TopMenu();
+          this._topMenu = null;
+          this._keys = null;
           this._elementIdCanvas = "gamecanvas"
           this._gameId = gameId;
           this._playerNumber = playerNum;
 
           this._initialize();
-          this._setWindowEvents();
-          this._setEventEmitters();
-          //console.log("Events in Emmitter = ", this._events);
-        }
-
-        _setWindowEvents() {
-          this._addEventToWindow(null, "keydown", this._onKeyDownEvent, this);
-        }
-
-        _addEventToWindow(data, event, listener, scope) {
-          $('body').on(event, { data: data, scope: scope }, listener);
-        }
-
-        _onKeyDownEvent(evt) {
-          let scope = evt.data.scope;
-          // console.log("evt.type = ", evt.type);
-          switch (evt.type) {
-            case "keydown":
-              // console.log("keydown...");
-              const emitter = scope._getKeyEmitter(evt)
-              // console.log("emitter = ", emitter);
-              if (emitter) {
-                scope.emit(emitter.text, emitter.data);
-              }
-              break;
-          }
-        }
-
-        _setEventEmitters() {
-          this.on('buildKeyPressed', () => {
-            this._topMenu.clickBuildButton();
-          });
-
-          this.on('portfolioButton', () => {
-            this._topMenu.clickPortfolioButton();
-          });
-
-          this.on('zoomIn', () => {
-            this._canvasView.zoomLevel += 1;
-          });
-
-          this.on('zoomOut', () => {
-            this._canvasView.zoomLevel -= 1;
-          });
-
-          this.on('moveMapDown', () => {
-            this._canvasView._moveMap(0, -100);
-          });
-          this.on('moveMapUp', () => {
-            this._canvasView._moveMap(0, 100);
-          });
-          this.on('moveMapLeft', () => {
-            this._canvasView._moveMap(100, 0);
-          });
-          this.on('moveMapRight', () => {
-            this._canvasView._moveMap(-100, 0);
-          });
-        }
-
-        _getKeyEmitter(evt) {
-          switch (evt.originalEvent.code) {
-            // - or _ key
-            case "Minus":
-              return ({
-                text: "zoomOut",
-                data: null
-              });
-
-            // + or = key
-            case "Equal":
-              return ({
-                text: "zoomIn",
-                data: null
-              });
-
-            // B key
-            case "KeyB":
-              console.log("B key pressed!");
-              return ({
-                text: "buildKeyPressed",
-                data: null
-              });
-
-            // down arrow or S key
-            case "ArrowDown":
-            case "KeyS":
-              return ({
-                text: "moveMapDown",
-                data: null
-              });
-
-            // right arrow or D key
-            case "ArrowRight":
-            case "KeyD":
-              return ({
-                text: "moveMapRight",
-                data: null
-              });
-
-            // up arrow  or W key
-            case "ArrowUp":
-            case "KeyW":
-              return ({
-                text: "moveMapUp",
-                data: null
-              });
-
-            // left arrow or A key
-            case "ArrowLeft":
-            case "KeyA":
-              return ({
-                text: "moveMapLeft",
-                data: null
-              });
-          }
         }
 
         _initialize() {
+          msgBox.initialize("game-user-messages");
+          this._setEventEmitters();
           this._initCanvas();
-          this._initSocketCallsReceived();
+          this._initializeWebSocket();
+          this._topMenu = new TopMenu();
+          this._keys = new Keys();
+          this._getInitialStates();
         }
 
-        _initSocketCallsReceived() {
+        _initializeWebSocket() {
           /////////////////////////////////////////////////////////////////////////////////
           // SocketIO connect to Server via websockets
 
           /* *************************************************************************** */
           // Connecting to server. Session ID is returned
           /* *************************************************************************** */
-          this._playerSocket = socketio.connect('http://' + document.domain + ':' + location.port)
-          console.log("playerSocket = ", this._playerSocket);
-
-          /////////////////////////////////////////////////////////////////////////////////
-          // SocketIO messages: Connection and Disconnection
+          webSocketCalls.initializeSocket(document.domain, location.port);
 
           /* *************************************************************************** */
-          //
+          // Setup all the socket calls for which we'll be listening.
           /* *************************************************************************** */
-          this._playerSocket.on('connect', () => {
-            this._socketCalls = new SocketIOCalls(this._playerSocket);
-            this._socketCalls.clientConnect(globalGameId);
-            console.log("client connected successfully... _socketCalls = ", this._socketCalls);
-          });
-
-          /* *************************************************************************** */
-          //
-          /* *************************************************************************** */
-          this._playerSocket.on('disconnect', () => {
-            this._socketCalls.clientDisconnect(globalGameId);
-            console.log("client disconnect successfully... _socketCalls = ", this._socketCalls);
-          });
-
-
-          /////////////////////////////////////////////////////////////////////////////////
-          // SocketIO messages: Game Turn 
-
-          /* *************************************************************************** */
-          // Game turn has finished and a new turn is ready for players.
-          // We need to have all clients for that game reload the page
-          /* *************************************************************************** */
-          this._playerSocket.on('game_turn_complete', (data) => {
-            location.reload();
-          })
-
-          /* *************************************************************************** */
-          //
-          /* *************************************************************************** */
-          this._playerSocket.on('game_turn_interval', (data) => {
-            console.log("game_turn_interval. Data = ", data);
-          })
-
-
-          /////////////////////////////////////////////////////////////////////////////////
-          /////////////////////////////////////////////////////////////////////////////////
-          /////////////////////////////////////////////////////////////////////////////////
-          /////////////////////////////////////////////////////////////////////////////////
-          // SocketIO messages: Map Updates
-
-          /* *************************************************************************** */
-          // New facility has been added. Update player map.
-          /* *************************************************************************** */
-          this._playerSocket.on('new_facility', (data) => {
-            console.log("websocket: new_facility", data);
-            evtEmitter.emit("updateMapAddFacility", { facility: data.facility });
-          })
-
-          /* *************************************************************************** */
-          // A newly created facility has been deleted. Update player map.
-          /* *************************************************************************** */
-          this._playerSocket.on('delete_facility', (data) => {
-            console.log("websocket: delete_facility", data);
-            evtEmitter.emit("updateMapDeleteFacility", { facility: data.facility });
-          })
-
-          // /* *************************************************************************** */
-          // // A newly created facility has been updated (type). Update player map.
-          // /* *************************************************************************** */
-          this._playerSocket.on('update_facility', (data) => {
-            console.log("websocket: update_facility", data);
-            evtEmitter.emit("updateMapUpdateFacility", { facility: data.facility });
-          })
-
+          webSocketCalls.listenForMessage('connect', 'client_connected_to_server');
+          webSocketCalls.listenForMessage('company_joined_game', 'company_joined_game');
+          webSocketCalls.listenForMessage('new_facility', 'map_new_facility');
+          webSocketCalls.listenForMessage('update_facility', 'map_update_facility');
+          webSocketCalls.listenForMessage('delete_facility', 'map_delete_facility');
+          webSocketCalls.listenForMessage('player_state_update', ['set_build_status', 'set_turn_status']);
+          webSocketCalls.listenForMessage('game_state_update', 'set_turn_status');
+          webSocketCalls.listenForMessage('players_message', 'message_player');
         }
 
+        /* *************************************************************************** */
+        // 
+        /* *************************************************************************** */
         _initCanvas() {
           this._canvasModel = new CanvasModel();
           this._canvasView = new CanvasView(this._elementIdCanvas, this._canvasModel);
@@ -248,22 +77,32 @@ define([
           this._canvasController.initialize();
         }
 
-        // this._playerSocket 
+        /* *************************************************************************** */
+        // 
+        /* *************************************************************************** */
+        _getInitialStates() {
+          webSocketCalls.sendMessageEmit("get_game_state", { gameId: globalGameId });
+          webSocketCalls.sendMessageEmit("get_player_state", { gameId: globalGameId });
+        }
 
-        // this._playerSocket.on('connect', () => {
-        //   this._playerSocket.send('player_connect')
-        //   console.log("Player connected.");
-        // });
+        /* *************************************************************************** */
+        // 
+        /* *************************************************************************** */
+        _setEventEmitters() {
+          // Websocket events
+          evtEmitter.on('client_connected_to_server', () => {
+            webSocketCalls.sendMessageEmit('join_gameroom', { gameId: globalGameId });
+          });
 
-        // this._playerSocket.on('game_connect', (data) => {
-        //   console.log("game_connect: data = ", data)
-        //   // this._playerNumber = data.p_num;
-        //   // this._gameNumber = data.g_num;
-        // });
+          evtEmitter.on('company_joined_game', (data) => {
+            let msg = `Company, ${data.socketio_data.company.name}, has joined the electrical revolution!`
+            msgBox.postMessage({ 'msg': msg, });
+          });
 
-        // this._playerSocket.on('test_disconnect', () => {
-        //   console.log("Player is not disconnected.");
-        // });
-
+          evtEmitter.on('message_player', (data) => {
+            let msg = data.socketio_data.msg
+            msgBox.postMessage({ 'msg': msg });
+          })
+        }
       });
   });

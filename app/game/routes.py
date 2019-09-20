@@ -12,9 +12,9 @@ from app.models import FacilitySchema, GeneratorSchema, FacilityModificationSche
 from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, FacilityModificationTypeSchema, GeneratorModificationType, GeneratorModificationTypeSchema
 from app.game.init_game import init_game_models
 from app.game.utils import format_date, convert_to_money_string, get_age, turns_to_hours, get_current_game_date, add_commas_to_number
-from app.game.turn import initialize_turn
-from app.game.turn import calculate_turn
-from app.game.turn import finalize_turn
+# from app.game.turn import initialize_turn
+# from app.game.turn import calculate_turn
+# from app.game.turn import finalize_turn
 from app.game.modifiers import load_modifiers
 from app.game.sio_outgoing import game_turn_complete, shout_new_facility, shout_update_facility, shout_delete_facility
 
@@ -30,12 +30,12 @@ def initgame(gid):
     flash(f'Error creating game (code:010)','danger')  
     return render_template("title.html")
 
-  if game.game_state != "initializing":
+  if game.state != "initializing":
     flash(f'Error creating game (code:011)','danger')
     return render_template("title.html")
 
   if init_game_models(game) == True:
-    game.game_state = "new"
+    game.state = "new"
     db.session.commit()
   else:
     flash(f'Error creating game (code:012)','danger')
@@ -63,7 +63,7 @@ def joingame(gid):
   # be assigned user id of 0 so it won't be chosen as a dummy
   # company by another player. 
   if len(dummy_companies) == 0:
-    game.game_state = "new"
+    game.state = "new"
     db.session.commit()
   else:
     seed()
@@ -77,7 +77,7 @@ def joingame(gid):
     db.session.delete(dc)
     db.session.commit()    
 
-  if game.game_state == "playing":
+  if game.state == "playing":
     flash(f'This game is full. Try joining another game.','danger')
     db.session.delete(company)
     db.session.commit()
@@ -105,7 +105,7 @@ def loadgame(gid):
   db.session.commit()
 
   return render_template(
-    "game.html", 
+    "game.jinja", 
     company=company, 
     game=game, 
     balance=balance, 
@@ -462,11 +462,13 @@ def update_facility():
   gid = request.args.get('gid', None)
   fid = request.args.get('fid', None)
   facility_updates = json.loads(request.args.get('facility', None))
+  # facility_updates = json.loads(request.args.get('facility', None))
 
   bad_key_fields = ['id', 'id_type', 'id_company', 'id_game']
 
-  # print(f"*"*80)
-  # print(f"facility = {facility_updates}")
+  print(f"*"*80)
+  print(f"facility = {facility_updates}")
+  print(f"*"*80)
 
   facility = Facility.query.filter_by(id=fid, id_game=gid).first()
   facility_update_keys = list(facility_updates.keys())
@@ -559,7 +561,7 @@ def new_generators():
   fid = request.args.get('fid', None)
   ftid = request.args.get('ftid', None)
   generators = json.loads(request.args.get('gens', None))
-  
+
   game = Game.query.filter_by(id=gid).first()
   facility = Facility.query.filter_by(id=fid,id_game=gid).first()
   facility_schema = FacilitySchema()
@@ -613,6 +615,9 @@ def update_generators():
   gid = request.args.get('gid', None)
   fid = request.args.get('fid', None)
   generator_updates = json.loads(request.args.get('gens', None))
+  print(f"*"*80)
+  print(f"generators = {generator_updates}")
+  print(f"*"*80)
   bad_key_fields = ['id', 'id_game', 'id_facility'] 
 
   updated_generators = []
@@ -740,19 +745,12 @@ def portfolio_html():
   company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
   facilities = Facility.query.filter_by(id_game=gid, id_company=company.id, state="active").all()
 
-  # generators = list()
-  # generators += (facility.generators for facility in facilities)
+  generators = list()
+  generators += (facility.generators for facility in facilities)
 
   # print(f"*"*80)
   # print(f"generator[0] = {generators[0]}")
-  # # print(f"generator[0].generator_type = {generators[0].generator_type}")
-
-  # # capacity_list = list(gen.generator_type.nameplate_capacity for gen in generators)
-  # total_capacity = sum(list(gen.generator_type.nameplate_capacity for gen in generators))
-
-  # print(f"*"*80)
-  # print(f"Total Capacity = {total_capacity}")
-
+  # print(f"generator[0].generator_type = {generators[0].generator_type}")
 
   return render_template(
     "viewportfolio.html",
@@ -760,8 +758,24 @@ def portfolio_html():
     company=company,
     bid_options=["MC", "LCOE", "Fixed"],
     maint_options=["Routine", "Proactive", "Reactive"]
-  )    
- 
+  )
+# ###############################################################################  
+#
+# ###############################################################################
+@game.route("/quarterlyhtml", methods=["GET", "POST"])
+@login_required
+def quarterly_html():
+  gid = request.args.get('gid', None)
+  company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
+  facilities = Facility.query.filter_by(id_game=gid, id_company=company.id, state="active").all()
+  # print(f"*"*80)
+  
+  return render_template(
+    "viewquarterly.html",
+    format_money=convert_to_money_string,
+    company=company
+  )
+
 # ###############################################################################  
 #
 # ###############################################################################
@@ -771,15 +785,15 @@ def runturn():
   gid = request.args.get('gid', None)
   game = Game.query.filter_by(id=gid).first()
 
-  modifiers = load_modifiers(game)
-  initialize_turn(game, modifiers)
-  state = calculate_turn(game, modifiers)
-  finalize_turn(game, modifiers, state)
+  # modifiers = load_modifiers(game)
+  # initialize_turn(game, modifiers)
+  # state = calculate_turn(game, modifiers)
+  # finalize_turn(game, modifiers, state)
 
   # Have server inform each client in game room game.id 
   # that the turn is over. This should cause each client 
   # to refresh.
-  game_turn_complete(gid)
+  # game_turn_complete(gid)
  
   return redirect(url_for('game.loadgame' , gid=gid))
   

@@ -21,7 +21,7 @@ define([
         return this;
       }
 
-      emit(evt, arg) {
+      emit(evt, arg = {}) {
         // console.log("EventEmitter.emit = ", evt, " : ", arg);
         if (!this._paused) (this._events[evt] || []).slice().forEach(lsn => lsn(arg));
       }

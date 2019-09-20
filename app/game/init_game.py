@@ -64,7 +64,7 @@ def init_companies(game):
 
   if num_avail_companies == 0:
     for i in range(1, game.companies_max+1):
-      company = Company(name="Company #" + str(i), id_game=game.id, id_user=1, player_number=i, connected_to_game=0)
+      company = Company(name="Company #" + str(i), id_game=game.id, id_user=1, player_number=i)
       db.session.add(company)
 
   # Commit (write to database) all the added records.

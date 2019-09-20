@@ -25,17 +25,8 @@ requirejs.config({
     CanvasController: "class/mvc/CanvasController",
     CanvasModel: "class/mvc/CanvasModel",
     CanvasView: "class/mvc/CanvasView",
-    // BuildFacilityController: "class/mvc/BuildFacilityController",
-    // BuildFacilityModel: "class/mvc/BuildFacilityModel",
-    // BuildFacilityView: "class/mvc/BuildFacilityView",
-
-
-    // Vue files
-    viewFacility: "vue/viewFacility",
-    viewFacilityHtml: "vue/viewFacilityHtml",
 
     // HTML Templates
-    // FacilityBuildDialog: "template/FacilityBuildTmplt",
     FacilitySelectTmplt: "template/FacilitySelectTmplt",
     FacilityViewTmplt: "template/FacilityViewTmplt",
     CityViewTmplt: "template/CityViewTmplt",
@@ -44,7 +35,6 @@ requirejs.config({
     Biome: "class/Biome",
     City: "class/City",
     CityLayer: "class/CityLayer",
-    Component: "class/Component",
     Dim2: "class/Dim2",
     EventEmitter: "class/EventEmitter",
     Facility: "class/Facility",
@@ -53,6 +43,7 @@ requirejs.config({
     FacilityViewDialog: "class/FacilityViewDialog",
     Game: "class/Game",
     Generator: "class/Generator",
+    Keys: "class/Keys",
     Layer: "class/Layer",
     LayerItem: "class/LayerItem",
     MarkerLayer: "class/MarkerLayer",
@@ -60,10 +51,11 @@ requirejs.config({
     ModelData: "class/ModelData",
     PortfolioViewDialog: "class/PortfolioViewDialog",
     ProgressBar: "class/ProgressBar",
-    PubSub: "class/PubSub",
+    // PubSub: "class/PubSub",
+    QuarterlyReportViewDialog: "class/QuarterlyReportDialog",
     ResourceLoader: "class/ResourceLoader",
     SocketIOCalls: "class/SocketIOCalls",
-    Store: "class/Store",
+    // Store: "class/Store",
     TerrainMap: "class/TerrainMap",
     Tile: "class/Tile",
     TileMap: "class/TileMap",
@@ -91,10 +83,9 @@ requirejs.config({
     // Misc objects
     dateUtils: "misc/dateUtils",
     evtEmitter: "misc/evtEmitter",
-    gameStore: "misc/gameStore",
     msgBox: "misc/msgBox",
     terrainLayer: "misc/terrainLayer",
-    // vueFacilitySelectDialog: "misc/vueFacilitySelectDialog",
+    webSocketCalls: "misc/webSocketCalls",
   },
 
   // Allows you to use non AMD (Asynchronus Module Definition)
