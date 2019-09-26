@@ -5,19 +5,24 @@ from app.game.modifiers import load_modifiers
 from app.game.turn import initialize_turn
 from app.game.turn import calculate_turn
 from app.game.turn import finalize_turn
+from app.game.sio_outgoing import shout_game_turn_complete
 
 
 ##############################################################################
-def run_turn():  
+def run_turn(game):  
   
+
   modifiers = load_modifiers(game)
+  # modifiers = None
+  # state = None
   initialize_turn(game, modifiers)
   state = calculate_turn(game, modifiers)
   finalize_turn(game, modifiers, state)
-  # game_turn_complete(gid)
-  history = calculate_quarter(game,db,mods,state)
+  # history = calculate_quarter(game, db, mods, state)
+
+  shout_game_turn_complete(game.id)
   
-  return redirect(url_for('game.loadgame' , gid=gid))
+  # return redirect(url_for('game.loadgame' , gid=gid))
 
 
 

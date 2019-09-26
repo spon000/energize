@@ -2,14 +2,16 @@
 #!/usr/bin/python3
 
 import json
+import time
 from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app
 from flask_login import current_user, login_required
 from flask_socketio import send, emit, join_room
 from app import db, sio
 from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType
 from app.models import FacilitySchema, GeneratorSchema, CompanySchema
-from app.game.sio_outgoing import shout_company_joined_game, shout_player_state, shout_game_state, shout_players_message
-from app.game import run_turn
+from app.game.sio_outgoing import shout_company_joined_game, shout_player_state, shout_game_state, shout_players_message, shout_ready_to_run_turn
+from app.game.sio_outgoing import shout_run_game_turn, shout_player_cancel_run_turn
+from app.game.run_turn import run_turn
 
 gamesio = Blueprint('gamesio', __name__) 
 
@@ -84,8 +86,6 @@ def on_player_next_turn(data):
   data = json.loads(data)
   game = Game.query.filter_by(id=data['gameId']).first()
   company = Company.query.filter_by(id_user=current_user.id, id_game=data['gameId']).first()
-  game_previous_state = game.state
-  company_previous_state = company.state
   
   if game.state == "runturn" :
     shout_players_message(
@@ -95,9 +95,9 @@ def on_player_next_turn(data):
     )
     return 
 
-  if company.state != "ready":
+  if company.state != "waiting":
     msg = f"Company, {company.name}, is ready for the next turn."
-    company.state = "ready"
+    company.state = "waiting"
     shout_players_message(
       game.id, 
       msg
@@ -113,20 +113,92 @@ def on_player_next_turn(data):
   db.session.commit()
  
   shout_player_state(game.id, company.state, [company.player_number])
-  companies_not_ready = Company.query.filter(Company.id_game == game.id, Company.state != "ready", Company.player_type == "human").all()
+  companies_not_waiting = Company.query.filter(Company.id_game == game.id, Company.state != "waiting", Company.player_type == "human").all()
 
-  if len(companies_not_ready) == 0:
-    game.state = "runturn"
-    db.session.commit()
-    shout_game_state(game.id, game.state, game_previous_state)
-    # run_turn(game)
+  if len(companies_not_waiting) == 0:
+    shout_ready_to_run_turn(game.id)
   else:
-    msg = "The following companies are NOT ready for the next turn: " + ", ".join([company.name for company in companies_not_ready])
+    msg = "The following companies are NOT ready for the next turn: " + ", ".join([company.name for company in companies_not_waiting])
     shout_players_message(
         game.id, 
         msg
     )    
     
+  return
+
+# ###############################################################################  
+#
+# ###############################################################################  
+@sio.on('player_is_ready')
+def on_player_is_ready(data):
+  data = json.loads(data)
+  game = game = Game.query.filter_by(id=data['gameId']).first()
+  company = Company.query.filter_by(id_user=current_user.id, id_game=data['gameId']).first()
+  company.state = "ready"
+  db.session.commit()
+
+  companies_not_ready = Company.query.filter(Company.id_game == game.id, Company.state != "ready", Company.player_type == "human").all()
+
+  if len(companies_not_ready) == 0:
+    game.state = "runturn"
+    db.session.commit()
+    shout_game_state(game.id, game.state)
+    shout_player_state(game.id, "ready", players=[1,2,3,4,5])
+
+    msg = "Running the next turn!"
+    shout_players_message(
+        game.id, 
+        msg
+    )    
+    shout_run_game_turn(game.id)
+    run_turn(game)
+
+  return 
+
+# ###############################################################################  
+#
+# ###############################################################################  
+@sio.on('get_running_turn_dialog')
+def on_get_running_turn_dialog(data):
+  data = json.loads(data)
+  game = game = Game.query.filter_by(id=data['gameId']).first()
+
+  return render_template("runningturn.html")
+
+# ###############################################################################  
+#
+# ###############################################################################  
+@sio.on('get_ready_turn_dialog')
+def on_get_ready_turn_dialog(data):
+  data = json.loads(data)
+  game = game = Game.query.filter_by(id=data['gameId']).first()
+
+  return render_template("readyturn.html")
+# ###############################################################################  
+#
+# ###############################################################################  
+@sio.on('cancel_run_turn')
+def on_cancel_run_turn(data):
+  data = json.loads(data)
+  game = Game.query.filter_by(id=data['gameId']).first()
+  company = Company.query.filter_by(id_user=current_user.id, id_game=data['gameId']).first()
+  
+  companies_updated = Company.query.filter_by(id_game=data['gameId']).update(dict(state='waiting'))
+  company.state = "view"
+
+  db.session.commit()
+  companies = Company.query.filter_by(id_game=data['gameId']).all()
+    
+  for c in companies:
+    shout_player_state(game.id, c.state, [c.player_number])
+  
+  shout_player_cancel_run_turn(game.id)
+  msg = f"Company, {company.name}, is NOT ready for the next turn."
+  shout_players_message(
+    game.id, 
+    msg
+  )  
+
   return
 
 # ###############################################################################  
@@ -145,7 +217,7 @@ def on_player_build_facility_button(data):
     elif company.state in ["build"]:
       company.state = "view"
       shout_player_state(game.id, company.state, [company.player_number])
-    elif company.state in ["ready"]:
+    elif company.state in ["waiting", "ready"]:
       shout_players_message(
         game.id, 
         "You can't toggle the build facility button while you are waiting for the next turn to run.",  

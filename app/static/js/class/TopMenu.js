@@ -46,11 +46,11 @@ define([
         evtEmitter.on("quarterly_report_btn", () =>
           $("#" + this._quarterlyRptButtonId).click()
         );
-        evtEmitter.on("set_build_status", data =>
-          this._setBuildBtnStatus(data.socketio_data.company_state)
+        evtEmitter.on("set_build_btn_status", data =>
+          this._setBuildBtnStatus(data.socketio_data.state)
         );
-        evtEmitter.on("set_turn_status", data =>
-          this._setNextTurnBtnStatus(data.socketio_data.game_state)
+        evtEmitter.on("set_turn_btn_status", data =>
+          this._setNextTurnBtnStatus(data.socketio_data.state)
         );
       }
 
@@ -113,7 +113,7 @@ define([
       //
       /* ************************************************************************************** */
       _setBuildBtnStatus(state) {
-        // console.log("setBuildBtnStatus() state = ", state);
+        console.log("setBuildBtnStatus() state = ", state);
         if (state === "view") {
           $("#" + this._buildFacilityButtonId).removeClass([
             "building",
@@ -121,21 +121,30 @@ define([
           ]);
           let msg = `You are in "Viewing" mode.`;
           msgBox.postMessage({ msg: msg });
-        } else if (state === "build") {
+        }
+        else if (state === "build") {
           $("#" + this._buildFacilityButtonId).addClass(["building", "no-hover"]);
-          let msg = `You are in "Build" mode.`;
+          let msg = `You are in "Building" mode.`;
           msgBox.postMessage({ msg: msg });
-        } else if (state === "ready") {
+        }
+        else if (state === "waiting") {
+          let msg = `You are in "Waiting" mode.`;
+          msgBox.postMessage({ msg: msg });
           $("#" + this._buildFacilityButtonId).addClass(["no-hover"]);
           $("#" + this._buildFacilityButtonId).removeClass(["building"]);
         }
       }
 
       _setNextTurnBtnStatus(state) {
-        console.log("setNextTurnBtnStatus() state = ", state);
+        console.log("setTurnBtnStatus() state = ", state);
         webSocketCalls.sendMessageReturn("get_turn_button", { gameId: globalGameId }, (data) => {
           $("#" + this._nextTurnButtonId).replaceWith(data);
-          console.log("_setNextTurnBtnStatus() callback... data = ", data)
+
+          // Set click event on Next Turn Button
+          $("#" + this._nextTurnButtonId).off()
+          $("#" + this._nextTurnButtonId).click(this, evt => {
+            this._buttonNextTurn(evt);
+          });
         });
       }
     };

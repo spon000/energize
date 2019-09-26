@@ -27,9 +27,7 @@ define([
             this._company = data[1];
             // this._events = data[2];
             this._quarterlyDialogHtml = data[2];
-
-            console.log("_getDialogData()  data = ", data);
-
+            // console.log("_getDialogData()  data = ", data);
             this._openQuarterlyDialog(this)
           });
         }

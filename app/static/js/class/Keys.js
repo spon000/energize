@@ -10,7 +10,7 @@ define([
       "Equal": "zoomIn",
       "KeyB": "build_facility_btn",
       "KeyT": "next_turn_btn",
-      "KeyT+CTRL+Shift": "force_run_turn",
+      "KeyT+Shift": "force_run_turn",
       "KeyP": "portfolio_btn",
       "KeyQ": "quarterly_report_btn",
       "ArrowDown": "moveMapDown",
@@ -37,6 +37,8 @@ define([
 
         _onKeyDownEvent(evt) {
           let keyCode = evt.originalEvent.code;
+          if (evt.shiftKey)
+            keyCode += "+Shift"
           evtEmitter.emit(keyMapEmitters[keyCode])
         }
       });

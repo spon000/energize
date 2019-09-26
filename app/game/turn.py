@@ -20,7 +20,48 @@ from shapely.geometry.polygon import Polygon
 #
 # ###############################################################################
 def initialize_turn(game, mods):
-  pass
+  modify_facility_states(game)
+  modify_generator_states(game)
+  
+  return
+
+# ###############################################################################  
+#
+# ###############################################################################  
+def modify_facility_states(game):
+  facilities = Facility.query.filter_by(id_game=game.id).all()
+  for facility in facilities:
+    if facility.state == "new":
+      facility.state="building"
+      facility.build_turn += 1
+    elif facility.state == "building":
+      facility.build_turn += 1
+      if facility.build_turn >= facility.facility_type.build_time:
+        facility.state="active"
+        facility.prod_turn += 1
+    elif facility.state == "active":
+      facility.prod_turn += 1
+
+  return
+
+# ###############################################################################  
+#
+# ###############################################################################
+def modify_generator_states(game):
+  generators = Generator.query.filter_by(id_game=game.id).all()
+  for generator in generators:
+    if generator.state == "new":
+      generator.state="building"
+      generator.build_turn += 1
+    elif generator.state == "building":
+      generator.build_turn += 1
+      if generator.build_turn >= generator.generator_type.build_time:
+        generator.state="active"
+        generator.prod_turn += 1
+    elif generator.state == "active":
+      generator.prod_turn += 1
+
+  return
 
 # ###############################################################################  
 #
@@ -40,9 +81,9 @@ def calculate_turn(game, mods):
 #
 # ###############################################################################
 def finalize_turn(game, mods, state):
-  add_costs_to_company(state)
-  state=age_generators(state, game.id)
-  age_facilities(game.id)
+  # add_costs_to_company(state)
+  # state=age_generators(state, game.id)
+  # age_facilities(game.id)
 
   game.turn_number += 1
   game.state = "playing"

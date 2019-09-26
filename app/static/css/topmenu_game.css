@@ -71,6 +71,7 @@
   padding: 0;
   margin: 0;
   font-size: 11px;
+  border-radius: 5px;
 }
 
 #next-turn-btn label {
@@ -95,8 +96,48 @@ a.running {
   text-decoration: none;
 }
 
-a.next-turn-btn {
+.stripes-loader {
+  /* margin: -30px; */
+  /* height: 20px; */
+  /*should not be larger than 20px*/
+  /* position: relative; */
+  background: linear-gradient(90deg, #eee 50%, transparent 50%);
+  /* background-color: crimson; */
+  background-size: 200%;
+  background-position: 100%;
+  border-radius: 5px;
+  transform: scale(1);
+  transition: 0.3s;
+}
 
+.stripes-loader:before {
+  content: "";
+  margin-left: -18px;
+  position: absolute; 
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(
+    75deg,
+    transparent 25%,
+    rgba(238, 238, 238, 0.5) 25%,
+    rgba(238, 238, 238, 0.5) 60%,
+    transparent 30%,
+    transparent 35%,
+    rgba(238, 238, 238, 0.5) 35%,
+    rgba(238, 238, 238, 0.5) 70%,
+    transparent 70%
+  );
+  animation: shift 1s linear infinite;
+  background-size: 60px 100%;
+  box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.2),
+    inset 0 -2px 1px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes shift {
+  
+    0% {background-position: 0 0;} 100% {background-position: 60px 0px;}
+  
 }
 
 

@@ -16,7 +16,7 @@ from app.game.utils import format_date, convert_to_money_string, get_age, turns_
 # from app.game.turn import calculate_turn
 # from app.game.turn import finalize_turn
 from app.game.modifiers import load_modifiers
-from app.game.sio_outgoing import game_turn_complete, shout_new_facility, shout_update_facility, shout_delete_facility
+from app.game.sio_outgoing import shout_game_turn_complete, shout_new_facility, shout_update_facility, shout_delete_facility
 
 game = Blueprint('game', __name__)
 #################################################################################  

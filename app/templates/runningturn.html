@@ -1,0 +1,46 @@
+<style>
+  .no-close .ui-dialog-titlebar-close {
+    display: none;
+  }
+
+  #running-turn-progress-dialog {
+    margin-top: 20px;
+  }
+
+  #running-turn-progress-dialog .running-turn-info-box {
+    width: 80%;
+    height: 200px;
+
+    margin: auto;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 10px;
+    background-color: lightcyan;
+  }
+
+  .progress {
+    margin: 0 auto;
+    width: 300px;
+  }
+
+  .progress-bar {
+    height: 16px;
+    border-radius: 4px;
+    transition: 1s linear;
+    background-color: rgb(30, 66, 224);
+    width: 0%;
+    margin-left: 0;
+    transition-property: width;
+
+  }
+</style>
+
+<div id="running-turn-progress-dialog">
+  <div class="running-turn-info-box">
+    <label>Game info slide goes here...</label>
+  </div>
+  <br/> <br/>
+  <div class="progress">
+    <div class="progress-bar"></div>
+  </div>
+</div>

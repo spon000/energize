@@ -17,6 +17,8 @@
   <div id="progress-bar-dialog"></div>
   <div id="portfolio-dialog"></div>
   <div id="quarterly-report-dialog"></div>
+  <div id="ready-for-turn-dialog"></div>
+  <div id="running-turn-dialog"></div>
 {% endblock middle_content %}
 
 
@@ -24,10 +26,10 @@
   <a id="next-turn-button"
   {% if (company.state == 'view' or company.state == 'build') %} 
     href="#" class='playing'>Ready <br/> Next Turn <br/> {{ game.turn_number }} >>> {{ game.turn_number + 1 }}</a>
-  {% elif company.state == 'ready' and game.state != 'runturn' %} 
+  {% elif company.state == 'waiting' and game.state != 'runturn' %} 
     href="#" class='waiting'>Waiting <br/> Next Turn <br/> {{ game.turn_number }} >>> {{ game.turn_number + 1 }}</a>
   {% elif company.state == 'ready' and game.state == 'runturn' %}
-    href="#" class='running'>Running <br/> Next Turn <br/> {{ game.turn_number }} >>> {{ game.turn_number + 1 }}</a>
+    href="#" class='running stripes-loader'>Running <br/> Next Turn <br/> {{ game.turn_number }} >>> {{ game.turn_number + 1 }}</a>
   {% else %}
     href="#" class='next-turn-btn playing'>Ready <br/> Next Turn <br/> {{ game.turn_number }} >>> {{ game.turn_number + 1 }}</a>
   {% endif %}

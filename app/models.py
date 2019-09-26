@@ -104,7 +104,7 @@ class Company(db.Model):
   quarter_net = db.Column(db.Float, default=0)
   global_bid_policy = db.Column(db.Enum("MC", "LCOE", "Fixed"), default="MC")
   global_maintenance_policy = db.Column(db.Enum("Routine", "Proactive", "Reactive"), default="Routine")
-  state = db.Column(db.Enum("view", "build", "ready"), default="view")
+  state = db.Column(db.Enum("view", "build", "waiting", "ready"), default="view")
   cost_operational = db.Column(db.Float, default=0)
   joined_game = db.Column(db.Boolean, default=False)
 

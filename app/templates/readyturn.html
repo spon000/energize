@@ -1,0 +1,34 @@
+<style>
+  .no-close .ui-dialog-titlebar-close {
+    display: none;
+  }
+
+  #ready-turn-countdown-dialog label {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .countdown {
+    margin: 0 auto;
+    width: 300px;
+  }
+
+  .countdown-bar {
+    height: 16px;
+    border-radius: 4px;
+    transition: 1s linear;
+    background-color: rgb(134, 224, 30);
+    width: 100%;
+    margin-left: 0;
+    transition-property: margin-left, width, background-color;
+
+  }
+</style>
+
+<div id="ready-turn-countdown-dialog">
+  <label>Press cancel to stop turn from running.</label>
+  <br/> <br/>
+  <div class="countdown">
+    <div class="countdown-bar"></div>
+  </div>
+</div>

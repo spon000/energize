@@ -60,6 +60,7 @@ requirejs.config({
     Tile: "class/Tile",
     TileMap: "class/TileMap",
     TopMenu: "class/TopMenu",
+    Turn: "class/Turn",
     Vector2: "class/Vector2",
     View: "class/View",
 

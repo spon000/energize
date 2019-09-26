@@ -7,6 +7,7 @@ define([
   "Keys",
   "msgBox",
   "TopMenu",
+  "Turn",
   "webSocketCalls",
 ], function (
   $,
@@ -17,6 +18,7 @@ define([
   Keys,
   msgBox,
   TopMenu,
+  Turn,
   webSocketCalls,
   ) {
     return (
@@ -28,6 +30,7 @@ define([
           this._canvasController = null;
           this._topMenu = null;
           this._keys = null;
+          this._turn = null;
           this._elementIdCanvas = "gamecanvas"
           this._gameId = gameId;
           this._playerNumber = playerNum;
@@ -42,6 +45,7 @@ define([
           this._initializeWebSocket();
           this._topMenu = new TopMenu();
           this._keys = new Keys();
+          this._turn = new Turn();
           this._getInitialStates();
         }
 
@@ -62,9 +66,14 @@ define([
           webSocketCalls.listenForMessage('new_facility', 'map_new_facility');
           webSocketCalls.listenForMessage('update_facility', 'map_update_facility');
           webSocketCalls.listenForMessage('delete_facility', 'map_delete_facility');
-          webSocketCalls.listenForMessage('player_state_update', ['set_build_status', 'set_turn_status']);
+          webSocketCalls.listenForMessage('player_state_update', ['set_build_btn_status', 'set_turn_btn_status']);
           webSocketCalls.listenForMessage('game_state_update', 'set_turn_status');
           webSocketCalls.listenForMessage('players_message', 'message_player');
+          webSocketCalls.listenForMessage('ready_to_run_turn', 'ready_to_run_turn');
+          webSocketCalls.listenForMessage('run_game_turn', 'running_game_turn');
+          webSocketCalls.listenForMessage('player_cancel_run_turn', 'cancel_ready_turn_dialog');
+          webSocketCalls.listenForMessage('game_turn_complete', 'game_turn_complete');
+
         }
 
         /* *************************************************************************** */
@@ -102,7 +111,11 @@ define([
           evtEmitter.on('message_player', (data) => {
             let msg = data.socketio_data.msg
             msgBox.postMessage({ 'msg': msg });
-          })
+          });
+
+          evtEmitter.on('game_turn_complete', (data) => {
+            location.reload();
+          });
         }
       });
   });
