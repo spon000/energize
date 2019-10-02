@@ -350,7 +350,7 @@ define([], function () {
       </div>
     `,
     checkboxDecom: `
-      <div class="decom-checkbox">
+      <div class="">
       {{#if decom_start}}
         <input type="checkbox" class="decom-checkbox" genid="{{genId}}" name="decom_start{{genid}}" checked>
       {{else}}

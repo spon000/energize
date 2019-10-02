@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+from app import celery
 # import math
 # import time
 # import scipy
@@ -44,11 +45,14 @@ def get_filename(gid):
   # return mods_filename_prefix + str(gid) + mods_filename_extension
   return mods_filename_prefix + '1' + mods_filename_extension
 
+
+# @celery.task()
 def load_modifiers(game):
   mods_filename = get_filename(game.id)
   mods_file = open(mods_filename, 'rb')
   modifiers = pickle.load(mods_file)
   return modifiers
+
 
 def cloud_cover(t):
   cc  = 0.5+np.cumsum(np.random.normal(0,0.25,len(t)))

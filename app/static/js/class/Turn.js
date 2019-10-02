@@ -1,11 +1,13 @@
 define([
   "jquery",
   "evtEmitter",
+  "ModelData",
   "msgBox",
   "webSocketCalls"
 ], function (
   $,
   evtEmitter,
+  ModelData,
   msgBox,
   webSocketCalls
 ) {
@@ -20,6 +22,7 @@ define([
           this._readyTurnDialogHtml = null;
           this._runningTurnDialogHtml = null;
           this._numIntervals = 2;
+          this._modelData = new ModelData();
 
           this._listenForEvents();
         }
@@ -49,6 +52,10 @@ define([
             if (this._readyDialog)
               $(this._readyDialog).dialog("close");
           });
+
+          evtEmitter.on('game_turn_interval', (data) => {
+            this._updateRunningTurnDialog(this, data);
+          })
         }
 
         /* *********************************************************************************** */
@@ -57,6 +64,7 @@ define([
           console.log("_checkTurnStatus()... ", data);
           if (state == "runturn" && !this._runningDialog) {
             this._openRunningTurnDialog(this);
+
           }
         }
 
@@ -103,7 +111,7 @@ define([
 
         /* *********************************************************************************** */
         _openRunningTurnDialog(scope, openFunction = null, closeFunction = null) {
-          webSocketCalls.sendMessageReturn('get_running_turn_dialog', { gameId: globalGameId }, (data) => {
+          this._modelData.getTurnRunningDialogHtml().then((data) => {
             this._runningTurnDialogHtml = data;
 
             $("#" + this._elementIdRunningTurnDialog).empty()
@@ -129,6 +137,16 @@ define([
               },
             });
           });
+        }
+
+        /* *********************************************************************************** */
+        _updateRunningTurnDialog(scope, data) {
+          let status = data.socketio_data.status;
+          let width = Math.floor(((status.interval / status.total) * 100))
+          console.log("_updateRunningTurnDialog() = ");
+
+
+          $("#" + this._elementIdRunningTurnDialog).find(".progress-bar").css("width", width + "%")
         }
 
         /* *********************************************************************************** */

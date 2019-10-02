@@ -77,7 +77,8 @@ class Game(db.Model):
   # Allows you to assign values to object properties as an associative array ex: generator['state'] = "new"
   def __setitem__(self, key, value):
     setattr(self, key, value)
-
+    print(f" Game object: {self}")
+ 
   def __repr__(self):
     return (
       f"Game -\n"
@@ -109,7 +110,6 @@ class Company(db.Model):
   joined_game = db.Column(db.Boolean, default=False)
 
   # Relational data
-  
   game = db.relationship('Game')
   user = db.relationship('User')
   facilities = db.relationship('Facility')
@@ -355,31 +355,33 @@ class Prompt(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
   # Foreign keys
-  id_type = db.Column(db.Integer, db.ForeignKey('prompt_type.id'), nullable=False)
+  # id_type = db.Column(db.Integer, db.ForeignKey('prompt_type.id'), nullable=False)
   id_company = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
   id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)  
 
   # Data
+  category = db.Column(db.Enum("information", "warning", "danger", "action"), default="information", nullable=False)
+  description = db.Column(db.String(300))
+  end = db.Column(db.Integer)
+  focus = db.Column(db.Enum("company", "facility", "generator", "infrastructure"), default="company", nullable=False)
+  function_name = db.Column(db.String(30))
+  image = db.Column(db.String(40), nullable=False, default='default.png')
   read = db.Column(db.Boolean, default=False)
   resolved = db.Column(db.Boolean, default=False)
   response = db.Column(db.Integer)
-  description = db.Column(db.String(300))
   start = db.Column(db.Integer)
-  end = db.Column(db.Integer)
-
+  
   # Relational Data
-  prompt_type = db.relationship('PromptType')
-  companies = db.relationship( 'Company')
+  # prompt_type = db.relationship('PromptType')
+  # companies = db.relationship( 'Company')
 
 #########################################################################################
 # PromptType Model
 class PromptType(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
-  # Foreign keys
-
   # Data
-  title = db.Column(db.String(50))
+  focus = db.Column(db.Enum("Company", "Facility", "danger", "action"), default="information", nullable=False)
   image = db.Column(db.String(20), nullable=False, default='default.png')
 
   # Relational Data

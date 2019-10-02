@@ -24,17 +24,18 @@ def initialize_db(app):
   init_table(Game, db)
   init_table(Company, db)
   init_table(City, db)
+  init_table(Prompt, db)
   init_table(PowerType, db)
   init_table(ResourceType, db)
   init_table(FacilityType, db)
   init_table(GeneratorType, db)
-  init_table(PromptType, db)
+  # init_table(PromptType, db)
   init_table(FacilityModificationType, db)
   init_table(GeneratorModificationType, db)
   init_table(Company, db)
   init_table(Facility, db)
   init_table(Generator, db)
-  init_table(Prompt, db)
+  
   init_table(FacilityModification, db)
   init_table(GeneratorModification, db)
 
@@ -146,6 +147,12 @@ def initialize_db(app):
     db.session.add(rt)
 
   #
+  # for prompt_type in prompt_types:
+  #   pmt = ResourceType(
+  #     title = prompt_type['title'],
+  #     description = prompt_type['description'],
+  #   )
+  #   db.session.add(pmt)
   
   # commit all the additions to the database.
   db.session.commit()

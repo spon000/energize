@@ -73,6 +73,7 @@ define([
           webSocketCalls.listenForMessage('run_game_turn', 'running_game_turn');
           webSocketCalls.listenForMessage('player_cancel_run_turn', 'cancel_ready_turn_dialog');
           webSocketCalls.listenForMessage('game_turn_complete', 'game_turn_complete');
+          webSocketCalls.listenForMessage('game_turn_interval', 'game_turn_interval');
 
         }
 

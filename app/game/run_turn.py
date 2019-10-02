@@ -13,8 +13,6 @@ def run_turn(game):
   
 
   modifiers = load_modifiers(game)
-  # modifiers = None
-  # state = None
   initialize_turn(game, modifiers)
   state = calculate_turn(game, modifiers)
   finalize_turn(game, modifiers, state)

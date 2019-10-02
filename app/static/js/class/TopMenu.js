@@ -2,6 +2,7 @@ define([
   "jquery",
   "evtEmitter",
   "msgBox",
+  "ModelData",
   "PortfolioViewDialog",
   "QuarterlyReportViewDialog",
   "webSocketCalls"
@@ -9,6 +10,7 @@ define([
   $,
   evtEmitter,
   msgBox,
+  ModelData,
   PortfolioViewDialog,
   QuarterlyReportViewDialog,
   webSocketCalls
@@ -19,6 +21,8 @@ define([
         this._nextTurnButtonId = "next-turn-button";
         this._portfolioButtonId = "portfolio-btn";
         this._quarterlyRptButtonId = "quarterly-report-btn";
+
+        this._modelData = new ModelData();
 
         this._initializeEmitEvents();
         this._setClickEvents();
@@ -137,8 +141,9 @@ define([
 
       _setNextTurnBtnStatus(state) {
         console.log("setTurnBtnStatus() state = ", state);
-        webSocketCalls.sendMessageReturn("get_turn_button", { gameId: globalGameId }, (data) => {
+        this._modelData.getTurnButtonHtml().then((data) => {
           $("#" + this._nextTurnButtonId).replaceWith(data);
+          console.log("setTurnBtnStatus() websocket callback data = ", data);
 
           // Set click event on Next Turn Button
           $("#" + this._nextTurnButtonId).off()

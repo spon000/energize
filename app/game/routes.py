@@ -6,24 +6,22 @@ import json
 import math 
 
 from sqlalchemy import func
+from sqlalchemy.orm.session import make_transient
 from app import db 
 from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType, ResourceType
 from app.models import FacilitySchema, GeneratorSchema, FacilityModificationSchema, GeneratorModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema
 from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, FacilityModificationTypeSchema, GeneratorModificationType, GeneratorModificationTypeSchema
 from app.game.init_game import init_game_models
 from app.game.utils import format_date, convert_to_money_string, get_age, turns_to_hours, get_current_game_date, add_commas_to_number
-# from app.game.turn import initialize_turn
-# from app.game.turn import calculate_turn
-# from app.game.turn import finalize_turn
 from app.game.modifiers import load_modifiers
 from app.game.sio_outgoing import shout_game_turn_complete, shout_new_facility, shout_update_facility, shout_delete_facility
 
 game = Blueprint('game', __name__)
 #################################################################################  
 # initgame: load game models with starting data
-@game.route("/cgame/<int:gid>", methods=["GET", "POST"])
+@game.route("/cgame/<int:gid>/<name>", methods=["GET", "POST"])
 @login_required
-def initgame(gid):
+def initgame(gid, name):
   game = Game.query.filter_by(id=gid).first()
 
   if game == None:
@@ -41,47 +39,35 @@ def initgame(gid):
     flash(f'Error creating game (code:012)','danger')
     return render_template("title.html")    
 
-  return redirect(url_for('game.joingame' , gid=gid))
+  return redirect(url_for('game.joingame' , gid=gid, name=name))
 
 #################################################################################  
 # joingame: Join an eligible game 
-@game.route("/jgame/<int:gid>", methods=["GET", "POST"])
+@game.route("/jgame/<int:gid>/<name>", methods=["GET", "POST"])
 @login_required
-def joingame(gid):
+def joingame(gid, name):
   game = Game.query.filter_by(id=gid).first()
-  company = Company.query.filter_by(id=current_user.current_company).first()
   
-  if company.player_type != "ai":
-    flash(f"This company can\'t be used for this game.", "danger")
+  # Get all the ai companies in this game. They are eligible for a human player to take control.
+  ai_companies = Company.query.filter(Company.id_game == game.id, Company.player_type == "ai").all()
+   
+  # If there aren't any ai companies then the game is full of human players already.
+  if len(ai_companies) == 0:
+    flash(f'This game is full. Try joining another game.','danger')
     return render_template("title.html")
-
-  dummy_companies = Company.query.filter(Company.id_game == game.id, Company.id_user == 1).all()
-
-  # We need to make sure two players don't get the same player_number.
-  # There might be a better way, but I'll figure it out later. For now, 
-  # if the random dummy company is picked it will immediately 
-  # be assigned user id of 0 so it won't be chosen as a dummy
-  # company by another player. 
-  if len(dummy_companies) == 0:
+  
+  # if the number of ai companies is the max number of companies than this game is new.
+  if len(ai_companies) == game.companies_max:
     game.state = "new"
     db.session.commit()
-  else:
-    seed()
-    dc = choice(dummy_companies)
-    dc.id_user = None
-    db.session.commit()
-    company.player_number = dc.player_number
-    company.player_type = "human"
-    company.id_game = dc.id_game
-    Facility.query.filter_by(id_company=dc.id).update({Facility.id_company: company.id}, synchronize_session=False)
-    db.session.delete(dc)
-    db.session.commit()    
 
-  if game.state == "playing":
-    flash(f'This game is full. Try joining another game.','danger')
-    db.session.delete(company)
-    db.session.commit()
-    return render_template("title.html")
+  # get a random ai company and assign it to the player.
+  seed()
+  assigned_company = choice(ai_companies)
+  assigned_company.name = name
+  assigned_company.player_type = "human"
+  assigned_company.id_user = current_user.id
+  db.session.commit()    
 
   return redirect(url_for('game.loadgame' , gid=gid))
 
@@ -112,9 +98,6 @@ def loadgame(gid):
     current_game_date=format_date(get_current_game_date(game), "Y Q"),
     format_money=convert_to_money_string
   )
-    # facilities=facilities, 
-
-
 
 # ###############################################################################  
 #
@@ -779,21 +762,23 @@ def quarterly_html():
 # ###############################################################################  
 #
 # ###############################################################################
-@game.route("/runturn", methods=["GET", "POST"])
+@game.route("/turnbuttonhtml", methods=["GET", "POST"])
 @login_required
-def runturn():
+def turn_button_html():
+  gid = request.args.get('gid', None)
+  game = Game.query.filter_by(id=gid).first()
+  company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
+
+  return render_template("nextturnbutton.jinja", company=company, game=game)
+
+# ###############################################################################  
+#
+# ###############################################################################
+@game.route("/turnrunningdialoghtml", methods=["GET", "POST"])
+@login_required
+def turn_running_dialog_html():
   gid = request.args.get('gid', None)
   game = Game.query.filter_by(id=gid).first()
 
-  # modifiers = load_modifiers(game)
-  # initialize_turn(game, modifiers)
-  # state = calculate_turn(game, modifiers)
-  # finalize_turn(game, modifiers, state)
-
-  # Have server inform each client in game room game.id 
-  # that the turn is over. This should cause each client 
-  # to refresh.
-  # game_turn_complete(gid)
- 
-  return redirect(url_for('game.loadgame' , gid=gid))
+  return render_template("runningturn.html")
   

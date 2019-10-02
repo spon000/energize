@@ -31,8 +31,6 @@ generator_types = [
   {'id_facility_type': 8, 'id_power_type': 8, 'id_resource_type': 3, 'build_time': 16, 'decom_time': 10, 'nameplate_capacity': 300,  'heat_rate': 1,      'continuous': True, 'lifespan': 400, 'fixed_cost_build': 408,  'fixed_cost_operate': 3,  'variable_cost_operate': 0.49,  'decomission_cost': 0} 
 ]
 
-
-
 power_types = [
   {'maintype': "BWR",     'description': ""},
   {'maintype': "PWR",     'description': ""},
@@ -76,8 +74,7 @@ generator_modification_types = [
   {'id_facility_type':  8,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
 ]
 
-
 prompt_type = [
-  {'title': 'Blizzard', 'description': 'Blizzard is coming!'}
+ 
 ]
 

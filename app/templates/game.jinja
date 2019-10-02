@@ -22,16 +22,3 @@
 {% endblock middle_content %}
 
 
-{% block turn_button %} 
-  <a id="next-turn-button"
-  {% if (company.state == 'view' or company.state == 'build') %} 
-    href="#" class='playing'>Ready <br/> Next Turn <br/> {{ game.turn_number }} >>> {{ game.turn_number + 1 }}</a>
-  {% elif company.state == 'waiting' and game.state != 'runturn' %} 
-    href="#" class='waiting'>Waiting <br/> Next Turn <br/> {{ game.turn_number }} >>> {{ game.turn_number + 1 }}</a>
-  {% elif company.state == 'ready' and game.state == 'runturn' %}
-    href="#" class='running stripes-loader'>Running <br/> Next Turn <br/> {{ game.turn_number }} >>> {{ game.turn_number + 1 }}</a>
-  {% else %}
-    href="#" class='next-turn-btn playing'>Ready <br/> Next Turn <br/> {{ game.turn_number }} >>> {{ game.turn_number + 1 }}</a>
-  {% endif %}
-{% endblock turn_button %} 
-

@@ -202,5 +202,25 @@ define([
         });
       }
 
+      getTurnButtonHtml() {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.turnButtonHtml.path)
+          loaded.then((results) => {
+            // console.log("resultes = ", results);
+            resolve(results)
+          });
+        });
+      }
+
+      getTurnRunningDialogHtml() {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.turnRunningDialogHtml.path)
+          loaded.then((results) => {
+            // console.log("resultes = ", results);
+            resolve(results)
+          });
+        });
+      }
+
     });
 });

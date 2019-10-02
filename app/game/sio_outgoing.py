@@ -9,8 +9,8 @@ from app import db, sio
 def shout_game_turn_start():
   None
 
-def shout_game_turn_interval(gid, interval, players=[1,2,3,4,5]):
-  None
+def shout_game_turn_interval(gid, status, players=[1,2,3,4,5]):
+  emit_message(gid, 'game_turn_interval', {'status': status})
 
 def shout_game_turn_complete(gid):
   emit_message(gid, 'game_turn_complete')
@@ -44,7 +44,6 @@ def shout_player_cancel_run_turn(gid, players=[1,2,3,4,5]):
 
 def shout_players_message(gid, msg, players=[1,2,3,4,5]):
   emit_message(gid, 'players_message', {'msg': msg}, players)
-
 
 
 # ###############################################################################

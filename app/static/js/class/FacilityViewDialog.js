@@ -357,6 +357,12 @@ define([
 
         /* *********************************************************************************** */
         _createGenTableEvents() {
+          $(".vfd-generator-name").off();
+          $(".capacity-selectbox").off();
+          $(".bidpolicy-selectbox").off();
+          $(".maintpolicy-selectbox").off();
+          $(".decom-checkbox").off();
+
           $(".vfd-generator-name").on("click", this, this._generatorNameAction);
           $(".capacity-selectbox").on("change", this, this._capacityOptionChange);
           $(".bidpolicy-selectbox").on("change", this, this._bidPolicyOptionChange);
@@ -386,6 +392,7 @@ define([
         // Generator Decom Checkbox event
         /* *********************************************************************************** */
         _startDecomCheckBox(evt) {
+          console.log("_startDecomCheckBox()...");
           let scope = evt.data;
           let genId = $(evt.currentTarget).attr('genid');
 
@@ -481,6 +488,7 @@ define([
 
         /* *********************************************************************************** */
         _addGeneratorUpdateToModifyList(scope, genId, keyValues = {}) {
+          console.log("_addGeneratorUpdateToModifyList() scope, genId, keyValues = ", scope, genId, keyValues);
           let genIndex = scope._updatedGenerators.findIndex(gen => gen.id == genId)
 
           if (genIndex <= -1)

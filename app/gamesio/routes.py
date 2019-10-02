@@ -158,12 +158,12 @@ def on_player_is_ready(data):
 # ###############################################################################  
 #
 # ###############################################################################  
-@sio.on('get_running_turn_dialog')
-def on_get_running_turn_dialog(data):
-  data = json.loads(data)
-  game = game = Game.query.filter_by(id=data['gameId']).first()
+# @sio.on('get_running_turn_dialog')
+# def on_get_running_turn_dialog(data):
+#   data = json.loads(data)
+#   game = game = Game.query.filter_by(id=data['gameId']).first()
 
-  return render_template("runningturn.html")
+#   return render_template("runningturn.html")
 
 # ###############################################################################  
 #
@@ -249,13 +249,13 @@ def on_get_company(data):
 # ###############################################################################  
 #
 # ###############################################################################  
-@sio.on('get_turn_button')
-def on_get_turn_button(data):
-  data = json.loads(data)
-  game = Game.query.filter_by(id=data['gameId']).first()
-  company = Company.query.filter_by(id_user=current_user.id, id_game=data['gameId']).first()
+# @sio.on('get_turn_button')
+# def on_get_turn_button(data):
+#   data = json.loads(data)
+#   game = Game.query.filter_by(id=data['gameId']).first()
+#   company = Company.query.filter_by(id_user=current_user.id, id_game=data['gameId']).first()
 
-  return render_template("nextturnbutton.jinja", company=company, game=game)
+#   return render_template("nextturnbutton.jinja", company=company, game=game)
 
 # ###############################################################################  
 #

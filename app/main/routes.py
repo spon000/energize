@@ -33,12 +33,12 @@ def creategame():
       game = Game(name=form.gamename.data)
       db.session.add(game)
       db.session.commit()
-      company = Company(name=form.companyname.data, id_user=current_user.id, player_number=0)
-      db.session.add(company)
-      db.session.commit()
-      current_user.current_company = company.id
-      db.session.commit()
-      return redirect(url_for('game.initgame', gid=game.id))
+      # company = Company(name=form.companyname.data, id_user=current_user.id, player_number=0, player_type="human")
+      # db.session.add(company)
+      # db.session.commit()
+      # # current_user.current_company = company.id
+      # db.session.commit()
+      return redirect(url_for('game.initgame', gid=game.id, name=form.companyname.data))
     else:
       flash(f'You are already playing too many concurrent games. Try rejoining one in progress','danger')
       return render_template("title.html")
@@ -52,17 +52,16 @@ def creategame():
 @login_required
 def joingame():
   form = JoinGameForm()
-  games = Game.query.all()
+  games = Game.query.filter(Game.state != "finished").all()
   available_games = list()
 
   # Get a list of all available games player can join.
   if games:
     for game in games:
-      # User.id=1 is a dummy user that is assciated will all dummy companies not yet assigned to a player.
-      open_company = Company.query.filter(game.id == Company.id_game, game.state == 'new', Company.id_user == 1).first()
-      user_company = Company.query.filter(game.id == Company.id_game, game.state == 'new', Company.id_user == current_user.id).first()
+      available_companies = Company.query.filter(game.id == Company.id_game, Company.player_type == "ai").count()
+      user_company = Company.query.filter(game.id == Company.id_game, Company.id_user == current_user.id).first()
 
-      if not user_company and open_company:
+      if not user_company and available_companies > 0:
         available_games.append(game)
 
   if available_games:
@@ -81,12 +80,7 @@ def joingame():
       game_companies = Company.query.filter(Company.id_game == game_id, Company.id_user != 1)
 
       if game_companies.count() < joining_game.companies_max:
-        company = Company(name=form.companyname.data, id_user=current_user.id, player_number=0)
-        db.session.add(company)
-        db.session.commit()
-        current_user.current_company = company.id
-        db.session.commit()
-        return redirect(url_for('game.joingame', gid=game.id))
+        return redirect(url_for('game.joingame', gid=game.id, name=form.companyname.data))
       else:
         flash(f'This game is full. Choose another game to join or create one.', 'danger')
         return render_template("joingame.html", form=form)

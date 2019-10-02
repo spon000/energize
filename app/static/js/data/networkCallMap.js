@@ -105,5 +105,13 @@ define([
       name: "quarterlyHtml",
       path: "/quarterlyhtml" + gid
     },
+    "turnButtonHtml": {
+      name: "turnButtonHtml",
+      path: "/turnbuttonhtml" + gid
+    },
+    "turnRunningDialogHtml": {
+      name: "turnRunningDialogHtml",
+      path: "/turnrunningdialoghtml" + gid
+    },
   });
 });				

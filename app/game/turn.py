@@ -1,20 +1,23 @@
 import numpy as np
+from math import trunc
 # import pickle
 # import math
 # import time
-# import scipy
-# import scipy.signal
-# import scipy.stats
+import scipy
+import scipy.signal
+import scipy.stats
 # import matplotlib as mpl
 # mpl.use('Agg')
 # import matplotlib.pyplot as plt
 from datetime import datetime 
-from app import db
+from app import db, celery
 from app.models import Facility, Generator, City, Company, Game, Prompt
 from app.models import FacilityType, GeneratorType
 
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
+
+from app.game.sio_outgoing import shout_game_turn_interval
 
 # ###############################################################################  
 #
@@ -31,14 +34,17 @@ def initialize_turn(game, mods):
 def modify_facility_states(game):
   facilities = Facility.query.filter_by(id_game=game.id).all()
   for facility in facilities:
+
     if facility.state == "new":
       facility.state="building"
       facility.build_turn += 1
+
     elif facility.state == "building":
       facility.build_turn += 1
       if facility.build_turn >= facility.facility_type.build_time:
         facility.state="active"
         facility.prod_turn += 1
+
     elif facility.state == "active":
       facility.prod_turn += 1
 
@@ -50,16 +56,31 @@ def modify_facility_states(game):
 def modify_generator_states(game):
   generators = Generator.query.filter_by(id_game=game.id).all()
   for generator in generators:
+
     if generator.state == "new":
       generator.state="building"
       generator.build_turn += 1
+
     elif generator.state == "building":
       generator.build_turn += 1
       if generator.build_turn >= generator.generator_type.build_time:
         generator.state="active"
         generator.prod_turn += 1
+
     elif generator.state == "active":
-      generator.prod_turn += 1
+      if gen.condition < 0.20:
+        generator.state = "inactive"
+      else:
+        generator.prod_turn += 1
+      
+    elif generator.state == "start_decom":
+      generator.state = "decommissioning"
+      generator.decom_turn -= 1
+
+    elif generator.state == "decommissioning":
+       generator.decom_turn -= 1
+       if generator.decom_turn <= 0:
+         generator.state = "decommissioned"
 
   return
 
@@ -81,9 +102,6 @@ def calculate_turn(game, mods):
 #
 # ###############################################################################
 def finalize_turn(game, mods, state):
-  # add_costs_to_company(state)
-  # state=age_generators(state, game.id)
-  # age_facilities(game.id)
 
   game.turn_number += 1
   game.state = "playing"
@@ -160,22 +178,24 @@ def run_turn(game, mods):
   state = {}
   state['i'] = game.turn_number * 90 * 24
   state = get_state_vars(state, mods)
+  mods = massage_mods(mods)
 
   filename = "history" + str(game.id) + ".txt"
   file = open(filename,'w')
 
   for day in range(90):
-    file.write("+" * 80 +"\n")
-    file.write(f"day: {day} \n")
-    file.write("+" * 80 + "\n")
+    shout_game_turn_interval(game.id, {'statusMsg': 'Calculating days...', 'interval': day, 'total': 90})
+    # file.write("+" * 80 +"\n")
+    # file.write(f"day: {day} ----  {datetime.now().time()}\n")
+    # file.write("+" * 80 + "\n")
 
     for hr in range(24):
-      file.write(f"hr({hr})... \n")
+      # file.write(f"hr({hr})...    {datetime.now().time()}\n")
       state = iso(mods, state, file)
       state['i'] += 1
-  
 
-  # roll_for_events(game,db,mods,state)
+      # db.session.commit()
+      # roll_for_events(game,db,mods,state)
 
   file.close()
   return state
@@ -186,15 +206,16 @@ def run_turn(game, mods):
 # ###############################################################################
 def iso(mods, state, file):
 
+  # file.write(f"\tiso start  {datetime.now().time()}\n")
   i      = state['i']
-  demand = np.sum(np.array(mods['ed']).squeeze()[:,i])
+  demand = np.sum(mods['ed'].squeeze()[:,i])
   ng     = len(state['gens'])
-  mc     = state['opMaint_gen']+state['opMaint_fac']+state['fuel_costs']
+  mc = np.sum([state['opMaint_gen'], state['opMaint_fac'], state['fuel_costs']], axis=0)
   jj     = np.argsort(mc)
   supply = 0
   price  = 0
   kk     = 0
-
+  
   for j in jj:
     if supply < demand:
       supply += state['availCap'][j]
@@ -234,30 +255,39 @@ def iso(mods, state, file):
       player_profit[state['pn'][j]] += [loss]
       gen_profit[j]         = loss
 
-
     if i%61==0:
       id   = state['gens'][j].id
       mt   = state['types'][j]
       if mt=='natural gas': mt = 'natgas'
       # file = open('log.txt','a')
-      file.write('gen %s %i %i %f %f %f %f %f %f %f %f\n' % (mt,i,id,state['dc'][j],state['cn'][j],state['opMaint_gen'][j],state['opMaint_fac'][j],state['fuel_costs'][j],gen_profit[j],state['aoc'][j],state['availCap'][j]) )
+      # file.write('gen %s %i %i %f %f %f %f %f %f %f %f\n' % (mt,i,id,state['dc'][j],state['cn'][j],state['opMaint_gen'][j],state['opMaint_fac'][j],state['fuel_costs'][j],gen_profit[j],state['aoc'][j],state['availCap'][j]) )
       # file.close()
 
   for company in Company.query.all():
     company.balance += np.sum(player_profit[str(company.player_number)])
 
-  if i%61==0:
-    # file=open('log.txt','a')
-    file.write('time %i %f %f %f\n' % (i,price,demand,np.sum(state['availCap'])) )
-    # file.close()
+  # if i%61==0:
+  #   # file=open('log.txt','a')
+  #   # file.write('time %i %f %f %f\n' % (i,price,demand,np.sum(state['availCap'])) )
+  #   # file.close()
 
-    for j in range(5):
-      # file=open('log.txt','a')
-      file.write('comp %i %i %f\n' % (i,j,np.sum(player_profit['%i'%(j+1)])) )
-      # file.close()
+  #   for j in range(5):
+  #     # file=open('log.txt','a')
+  #     # file.write('comp %i %i %f\n' % (i,j,np.sum(player_profit['%i'%(j+1)])) )
+  #     # file.close()
 
+  # file.write(f"\tiso end {datetime.now().time()}\n")
   return state
 
+# ###############################################################################
+#
+# ###############################################################################
+def massage_mods(mods):
+
+  # we need to turn this into an numpy array for later calculations
+  mods['ed'] = np.array(mods['ed'])
+  
+  return mods
 
 # ###############################################################################
 #
@@ -283,14 +313,14 @@ def get_state_vars(state, mods):
 
     jgen           = gens[j]
     fac            = jgen.facility
-    facCap         = float(np.sum([kgen.generator_type.nameplate_capacity for kgen in fac.generators]))
+    facCap         = float(np.sum([kgen.generator_type.nameplate_capacity for kgen in fac.generators if kgen.state == "available"]))
     genCap         = float(jgen.generator_type.nameplate_capacity)
     genType        = jgen.generator_type
     facType        = fac.facility_type
     dc[j]          = jgen.duty_cycles
     cn[j]          = jgen.condition
-    opMaint_gen[j] = genType.fixed_cost_operate / (356.0*24.0) * (1.0/cn[j]**0.5)	# converts kW/y to kW/h
-    opMaint_fac[j] = facType.fixed_cost_operate / (356.0*24.0) * (genCap/facCap)	# converts kW/y to kW/h
+    opMaint_gen[j] = 1000 * (genType.fixed_cost_operate / (356.0*24.0) * (1.0/cn[j]**0.5))	# converts kW/y to kW/h
+    opMaint_fac[j] = 1000 * (facType.fixed_cost_operate / (356.0*24.0) * (genCap/facCap))	# converts kW/y to kW/h
     nc[j]          = genType.nameplate_capacity * 1000.0				# convert from MW to kW
     availCap[j]    = genType.nameplate_capacity * 1000.0 * (0.8+0.2*cn[j])		# convert from MW to kW
     pn[j]          = str(fac.player_number)
@@ -307,26 +337,31 @@ def get_state_vars(state, mods):
     elif types[j] == 'natural gas': fuel_costs[j] = mods['fp'][2][i] / (heat_cont/heat_rate)
     elif types[j] == 'solar':       availCap[j]   = mods['sp'][i]*availCap[j]
 
-  return {'i':i,
-          'gens':gens,
-          'availCap':availCap,
-          'fuel_costs':fuel_costs,
-          'opMaint_gen':opMaint_gen,
-          'opMaint_fac':opMaint_fac,
-          'dc':dc,
-          'cn':cn,
-          'nc':nc,
-          'life':life,
-          'aoc':aoc,
-          'types':types,
-          'pn':pn}
+  return ({
+    'i':i,
+    'gens':gens,
+    'availCap':availCap,
+    'fuel_costs':fuel_costs,
+    'opMaint_gen':opMaint_gen,
+    'opMaint_fac':opMaint_fac,
+    'dc':dc,
+    'cn':cn,
+    'nc':nc,
+    'life':life,
+    'aoc':aoc,
+    'types':types,
+    'pn':pn
+  })
 
+# ###############################################################################  
+# roll_for_events():
+#   
+#   
+#   this function runs every hour, so probabilities should be scaled accordingly
+# ###############################################################################
 def roll_for_events(game,db,mods,state):
 
   i = state['i']
-
-  # this function runs every hour, so probabilities should be scaled accordingly
-
   if game.turn_number%4==1:
     # Spring, nice weather, nothing bad ever happens in spring
     pass
@@ -340,12 +375,17 @@ def roll_for_events(game,db,mods,state):
       # roll random numbers to decide heatwave severity and duration, increase demand by 10-25% for 4-12 days
       dur  = 4+np.random.randint(9)
       peak = np.random.uniform(0.10,0.25)
+
       # create event object with message describing heatwave
       # push event notification to all companies
+      # event = Prompt( id_type=1, description=desc, start=i, end=i+dur*24 )
       desc = 'A heatwave has struck and is expected to last for %i days, increasing energy demand by as much as %i percent' % (dur,np.ceil(peak*100))
-      event = Prompt( id_type=1, description=desc, start=i, end=i+dur*24 )
-      print(event.prompt_type)
-      event.companies += Company.query.all()
+
+      for company in Company.query.filter_by(id_game=game.id).all():
+        event = Prompt(id_game=game.id, id_company=company.id, focus="company", category="warning", description=desc, start=i, end=i+dur*24)
+        db.session.add(event)
+
+      # event.companies = Company.query.filter_by(id_game=game.id).all()
       # create randomly fluctuating timeseries to represent increase in energy demand due to heat
       x1 = np.linspace(0,14,6)
       y1 = np.random.uniform(0.2,0.5,6)
@@ -363,8 +403,8 @@ def roll_for_events(game,db,mods,state):
         for kk in range(14*24):
           mods['ed'][jj][0][i+kk] *= y2[kk]
       # push event object to database
-      db.session.add(event)
-      db.session.commit()
+      # db.session.add(event)
+      # db.session.commit()
       # in the future, the location of the heatwave would also be decided here
       # therefore the demand of individual cities might become too high for the transmission lines in some places
       # aint no tranmission network yet so we'll ignore that for now
@@ -405,16 +445,16 @@ def roll_for_events(game,db,mods,state):
               off_facs += [facility]
         if len(off_facs)>0:
           desc = 'A hurricane has struck, and %i of your facilities are expected to be offline for %i days' % (len(off_facs),dur)
-          event = Prompt( id_type=2, description=desc, start=game.turn_number, end=game.turn_number+dur )
-          event.companies += [company]
+          event = Prompt( id_game=game.id, id_company=company.id, focus="company", category="danger", description=desc, start=game.turn_number, end=game.turn_number+dur)
+          # event.companies += [company]
           db.session.add(event)
-          db.session.commit()
+          # db.session.commit()
         else:
           desc = 'A hurricane has struck, none of your facilities were directly affected'
-          event = Prompt( id_type=2, description=desc, start=i, end=i+dur*24 )
-          event.companies += [company]
+          event = Prompt(id_game=game.id, id_company=company.id, focus="company", category="information", description=desc, start=i, end=i+dur*24)
+          # event.companies += [company]
           db.session.add(event)
-          db.session.commit()
+          # db.session.commit()
       for facility in Facility.query.all():
         point = Point(facility.column, facility.row)
         if polygon.contains(point):
@@ -475,14 +515,16 @@ def roll_for_events(game,db,mods,state):
               off_facs += [facility]
         if len(off_facs)>0:
           desc = 'A blizzard has struck, and %i of your facilities are expected to be offline for %i days' % (len(off_facs),dur)
-          event = Prompt( id_game=game.id, id_company=company.id, id_type=3, description=desc, start=i, end=i+dur*24 )
+          event = Prompt( id_game=game.id, id_company=company.id, focus="company", category="danger", description=desc, start=i, end=i+dur*24)
+          # event = Prompt( id_game=game.id, id_company=company.id, id_type=3, description=desc, start=i, end=i+dur*24 )
           db.session.add(event)
-          db.session.commit()
+          # db.session.commit()
         else:
           desc = 'A blizzard has struck, none of your facilities were directly affected'
-          event = Prompt( id_game=game.id, id_company=company.id, id_type=3, description=desc, start=i, end=i+dur*24 )
+          event = Prompt( id_game=game.id, id_company=company.id, focus="company", category="information", description=desc, start=i, end=i+dur*24)
+          # event = Prompt( id_game=game.id, id_company=company.id, id_type=3, description=desc, start=i, end=i+dur*24 )
           db.session.add(event)
-          db.session.commit()
+          # db.session.commit()
       for facility in Facility.query.all():
         point = Point(facility.column, facility.row)
         if polygon.contains(point):
