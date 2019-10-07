@@ -3,7 +3,7 @@
     display: grid;
     grid-gap: 5px;
     grid-template-columns: 350px 350px;
-    grid-template-rows: 200px 30px 320px;
+    grid-template-rows: 200px 30px 300px;
   }
 
   .grid-box {
@@ -91,14 +91,20 @@
   /* ******************************************************************* 
    * Events list table style
    ******************************************************************* */
-  #quarterly-events-list-table {
+  #quarterly-events-list-main {
     grid-column: 1 / span 2;
     grid-row: 3;
     border-style: solid;
     border-width: 1px;
     border-radius: 5px;
   }
+
+  #quarterly-events-list-main hr {
+    margin: 2px;
+  }
 </style>
+
+
 
 <div id="quarterly-content">
 
@@ -172,6 +178,100 @@
   </div>
 
   <div id="quarterly-events-list-heading" class="grid-box"><label>Event List (Click on an event name for more details)</label></div>
-  <div id="quarterly-events-list-table" class="grid-box"><label></label></div>
 
+  <div id="quarterly-events-list-main" class="grid-box">
+    <button class="sidebar-btn open-b">&#9664;</button>
+    <hr/>
+
+    <div id="quarterly-events-list-table">
+      <h2>Collapsed </h2>
+      <p>This table will collapse when the button is pushed.</p>
+    </div>
+
+    <div id="quarterly-events-list-sidebar" class="event-sidebar">
+    </div>
+  </div>
 </div>
+
+
+
+
+
+<style>
+  .event-sidebar {
+    height: 260px;
+    width: 0;
+    position: absolute;
+    z-index: 1;
+    top: 287px;
+    right: 20px;
+    background-color: #eee;
+
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #222;
+    border-radius: 5px;
+  }
+
+  .event-sidebar a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+  }
+
+  .event-sidebar a:hover {
+    color: #f1f1f1;
+  }
+
+  /* .event-sidebar .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+  } */
+
+  .open-b {
+    margin-left: 96.3%;
+    transition: 0.5s
+  }
+
+  .close-b {
+    margin-left: 36%;
+    transition: 0.5s
+  }
+
+  .sidebar-btn {
+    margin-top: 2px;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #ccc;
+    color: white;
+    padding: 3px 4px 3px 3px;
+
+    border: none;
+    border-style: dashed;
+    border-width: 2px;
+    border-color: #888;
+    border-radius: 5px;
+  }
+
+  .sidebar-btn:hover {
+    background-color: #444;
+    border-color: #444;
+  }
+
+  #quarterly-events-list-main {}
+
+  #quarterly-events-list-table {
+    transition: margin-right .5s;
+    height: 90%;
+    display: inline;
+  }
+</style>

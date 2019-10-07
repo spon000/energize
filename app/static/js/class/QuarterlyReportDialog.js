@@ -17,6 +17,8 @@ define([
       class QuarterlyViewDialog {
         constructor() {
           this._modelData = new ModelData();
+          this._elementIdQuarterlyEventsMain = "quarterly-events-list-main";
+          this._elementIdQuarterlyEventsSidebar = "quarterly-events-list-sidebar";
           this._elementIdQuarterlyEventsTable = "quarterly-events-list-table";
           this._quarterlyDialogHtml = null
           this._quarterlyDialog = null;
@@ -29,6 +31,7 @@ define([
             this._quarterlyDialogHtml = data[2];
             // console.log("_getDialogData()  data = ", data);
             this._openQuarterlyDialog(this)
+            this._createEvents();
           });
         }
 
@@ -58,11 +61,34 @@ define([
 
         /* *********************************************************************************** */
         _createEvents() {
+
+          $("#" + this._elementIdQuarterlyEventsMain).find(".sidebar-btn").on("click", this, this._sidebar);
         }
 
         /* *********************************************************************************** */
         // Event functions
         /* *********************************************************************************** */
+        _sidebar(evt) {
+          console.log("sidebar testing...", evt);
+          let button = evt.currentTarget;
+          let scope = evt.data;
+
+          if ($(button).hasClass("open-b")) {
+            $(button).toggleClass("open-b");
+            $(button).toggleClass("close-b");
+            $(button).html("&#9654;");
+            $("#" + scope._elementIdQuarterlyEventsSidebar).css("width", "450px");
+            // $("#" + scope._elementIdQuarterlyEventsTable).css("margin-right", "350px");
+          }
+          else {
+            $(button).toggleClass("close-b");
+            $(button).toggleClass("open-b");
+            $(button).html("&#9664;");
+            $("#" + scope._elementIdQuarterlyEventsSidebar).css("width", "0");
+            // $("#" + scope._elementIdQuarterlyEventsTable).css("margin-right", "0");
+          }
+        }
+
 
         /* *********************************************************************************** */
         // Create dialog box
@@ -75,7 +101,7 @@ define([
             title: "Quarterly Report",
             scope: scope,
             width: 750,
-            height: 700,
+            height: 680,
             position: {},
             modal: true,
             open: (evt, ui) => {

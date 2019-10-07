@@ -37,11 +37,11 @@ def modify_facility_states(game):
 
     if facility.state == "new":
       facility.state="building"
-      facility.build_turn += 1
+      facility.build_turn -= 1
 
     elif facility.state == "building":
-      facility.build_turn += 1
-      if facility.build_turn >= facility.facility_type.build_time:
+      facility.build_turn -= 1
+      if facility.build_turn <= 0: #facility.facility_type.build_time:
         facility.state="active"
         facility.prod_turn += 1
 
@@ -59,17 +59,17 @@ def modify_generator_states(game):
 
     if generator.state == "new":
       generator.state="building"
-      generator.build_turn += 1
+      generator.build_turn -= 1
 
     elif generator.state == "building":
-      generator.build_turn += 1
-      if generator.build_turn >= generator.generator_type.build_time:
-        generator.state="active"
+      generator.build_turn -= 1
+      if generator.build_turn <= 0:  #>= generator.generator_type.build_time:
+        generator.state="available"
         generator.prod_turn += 1
 
-    elif generator.state == "active":
-      if gen.condition < 0.20:
-        generator.state = "inactive"
+    elif generator.state == "available":
+      if generator.condition < 0.20:
+        generator.state = "unavailable"
       else:
         generator.prod_turn += 1
       

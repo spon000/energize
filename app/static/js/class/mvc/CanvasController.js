@@ -424,6 +424,8 @@ define([
           let colRow = this._canvasModel.facilityLayer.getTileColRow(facilityId);
           this._onDeleteFacility(facilityId);
           this._onBuildFacility(colRow.col, colRow.row, facilityTypeList);
+
+          this._setFacilityEvents(this._canvasView.getTileMap("facilities"));
         }
 
         _onBuildFacility(col, row, facilityTypeList) {
@@ -437,6 +439,7 @@ define([
               this._dialogStatus = "popup";
             });
           });
+
         }
 
         _onDeleteFacility(facilityId) {
@@ -466,7 +469,7 @@ define([
                 let facilityViewDialog = new FacilityViewDialog(results.facility.id, facilityTypeList, (evt) => {
                   this._dialogStatus = "popup";
                 });
-                // this._setFacilityEvents(this._canvasView.getTileMap("facilities"));
+                this._setFacilityEvents(this._canvasView.getTileMap("facilities"));
               });
             });
           }

@@ -355,25 +355,28 @@ class Prompt(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
   # Foreign keys
-  # id_type = db.Column(db.Integer, db.ForeignKey('prompt_type.id'), nullable=False)
+  id_type = db.Column(db.Integer, db.ForeignKey('prompt_type.id'), nullable=False)
   id_company = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
   id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)  
 
   # Data
-  category = db.Column(db.Enum("information", "warning", "danger", "action"), default="information", nullable=False)
-  description = db.Column(db.String(300))
+  date = db.Column(db.Integer, default=0)
+  start = db.Column(db.Integer)
   end = db.Column(db.Integer)
-  focus = db.Column(db.Enum("company", "facility", "generator", "infrastructure"), default="company", nullable=False)
-  function_name = db.Column(db.String(30))
-  image = db.Column(db.String(40), nullable=False, default='default.png')
   read = db.Column(db.Boolean, default=False)
   resolved = db.Column(db.Boolean, default=False)
   response = db.Column(db.Integer)
-  start = db.Column(db.Integer)
+  scope_name = db.Column(db.String(40))
+
+  short_description = db.Column(db.String(40))
+  long_description = db.Column(db.String(300))
+
+  
   
   # Relational Data
-  # prompt_type = db.relationship('PromptType')
-  # companies = db.relationship( 'Company')
+  game = db.relationship('Game')
+  company = db.relationship('Company')
+  prompt_type = db.relationship('PromptType')
 
 #########################################################################################
 # PromptType Model
@@ -381,10 +384,17 @@ class PromptType(db.Model):
   id = db.Column(db.Integer, primary_key=True)
 
   # Data
-  focus = db.Column(db.Enum("Company", "Facility", "danger", "action"), default="information", nullable=False)
-  image = db.Column(db.String(20), nullable=False, default='default.png')
+  category = db.Column(db.Enum("Company Memo", "News Brief", "Projections"), default="Company Memo", nullable=False)
+  image = db.Column(db.String(30), nullable=False, default='default.png')
+  priority = scope = db.Column(db.Enum("information", "warning", "danger"), default="information", nullable=False)
+  scope = db.Column(db.Enum("company", "facility", "generator", "other"), default="company", nullable=False)
+  title = db.Column(db.String(30))
+    
+  short_description = db.Column(db.String(40))
+  long_description = db.Column(db.String(300))
 
   # Relational Data
+  prompts = db.relationship('Prompt')
  
 
 

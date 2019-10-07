@@ -74,7 +74,67 @@ generator_modification_types = [
   {'id_facility_type':  8,  'name': 'weatherize', 'value': 0, 'marginal_cost_build': 0, 'marginal_cost_operate': 0, 'marginal_area': 0},
 ]
 
-prompt_type = [
+prompt_types = [
+  {
+    'title' : 'welcome',
+    'category': 'Company Memo', 
+    'image': 'default.png', 
+    'priority': 'information', 
+    'scope': 'company',
+    'short_description' : 'Welcome to the family!',
+    'long_description' : 'We\'d like to congratulate you on your new appointment as CEO of %s. We have confidence that you will help this company prosper within the coming years.',
+  },
+  {
+    'title' : 'heatwave',
+    'category': 'News Brief', 
+    'image': 'default.png', 
+    'priority': 'warning', 
+    'scope': 'company',
+    'short_description' : 'Hot out here.',
+    'long_description' : 'A heatwave has struck and is expected to last for %i days, increasing energy demand by as much as %i percent.',
+  },
+  {
+    'title' : 'hurricane-affected',
+    'category': 'Company Memo', 
+    'image': 'default.png', 
+    'priority': 'danger', 
+    'scope': 'company',
+    'short_description' : 'Hurricane making landfall!',
+    'long_description' : 'A hurricane has struck, and %i of your facilities are expected to be offline for %i days.',
+  },
+  {
+    'title' : 'hurricane-unaffected',
+    'category': 'Company Memo', 
+    'image': 'default.png', 
+    'priority': 'warning', 
+    'scope': 'company',
+    'short_description' : 'Swirly clouds coming ashore.',
+    'long_description' : 'A hurricane has struck, none of your facilities were directly affected.',
+  },  
+  {
+    'title' : 'blizzard-affected',
+    'category': 'Company Memo', 
+    'image': 'default.png', 
+    'priority': 'danger', 
+    'scope': 'company',
+    'short_description' : 'Lots of snowfall!',
+    'long_description' : 'A blizzard has struck, and %i of your facilities are expected to be offline for %i days.',
+  },
+  {
+    'title' : 'blizzard-unaffected',
+    'category': 'Company Memo', 
+    'image': 'default.png', 
+    'priority': 'warning', 
+    'scope': 'company',
+    'short_description' : 'Frosty is living the dream.',
+    'long_description' : 'A hurricane has struck, none of your facilities were directly affected.',
+  },    
+
+
+
+
+
+  
  
 ]
 
