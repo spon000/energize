@@ -171,6 +171,16 @@ define([
         });
       }
 
+      getCompanyEvents() {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.playerCompanyEvents.path)
+          loaded.then((results) => {
+            // console.log("getCompany resultes = ", results);
+            resolve(results)
+          });
+        });
+      }
+
       getCurrentDate() {
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.currentDate.path)

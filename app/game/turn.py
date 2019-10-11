@@ -17,7 +17,9 @@ from app.models import FacilityType, GeneratorType
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
+from app.game.prompts import assign_prompt
 from app.game.sio_outgoing import shout_game_turn_interval
+from app.game.utils import get_age
 
 # ###############################################################################  
 #
@@ -379,10 +381,11 @@ def roll_for_events(game,db,mods,state):
       # create event object with message describing heatwave
       # push event notification to all companies
       # event = Prompt( id_type=1, description=desc, start=i, end=i+dur*24 )
-      desc = 'A heatwave has struck and is expected to last for %i days, increasing energy demand by as much as %i percent' % (dur,np.ceil(peak*100))
+      # desc = 'A heatwave has struck and is expected to last for %i days, increasing energy demand by as much as %i percent' % (dur,np.ceil(peak*100))
 
       for company in Company.query.filter_by(id_game=game.id).all():
-        event = Prompt(id_game=game.id, id_company=company.id, focus="company", category="warning", description=desc, start=i, end=i+dur*24)
+        # event = assign_prompt('heatwave', game, company, focus="company", category="warning", description=desc, start=i, end=i+dur*24)
+        event = assign_prompt('heatwave', game, company, {'start': i, 'end': (i+dur*24)}, [dur, np.ceil(peak*100)])
         db.session.add(event)
 
       # event.companies = Company.query.filter_by(id_game=game.id).all()
@@ -445,7 +448,9 @@ def roll_for_events(game,db,mods,state):
               off_facs += [facility]
         if len(off_facs)>0:
           desc = 'A hurricane has struck, and %i of your facilities are expected to be offline for %i days' % (len(off_facs),dur)
-          event = Prompt( id_game=game.id, id_company=company.id, focus="company", category="danger", description=desc, start=game.turn_number, end=game.turn_number+dur)
+          # event = Prompt( id_game=game.id, id_company=company.id, focus="company", category="danger", description=desc, start=game.turn_number, end=game.turn_number+dur)
+          turn_hours = get_age(game.turn_number)
+          event = assign_prompt('hurricane-affected', game, company, {'start': turn_hours, 'end': turn_hours + dur, [dur, np.ceil(peak*100)])
           # event.companies += [company]
           db.session.add(event)
           # db.session.commit()

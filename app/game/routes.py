@@ -8,12 +8,13 @@ import math
 from sqlalchemy import func
 from sqlalchemy.orm.session import make_transient
 from app import db 
-from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType, ResourceType
-from app.models import FacilitySchema, GeneratorSchema, FacilityModificationSchema, GeneratorModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema
+from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType, ResourceType, Prompt, PromptType
+from app.models import FacilitySchema, GeneratorSchema, FacilityModificationSchema, GeneratorModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema, PromptSchema, PromptTypeSchema
 from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, FacilityModificationTypeSchema, GeneratorModificationType, GeneratorModificationTypeSchema
 from app.game.init_game import init_game_models
 from app.game.utils import format_date, convert_to_money_string, get_age, turns_to_hours, get_current_game_date, add_commas_to_number
 from app.game.modifiers import load_modifiers
+from app.game.prompts import assign_prompt
 from app.game.sio_outgoing import shout_game_turn_complete, shout_new_facility, shout_update_facility, shout_delete_facility
 
 game = Blueprint('game', __name__)
@@ -67,6 +68,9 @@ def joingame(gid, name):
   assigned_company.name = name
   assigned_company.player_type = "human"
   assigned_company.id_user = current_user.id
+  prompt = assign_prompt('welcome', game, assigned_company, {'resolved': True}, [assigned_company.name])
+
+  db.session.add(prompt)
   db.session.commit()    
 
   return redirect(url_for('game.loadgame' , gid=gid))
@@ -168,6 +172,29 @@ def player_company():
 
   return jsonify({'company': serialized_company})
 
+# ###############################################################################  
+#
+# ###############################################################################  
+@game.route("/playercompanyevents", methods=["GET", "POST"])
+@login_required
+def player_company_events():
+
+  gid = request.args.get('gid', None)
+
+  company = Company.query.filter_by(id_user=current_user.id, id_game=gid).first()
+  company_prompts = company['prompts']
+  prompt_types = dict()
+
+  prompt_type_schema = PromptTypeSchema()
+  for prompt in company_prompts:
+    pt = PromptType.query.filter_by(id=prompt.id_type).first()
+    serialized_prompt_type = prompt_type_schema.dump(pt).data
+    prompt_types[str(prompt.id_type)] = serialized_prompt_type
+ 
+  prompt_schema = PromptSchema(many=True)
+  serialized_prompts = prompt_schema.dump(company_prompts).data
+
+  return jsonify({'prompts': serialized_prompts, 'prompt_types': prompt_types} )
 # ###############################################################################  
 #
 # ###############################################################################  

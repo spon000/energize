@@ -180,7 +180,7 @@ class Facility(db.Model):
 
   # Allows you to access object properties as an associative array ex: generator['state']
   def __getitem__(self, key):
-    return getattr(self, key)
+     return getattr(self, key)
   
   # Allows you to assign values to object properties as an associative array ex: generator['state'] = "new"
   def __setitem__(self, key, value):
@@ -361,6 +361,7 @@ class Prompt(db.Model):
 
   # Data
   date = db.Column(db.Integer, default=0)
+  date_string = db.Column(db.String(40))
   start = db.Column(db.Integer)
   end = db.Column(db.Integer)
   read = db.Column(db.Boolean, default=False)
@@ -368,15 +369,35 @@ class Prompt(db.Model):
   response = db.Column(db.Integer)
   scope_name = db.Column(db.String(40))
 
-  short_description = db.Column(db.String(40))
+  short_description = db.Column(db.String(70))
   long_description = db.Column(db.String(300))
 
-  
-  
   # Relational Data
   game = db.relationship('Game')
   company = db.relationship('Company')
-  prompt_type = db.relationship('PromptType')
+  prompt_type = db.relationship('PromptType', lazy=False)
+
+  # Methods
+  # Allows you to access object properties as an associative array ex: generator['state']
+  def __getitem__(self, key):
+    return getattr(self, key)
+  
+  # Allows you to assign values to object properties as an associative array ex: generator['state'] = "new"
+  def __setitem__(self, key, value):
+    setattr(self, key, value)  
+
+  def __repr__(self):
+    return ( 
+      f"Prompt -->\n"
+      f"ID: {self.id}\n"
+      f"Type: {self.id_type}\n"
+      f"Company: {self.id_company}\n"
+      f"Game: {self.id_game}\n"
+      f"Date: {self.date}\n"
+      f"Short Descrip: {self.short_description}\n" 
+      f"Long Descrip: {self.long_description}\n" 
+    )    
+
 
 #########################################################################################
 # PromptType Model
@@ -621,6 +642,16 @@ class PowerTypeSchema(ma.ModelSchema):
 class ResourceTypeSchema(ma.ModelSchema):
   class Meta:
     model = ResourceType
+
+# Schema for Prompt
+class PromptSchema(ma.ModelSchema):
+  class Meta:
+    model = Prompt
+
+# Schema for PromptType
+class PromptTypeSchema(ma.ModelSchema):
+  class Meta:
+    model = PromptType    
 
 
 

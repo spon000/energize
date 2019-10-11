@@ -180,30 +180,86 @@
   <div id="quarterly-events-list-heading" class="grid-box"><label>Event List (Click on an event name for more details)</label></div>
 
   <div id="quarterly-events-list-main" class="grid-box">
-    <button class="sidebar-btn open-b">&#9664;</button>
+    <span id="sidebar-title">
+      <h4 class="sidebar-title-heading">Event Items</h4>
+      <label class="sidebar-btn open-b">&#9664;</label>
+      <label class="trash-btn">&#128465;</label>
+      <h4 class="sidebar-title-heading">Details</h4>
+    </span>
+
     <hr/>
 
     <div id="quarterly-events-list-table">
-      <h2>Collapsed </h2>
-      <p>This table will collapse when the button is pushed.</p>
+      <p>There are no events to display...</p>
     </div>
 
-    <div id="quarterly-events-list-sidebar" class="event-sidebar">
-    </div>
+    <div id="quarterly-events-list-sidebar" class="event-sidebar"></div>
   </div>
 </div>
 
 
-
-
-
 <style>
+  #quarterly-events-list-sidebar {
+    /* width: 0; */
+  }
+
+  #quarterly-events-list-table {
+    /* margin-right: 0; */
+    overflow: hidden;
+    transition: margin-right .5s;
+  }
+
+  #sidebar-title {
+    margin-top: 10px;
+    display: inline-block;
+    width: 100%;
+    height: 34px;
+    overflow: hidden;
+  }
+
+  #sidebar-title label {
+    font-size: 24px;
+    display: inline-block;
+    cursor: pointer;
+    color: #444;
+  }
+
+  #sidebar-title label:hover {
+    color: blue;
+    border-color: #000;
+  }
+
+  .sidebar-title-heading {
+    display: inline-block;
+    margin-top: 0px;
+    width: 300px;
+  }
+
+  .open-b {
+    margin-left: 50%;
+    transition: 0.5s;
+  }
+
+  .close-b {
+    margin-left: -15%;
+    transition: 0.5s;
+  }
+
+  .open-sb {
+    width: 500px;
+    transition: 0.5s;
+  }
+
+  .open-t {
+    margin-right: 350px;
+  }
+
+
   .event-sidebar {
-    height: 260px;
-    width: 0;
+    height: 238px;
     position: absolute;
     z-index: 1;
-    top: 287px;
+    top: 305px;
     right: 20px;
     background-color: #eee;
 
@@ -214,64 +270,5 @@
     border-width: 2px;
     border-color: #222;
     border-radius: 5px;
-  }
-
-  .event-sidebar a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 25px;
-    color: #818181;
-    display: block;
-    transition: 0.3s;
-  }
-
-  .event-sidebar a:hover {
-    color: #f1f1f1;
-  }
-
-  /* .event-sidebar .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 50px;
-  } */
-
-  .open-b {
-    margin-left: 96.3%;
-    transition: 0.5s
-  }
-
-  .close-b {
-    margin-left: 36%;
-    transition: 0.5s
-  }
-
-  .sidebar-btn {
-    margin-top: 2px;
-    font-size: 20px;
-    cursor: pointer;
-    background-color: #ccc;
-    color: white;
-    padding: 3px 4px 3px 3px;
-
-    border: none;
-    border-style: dashed;
-    border-width: 2px;
-    border-color: #888;
-    border-radius: 5px;
-  }
-
-  .sidebar-btn:hover {
-    background-color: #444;
-    border-color: #444;
-  }
-
-  #quarterly-events-list-main {}
-
-  #quarterly-events-list-table {
-    transition: margin-right .5s;
-    height: 90%;
-    display: inline;
   }
 </style>

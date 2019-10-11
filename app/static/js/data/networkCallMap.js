@@ -45,6 +45,10 @@ define([
       name: "playerCompany",
       path: "/playercompany" + gid
     },
+    "playerCompanyEvents": {
+      name: "playerCompanyEvents",
+      path: "/playercompanyevents" + gid
+    },
     "facilityTypes": {
       name: "facilityTypes",
       path: "/facilitytypes"

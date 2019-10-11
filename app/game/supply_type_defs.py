@@ -82,7 +82,7 @@ prompt_types = [
     'priority': 'information', 
     'scope': 'company',
     'short_description' : 'Welcome to the family!',
-    'long_description' : 'We\'d like to congratulate you on your new appointment as CEO of %s. We have confidence that you will help this company prosper within the coming years.',
+    'long_description' : 'We\'d like to congratulate you on your new appointment as CEO of {}. We have confidence that you will help this company prosper within the coming years.',
   },
   {
     'title' : 'heatwave',
@@ -91,7 +91,7 @@ prompt_types = [
     'priority': 'warning', 
     'scope': 'company',
     'short_description' : 'Hot out here.',
-    'long_description' : 'A heatwave has struck and is expected to last for %i days, increasing energy demand by as much as %i percent.',
+    'long_description' : 'A heatwave has struck and is expected to last for {} days, increasing energy demand by as much as {} percent.',
   },
   {
     'title' : 'hurricane-affected',
@@ -100,7 +100,7 @@ prompt_types = [
     'priority': 'danger', 
     'scope': 'company',
     'short_description' : 'Hurricane making landfall!',
-    'long_description' : 'A hurricane has struck, and %i of your facilities are expected to be offline for %i days.',
+    'long_description' : 'A hurricane has struck, and {} of your facilities are expected to be offline for {} days.',
   },
   {
     'title' : 'hurricane-unaffected',
@@ -118,7 +118,7 @@ prompt_types = [
     'priority': 'danger', 
     'scope': 'company',
     'short_description' : 'Lots of snowfall!',
-    'long_description' : 'A blizzard has struck, and %i of your facilities are expected to be offline for %i days.',
+    'long_description' : 'A blizzard has struck, and {} of your facilities are expected to be offline for {} days.',
   },
   {
     'title' : 'blizzard-unaffected',

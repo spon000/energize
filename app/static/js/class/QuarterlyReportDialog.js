@@ -22,16 +22,18 @@ define([
           this._elementIdQuarterlyEventsTable = "quarterly-events-list-table";
           this._quarterlyDialogHtml = null
           this._quarterlyDialog = null;
+          this._eventSelected = true;
           this._events = null;
 
+
           this._getDialogData().then((data) => {
-            this._facilities = data[0];
-            this._company = data[1];
-            // this._events = data[2];
-            this._quarterlyDialogHtml = data[2];
-            // console.log("_getDialogData()  data = ", data);
+            this._events = data[0].prompts;
+            this._eventTypes = data[0].prompt_types;
+            this._quarterlyDialogHtml = data[1];
+            console.log("_getDialogData()  data = ", data);
             this._openQuarterlyDialog(this)
             this._createEvents();
+            this._createEventListTable();
           });
         }
 
@@ -42,13 +44,9 @@ define([
         /* *********************************************************************************** */
         _getDialogData() {
           return Promise.all([
-            this._modelData.getPlayerFacilities(),
-            this._modelData.getCompany(),
-            // this._modelData.getCompanyEvents(),
+            this._modelData.getCompanyEvents(),
             this._modelData.getQuarterlyHtml()
           ]).then((data) => data)
-            .then((data) => data)
-            //.then((data) => data)
             .then((data) => data);
         }
 
@@ -61,7 +59,6 @@ define([
 
         /* *********************************************************************************** */
         _createEvents() {
-
           $("#" + this._elementIdQuarterlyEventsMain).find(".sidebar-btn").on("click", this, this._sidebar);
         }
 
@@ -73,20 +70,20 @@ define([
           let button = evt.currentTarget;
           let scope = evt.data;
 
+          if (!scope._eventSelected)
+            return;
+
           if ($(button).hasClass("open-b")) {
-            $(button).toggleClass("open-b");
-            $(button).toggleClass("close-b");
             $(button).html("&#9654;");
-            $("#" + scope._elementIdQuarterlyEventsSidebar).css("width", "450px");
-            // $("#" + scope._elementIdQuarterlyEventsTable).css("margin-right", "350px");
           }
           else {
-            $(button).toggleClass("close-b");
-            $(button).toggleClass("open-b");
             $(button).html("&#9664;");
-            $("#" + scope._elementIdQuarterlyEventsSidebar).css("width", "0");
-            // $("#" + scope._elementIdQuarterlyEventsTable).css("margin-right", "0");
           }
+
+          $(button).toggleClass("open-b");
+          $(button).toggleClass("close-b");
+          $("#" + scope._elementIdQuarterlyEventsSidebar).toggleClass("open-sb");
+          $("#" + scope._elementIdQuarterlyEventsTable).toggleClass("open-t");
         }
 
 
@@ -133,16 +130,87 @@ define([
         }
 
 
+        /* *********************************************************************************** */
         _numberWithCommas(x) {
           return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
 
 
         /* *********************************************************************************** */
-        // Create Facility list table
+        // Create Events list table
         /* *********************************************************************************** */
-        _createEventsListTable() {
+        _createEventListTable() {
+          const event_table_data = [];
+
+          // console.log("_createFacilityListTable() this._facilities = ", this._facilities);
+          this._events.forEach((event, index) => {
+            let event_type = this._eventTypes['' + event.prompt_type + ''];
+            // console.log("event = ", event);
+            // console.log("event_type = ", event_type);
+            // console.log("event_types = ", this._eventTypes);
+
+            event_table_data.push({
+              priority: event_type.priority,
+              type: event_type.category,
+              date: event.date_string,
+              subject: event.short_description,
+            });
+          });
+
+          const eventTableDef = {
+            height: 238,
+            layout: "fitDataFill",
+            data: event_table_data,
+            columns: [
+              {
+                title: "!", field: "priority", width: 20, align: "center",
+                formatter: this._priority_cell,
+              },
+
+              {
+                title: "Type", field: "type", width: 200, align: "center",
+                formatter: this._type_cell,
+              },
+
+              {
+                title: "Date", field: "date", width: 100,
+              },
+
+
+              {
+                title: "Subject", field: "subject", width: 300,
+              },
+            ],
+
+            selectable: true,
+            rowSelected: (row) => {
+              console.log("row selected ", row);
+            },
+            rowClick: (row) => {
+              console.log("row clicked ", row)
+            }
+          }
+
+          return new Tabulator("#" + this._elementIdQuarterlyEventsTable, eventTableDef);
         }
 
+        /* *********************************************************************************** */
+        _priority_cell(cell, formatterParams = null) {
+          switch (cell.getValue()) {
+            case "information":
+              return "!"
+            case "warning":
+              return "!"
+            case "danger":
+              return "!"
+            default:
+              return "!"
+          }
+        }
+
+        /* *********************************************************************************** */
+        _type_cell(cell, formatterParams = null) {
+          return ("[" + cell.getValue() + "]")
+        }
       });
   });
