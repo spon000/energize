@@ -450,7 +450,7 @@ def roll_for_events(game,db,mods,state):
           desc = 'A hurricane has struck, and %i of your facilities are expected to be offline for %i days' % (len(off_facs),dur)
           # event = Prompt( id_game=game.id, id_company=company.id, focus="company", category="danger", description=desc, start=game.turn_number, end=game.turn_number+dur)
           turn_hours = get_age(game.turn_number)
-          event = assign_prompt('hurricane-affected', game, company, {'start': turn_hours, 'end': turn_hours + dur, [dur, np.ceil(peak*100)])
+          event = assign_prompt('hurricane-affected', game, company, {'start': turn_hours, 'end': turn_hours + dur}, [dur, np.ceil(peak*100)])
           # event.companies += [company]
           db.session.add(event)
           # db.session.commit()
