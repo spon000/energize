@@ -243,7 +243,7 @@
 <li>Thermodynamics. A dimensionless quantity that characterizes an energy conversion process based on the relationship of work output to energy input. See also first law efficiency, second law efficiency.</li>
 </ul>
 </li>
- <li>Electric
+<li>Electric
 <ul>
 <li>Electricity. 1. Having to do with or involving electricity. 2. Produced by or carrying electricity.</li>
 </ul>
@@ -268,5 +268,454 @@
 <li>See Generator</li>
 </ul>
 </li>
- 
+<li>Electric power
+<ul>
+<li>See Electrical energy</li>
+</ul>
+</li>
+<li>Electricity
+<ul>
+<li>1. A fundamental form of energy, consisting of oppositely charged electrons and protons that produce light, heat, magnetic force, and chemical changes. 2. The flow of this energy; electric current. 3. The general phenomenon of charges at rest and in motion.</li>
+</ul>
+</li>
+<li>Emissions
+<ul>
+<li>Environment. 1. Materials that are emitted; <em>e.g.,</em> discharged or sent off from a given site. 2. Specifically, the release of primary pollutants directly to the atmosphere by processes such as combustion, and also by natural processes.</li>
+</ul>
+</li>
+<li>Emissions control
+<ul>
+<li>Environment. A general term for all efforts to control and reduce the amount of material released to the atmosphere by human activities, especially the discharge of harmful pollutants from point sources such as motor vehicles, power plants, factories, and other industrial facilities.</li>
+</ul>
+</li>
+<li>Emissions rate
+<ul>
+<li>Environment. The weight of a given pollutant emitted per unit of time (<em>e.g.,</em> tons emitted per year).</li>
+</ul>
+</li>
+<li>Emissions tax
+<ul>
+<li>Policy. A type of market-based instrument in the form of tax per unit of pollution released.</li>
+</ul>
+</li>
+<li>Emissions trading
+<ul>
+<li>Economics & Business. A market-based form of environmental regulation that uses an allowance for emissions (or credit for emission reductions) that can be bought and sold.</li>
+</ul>
+</li>
+<li>Energy
+<ul>
+<li>Physics. 1. A fundamental physical concept, defined classically as the capacity to do work. Can be described more generally as the potential ability of a system to influence changes in other systems by imparting either work (forced directional displacement) or heat (chaotic displacement/motion of system microstructure). 2. The use of this capacity to perform useful functions for humans, such as heating or cooling buildings and enclosures, powering vehicles and machinery, lighting, cooking foods, and so on.</li>
+<li>In the mechanical sense,energy is the ability to do work where work is the action of a force acting on an object undergoing a displacement. Matter in motion is said to have kinetic energy because of its ability to change the motion of another object. Matter in a favorable position, such as water atop a dam, is said to have potential energy because of its ability to change the motion of another object once the water flows over the dam. Other important forms of energy include thermal energy, nuclear energy, electromagnetic energy, and gravitational energy. Energy can be transformed from one form to another. For example, a steam turbine converts thermal energy to mechanical energy, a nuclear reactor transforms nuclear energy to thermal energy, and a solar cell converts electromagnetic energy into electric energy. The physics principle of conservation of energy requires that there be no loss of energy in any energy transformation.</li>
+</ul>
+</li>
+<li>Energy conservation
+<ul>
+<li>Consumption & Efficiency. 1. A collective term for activities that reduce end-use demand for energy by reducing the service demanded, <em>e.g.,</em> a reduction in the demand for gasoline by reducing the number of miles driven, or a reduction in the demand for natural gas for space heating by lowering the thermostat. 2. Another term for energy efficiency.</li>
+<li>Energy conservation has been diversely interpreted as meaning (1) increasing the efficiency or productivity of energy use to maintain or increase economic output with less energy; (2) accommodating behavior by curtailing (rationing or “doing without”) energy; and (3) switching to more abundant energy sources. Energy efficiency, in the most common meaning of energy conservation today, involves technological change—the substitution of ingenuity for energy resources—to provide a given amenity level for less. Energy efficiency is sometimes quantified in terms of energy intensity, or the amount of energy required to produce a unit of goods or service. Energy conservation and energy efficiency can be stimulated by information (for example, labeling of appliances), technological progress (research and development), shortages (wartime rationing), price increases (price elasticity of demand), and codes and standards (for example, automotive fuel economy standards). Interest in energy conservation is driven not for its own sake but by economic, security, and environmental concerns, including climate change. Energy conservation, in an economic and policy context, thus means the intelligent use of energy through the reduction of waste.</li>
+</ul>
+</li>
+<li>Energy efficiency
+<ul>
+<li>Consumption & Efficiency. 1. A reduction in the quantity of energy used per unit service provided, <em>e.g.,</em> a reduction in the quantity of motor gasoline used per kilometer driven. 2. Another term for energy conservation.</li>
+</ul>
+</li>
+<li>Enrichment
+<ul>
+<li>Nuclear. The process of increasing the proportion of a fissile isotope in a nuclear fuel above its natural fraction, typically the isotope uranium-235 to U-238. Thus, enrichment feed.</li>
+</ul>
+</li>
+<li>Facility
+<ul>
+<li>See Power plant</li>
+</ul>
+</li>
+<li>Federal Energy Regulatory Commission (FERC)
+<ul>
+<li>Organizations. A U.S. federal agency (est. 1977) that regulates the interstate transmission of natural gas, oil, and electricity.</li>
+</ul>
+</li>
+<li>Fixed costs
+<ul>
+<li>See Fixed operating costs</li>
+</ul>
+</li>
+<li>Fixed operating costs (from Energy Education)
+<ul>
+<li>Fixed costs are costs that a firm will incur regardless of its output and are sometimes referred to as overhead. These can be costs such as insurance, rent, salaries and others. These costs are incurred even if the company doesn't generate revenue. For power plants, these are usually defined on a per unit capacity basis.</li>
+</ul>
+</li>
+<li>Fuel
+<ul>
+<li>Materials. 1. Any material that evolves energy in a chemical or nuclear reaction. 2. Specifically, a material that can be used to provide power for an engine, combustor, power plant, nuclear reactor, and so on.</li>
+</ul>
+</li>
+<li>Fuel assembly
+<ul>
+<li>See Fuel element</li>
+</ul>
+</li>
+<li>Fuel cycle
+<ul>
+<li>Consumption & Efficiency. The total life of a given fuel in all of its uses and forms, including its extraction or generation, transportation, combustion, air emission, byproduct removal, and waste transportation and disposal.</li>
+</ul>
+</li>
+<li>Fuel element
+<ul>
+<li>Nuclear. A cluster of fuel pins mounted into a single assembly.</li>
+</ul>
+</li>
+<li>Fuel fabrication
+<ul>
+<li>Nuclear. The process of making reactor fuel assemblies, usually from sintered uranium oxide pellets that are inserted into zircalloy tubes, comprising the fuel rods or elements.</li>
+</ul>
+</li>
+<li>Fuel pellet
+<ul>
+<li>Nuclear. A small cylinder of enriched uranium, typically uranium oxide; several pellets are assembled into a fuel pin, which then forms a component of a fuel element.</li>
+</ul>
+</li>
+<li>Fuel pin
+<ul>
+<li>Nuclear. A long slender tube made of a zirconium alloy and containing fuel pellets; several fuel pins bundled together form a fuel element.</li>
+</ul>
+</li>
+<li>Fuel reprocessing
+<ul>
+<li>See Reprocessing</li>
+</ul>
+</li>
+<li>Fuel rod
+<ul>
+<li>See Fuel element</li>
+</ul>
+</li>
+<li>Fuel-switiching
+<ul>
+<li>Consumption & Efficiency. 1. The potential ability of a manufacturer or power generator to use a different energy source in place of that actually consumed, by a substitution within a short time and without extensive modifications. 2. More generally, any instance of a change by a provider or consumer of energy from one fuel source to another; <em>e.g.,</em> from wood to coal as a household fuel. Also, fuel substitution.</li>
+</ul>
+</li>
+<li>Gas, natural
+<ul>
+<li>See natural gas</li>
+</ul>
+</li>
+<li>Gas turbine
+<ul>
+<li>Conversion. A rotary engine in which liquid or gaseous fuel is burned to produce electric power and heat. Hot combustion gases are passed to the turbine, where they expand to drive a generator and are then used to run a compressor.</li>
+</ul>
+</li>
+<li>Generating unit
+<ul>
+<li>See Generator</li>
+</ul>
+</li>
+<li>Generation
+<ul>
+<li>Electricity. 1. The process of producing electric energy by transforming other forms of energy (mechanical, chemical, or nuclear). 2. The amount of electric energy produced, expressed in watt-hours (Wh). Thus, generation unit, company, and so on.</li>
+</ul>
+</li>
+<li>Generation mix
+<ul>
+<li>Electricity. A term for a diversity of generating units used to produce electricity (<em>e.g.,</em> 40 % coal, 30 % hydropower, and 30 % natural gas).</li>
+</ul>
+</li>
+<li>GENCO: generation company
+<ul>
+<li>Economics & Business. A regulated or non-regulated entity (depending upon the industry structure) that operates and maintains existing generating plants.</li>
+</ul>
+</li>
+<li>Generator
+<ul>
+<li>Conversion. Any machine that converts mechanical energy into electrical energy. Also called generating unit.</li>
+</ul>
+</li>
+<li>Geologic storage
+<ul>
+<li>Earth Science. The long-term accumulation of a substance, such as carbon dioxide or radioactive waste, in a natural geologic formation; <em>e.g.,</em> a sedimentary basin, seabed, or underground cavern. Also, geologic sequestration.</li>
+</ul>
+</li>
+<li>Global warming
+<ul>
+<li>Climate Change. 1. Any general increase in the earth’s surface temperatures over an extended period of time. 2. The proposition that in the current era, global temperatures have been slowly rising. This is attributed to the phenomenon of atmospheric gases such as carbon dioxide absorbing long-wave radiation as it is reradiated off the earth’s surface rather than this heat escaping into space, thus making the atmosphere warmer.</li>
+<li>The theory that global climatic change, surface warming in particular, is increasingly caused by human emissions of greenhouse gases, mainly carbon dioxide from fossil fuel burning. Aerosol particles also emitted from fossil fuel and biomass burning are believed to result in cooling, partly masking global warming. However, the dominant effect is warming the entire troposphere (the atmosphere below about 11 kilometers containing most of the air’s mass) by 1.5 to 4.5 degrees Celsius (eventually) if the preindustrial atmospheric CO<sub>2</sub> concentration of 270 ppm were to double. Without natural greenhouse gases (water vapor, carbon dioxide and ozone), the earth would be a frozen iceball. As CO<sub>2</sub> has climbed above 360 ppm from fossil fuel burning, planetary mean temperatures rose to the highest in millennia; with warming amplified in the Arctic, thawing permafrost, thinning sea ice and creating marked recession of glaciers. Also observed, as predicted, is subsurface warming from heat penetrating the sea. Likewise, satellite-derived troposphere temperatures are rising, and the stratospheric cooling, the latter consistent with a CO<sub>2</sub> greenhouse effect. Potential warming of the earth’s surface if the bulk of fossil fuel resources are burned could be as much as 10&#8451;, comparable to mid-Cretaceous climates when the poles were deglaciated and dinosaurs roamed Antarctica. Adverse impacts of such dramatic climate shifts on the biosphere and human economy are incalculable. The challenge for energy technology is slowing, stabilizing, and if possible reversing, fossil fuel burning induced global warming, requiring a revolutionary change in the global energy system.</li>
+</ul>
+</li>
+<li>Global warming potential (GWP)
+<ul>
+<li>Climate Change. An index that represents the combined effect of the differing times that greenhouse gases remain in the atmosphere and their relative effectiveness in absorbing outgoing infrared radiation.</li>
+</ul>
+</li>
+<li>Greenhouse effect
+<ul>
+<li>Earth Science. The trapping of heat by greenhouse gases (see next) that allow incoming solar radiation to pass through the earth’s atmosphere but prevent the escape to outer space of a portion of the outgoing infrared radiation from the surface and lower atmosphere. This process has kept the earth’s temperature approximately 33&#8451; warmer than it would be otherwise; it occurs naturally but may also be enhanced by certain human activities; <em>e.g.,</em> the burning of fossil fuels.</li>
+</ul>
+</li>
+<li>Greenhouse gas (GHG)
+<ul>
+<li>Earth Science.any of the gaseous constituents of the atmosphere, both natural and anthropogenic, that absorb and emit radiation at specific wavelengths within the spectrum of infrared radiation emitted by the earth’s surface, the atmosphere, and clouds. This causes the greenhouse effect.</li>
+<li>A gas that is largely transparent to the visible radiation reaching Earth from the sun but absorbs the thermal, infrared radiation that is radiated outward from the earth’s surface. The energy absorbed in the atmosphere is re-radiated in all directions, warming the earth’s surface. The greenhouse gases H<sub>2</sub>O and CO<sub>2</sub> occur naturally in the atmosphere and make earth's surface temperature approximately 33&#8451; warmer than it would otherwise be. Human activities, such as burning fossil fuels, are now releasing additional greenhouse gases to the atmosphere, creating an enhanced greenhouse effect. Greenhouse gases include H<sub>2</sub>O, CO<sub>2</sub>, N<sub>2</sub>O, ozone, the chlorofluorocarbons, and SF<sub>6</sub>. Greenhouse gases exist in the atmosphere as molecules of three or more atoms. The atoms in the gas molecule vibrate with respect to each other, and the molecules rotate in space. Transitions between different energy levels of vibration and rotation in the molecule are quantized and occur with the absorption or release of infrared radiation. Fourier is generally credited with describing (in 1827) how the earth's surface temperature is controlled by the differential absorption of visible and infrared radiation, but use of the phrase “greenhouse effect” to characterize this phenomena seems to have appeared about 1950. Although the phrase has become entrenched in our vocabulary, it is a bit of a misnomer as the physical processes of the two phenomena are quite different. Greenhouse gases in the atmosphere act to restrict the radiative transfer of energy whereas a glass greenhouse acts primarily by restricting the convective transfer of energy.</li>
+</ul>
+</li>
+<li>Greenhouse gas (GHG)
+<ul>
+<li>Earth Science.any of the gaseous constituents of the atmosphere, both natural and anthropogenic, that absorb and emit radiation at specific wavelengths within the spectrum of infrared radiation emitted by the earth’s surface, the atmosphere, and clouds. This causes the greenhouse effect.</li>
+<li>A gas that is largely transparent to the visible radiation reaching Earth from the sun but absorbs the thermal, infrared radiation that is radiated outward from the earth’s surface. The energy absorbed in the atmosphere is re-radiated in all directions, warming the earth’s surface. The greenhouse gases H<sub>2</sub>O and CO<sub>2</sub> occur naturally in the atmosphere and make earth's surface temperature approximately 33&#8451; warmer than it would otherwise be. Human activities, such as burning fossil fuels, are now releasing additional greenhouse gases to the atmosphere, creating an enhanced greenhouse effect. Greenhouse gases include H<sub>2</sub>O, CO<sub>2</sub>, N<sub>2</sub>O, ozone, the chlorofluorocarbons, and SF<sub>6</sub>. Greenhouse gases exist in the atmosphere as molecules of three or more atoms. The atoms in the gas molecule vibrate with respect to each other, and the molecules rotate in space. Transitions between different energy levels of vibration and rotation in the molecule are quantized and occur with the absorption or release of infrared radiation. Fourier is generally credited with describing (in 1827) how the earth's surface temperature is controlled by the differential absorption of visible and infrared radiation, but use of the phrase “greenhouse effect” to characterize this phenomena seems to have appeared about 1950. Although the phrase has become entrenched in our vocabulary, it is a bit of a misnomer as the physical processes of the two phenomena are quite different. Greenhouse gases in the atmosphere act to restrict the radiative transfer of energy whereas a glass greenhouse acts primarily by restricting the convective transfer of energy.</li>
+</ul>
+</li>
+<li>Grid
+<ul>
+<li>Electricity. 1. The transmission network through which electricity moves from suppliers to customers. 2. Storage.a metal framework in a storage cell or battery, used as a conductor and support for the active material.</li>
+</ul>
+</li>
+<li>Gross generation
+<ul>
+<li>Electricity. the total amount of electric energy produced by generating units, measured at the generating terminal in kilowatt-hours (kWh) or megawatt-hours (MWh).</li>
+</ul>
+</li>
+<li>Half-life
+<ul>
+<li>Nuclear. The time required for one half of a radioactive sample to decay.</li>
+</ul>
+</li>
+<li>Hard coal
+<ul>
+<li>Coal. Another term for anthracite coal, because of its hardness.</li>
+</ul>
+</li>
+<li>Heating degree day
+<ul>
+<li>See degree day</li>
+</ul>
+</li>
+<li>Heating value
+<ul>
+<li>Consumption & Efficiency. The amount of heat produced from the complete combustion of a unit quantity of fuel (<em>e.g.,</em> joules per cubic foot of natural gas). Higher (gross) heating value (HHV) is the amount of energy from the complete combustion of a fuel, including the vaporization heat of the water vapor. Lower (net) heating value (LHV) is obtained by subtracting the latent heat of vaporization of the water vapor formed by the combustion of the hydrogen in the fuel from the HHV. The differences between LHV and HHV are, depending on the fuel, 5–20 %.</li>
+</ul>
+</li>
+<li>Heat rate
+<ul>
+<li>Measurement. An expression of the conversion efficiency of thermal energy to work output; <em>e.g.,</em> the total Btu content of a fuel burned for electric generation divided by the resulting net power generation in kilowatt-hours.</li>
+</ul>
+</li>
+<li>Heat recovery
+<ul>
+<li>Consumption & Efficiency. Any process in which what would otherwise be waste heat is recovered for a useful purpose; <em>e.g.,</em> heat from the generation of electricity that is then used for heating purposes in the plant.</li>
+</ul>
+</li>
+<li>Higher heating value
+<ul>
+<li>See Heating value</li>
+</ul>
+</li>
+<li>Hydroelectric
+<ul>
+<li>Hydropower. Describing electric current produced from water power, especially the force or pressure of falling water. Thus, hydroelectricity, hydroelectric power.</li>
+</ul>
+</li>
+<li>Hydropower
+<ul>
+<li>Energy derived at a variety of scales from water pressure, especially the force or pressure of falling water used to power a water wheel, turbine, and so on.</li>
+</ul>
+</li>
+<li>Independent system operator (ISO)
+<ul>
+<li>Electricity. An independent, governmentally regulated entity established to coordinate, control, and monitor regional transmission in a nondiscriminatory manner and ensure the safety and reliability of the electric system. Similarly,independent system planner (ISP).</li>
+</ul>
+</li>
+<li>Intermittent
+<ul>
+<li>Renewable/Alternative. Describing energy sources whose availability is not constant, such as wind or solar energy.</li>
+</ul>
+</li>
+<li>Joule
+<ul>
+<li>Measurement. The basic unit of energy in the meter-kilogram-second system, symbol J; the amount of work done by a force of one newton acting through a distance of one meter in the direction of the force. Equivalent to 107 ergs and one watt-second.</li>
+</ul>
+</li>
+<li>Kilo
+<ul>
+<li>Measurement. A prefix or word meaning “one thousand”; symbol k.</li>
+</ul>
+</li>
+<li>Kilojoule (kJ)
+<ul>
+<li>The kilojoule (kJ) is equal to one thousand (1000) joules.</li>
+</ul>
+</li>
+<li>Kilowatt (kW)
+<ul>
+<li>Electricity. A standard unit of electric power equal to 1000 watts or approximately 1.34 hp; <em>e.g.,</em> the amount of electric energy required to light ten 100-watt light bulbs.</li>
+</ul>
+</li>
+<li>Kilowatt hour
+<ul>
+<li>Electricity. A standard unit of electricity consumption, corresponding to a usage of 1000 watts for 1 hour; <em>e.g.,</em> a 100-watt light bulb burning for 10 hours consumes 1 kWh.</li>
+</ul>
+</li>
+<li>Levelized cost of electricity (LCOE)
+<ul>
+<li>Economics & Business. The total cost of generating electricity from a new power plant. Also known as levelized energy cost or levelized cost of energy.</li>
+<li>This is a term most frequently used to characterize the total cost of generating electricity from a new power plant, though it can be applied to any other technology as well. It is similar to an annual home mortgage payment, except that it covers not only the cost of purchasing or building the plant (<em>i.e.,</em> the capital cost, or initial cost), but also the costs of maintaining and operating the plant over its useful life. Because capital and operating expenses occur in different amounts at different points in time, economists employ a “time value of money”—expressed as an interest rate, discount rate, or rate of return—to determine the “net present value” (NPV) of all lifetime costs. This is the total amount of money needed at the start of the project to acquire, operate and maintain the plant over its useful life, as well as pay all interest (or make a profit) on funds used to finance the project. The levelized cost is the uniform annual amount (dollars per year), paid over the life of the plant, which produces the same total NPV (dollars) as the actual project. The levelized cost can also be expressed as a cost per unit of electricity generated (<em>e.g.,</em> cents per kilowatt-hour) by dividing the total annual cost by the total annual kWh generated. Technologies with the lowest levelized cost are generally preferred in economic decision-making.</li>
+</ul>
+</li>
+<li>Life cycle assessment (LCA)
+<ul>
+<li>Consumption & Efficiency. The process of evaluating energy, water, and other natural resource use, and the emissions associated with a good or service from “cradle to grave.” This includes raw material extraction, material fabrication, and product manufacture, use, recycling, and/or disposal. Typically used for consumer products. Also, life cycle analysis.</li>
+<li>Life Cycle Assessment Life cycle assessment (LCA) is a tool for systematically evaluating the potential environmental impacts of products, services, and technologies. LCA examines inputs (resources) and outputs (emissions, wastes, and desired products) from “cradle to grave;” that is, across the entire product life cycle from resource extraction to materials processing to manufacturing and fabrication to use and then to collection, processing, and disposal. By doing so, LCA can help identify and avoid shifting of environmental burdens, <em>e.g.,</em> from one life cycle stage to another or from one environmental threat to another. What started as an approach to assess the environmental performance (“greenness”) of products has evolved into a standardized method to provide an analytical basis for the assessment and comparison of not only products, but also processes, materials, and service systems. The LCA framework is broadly defined in the ISO 14000 environmental management standards. LCA involves specifying the system to be investigated, and the compilation of a quantitative inventory of relevant energy and material inputs and environmental releases. The identified inputs and releases are then evaluated with regard to their potential environmental impacts, including human health, ecosystems, and depletion of resources, and interpreted to help make more informed decisions. Recent efforts have focused on capturing indirect effects in supply chains and across the economy through the use of economic techniques and models, and broadening the traditional LCA framework to integrate environmental, social, and economic aspects at varying spatial levels. This is also referred to as life cycle sustainability assessment (LCSA).</li>
+</ul>
+</li>
+<li>Load
+<ul>
+<li>See Load demand</li>
+</ul>
+</li>
+<li>Load curve
+<ul>
+<li>Electricity. A graph describing the amount of power supplied as a function of time, especially one illustrating the varying magnitude of the load during a 24-hour period.</li>
+</ul>
+</li>
+ <li>Load demand
+<ul>
+<li>Electricity. An electrical load on generating units, especially a sudden load.</li>
+</ul>
+</li>
+<li>Load factor
+<ul>
+<li>Electricity. 1. The ratio of the average load in kilowatts supplied during a designated period to the peak or maximum load in kilowatts occurring in that same period.</li>
+</ul>
+</li> 
+<li>Load-following
+<ul>
+<li>Electricity. The process by which a utility meets variations in electricity demand by preparing generating units for operation under unit commitment schedules, which reflect forecasted load changes over daily, weekly, and seasonal cycles, plus an allowance for random variations.</li>
+</ul>
+</li>
+<li>Load shedding
+<ul>
+<li>Electricity. A policy of turning off or disconnecting certain loads (typically nonessential ones) to limit peak demand.</li>
+</ul>
+</li>
+<li>Load shifting
+<ul>
+<li>Electricity. A load management objective that moves loads from on-peak to off-peak periods.</li>
+</ul>
+</li>
+<li>Lower heating value
+<ul>
+<li>See Heating value</li>
+</ul>
+</li>
+<li>Margin
+<ul>
+<li>Economics & Business. Funds posted during the trading life of a futures contract to guarantee the fulfillment of contract obligations.</li>
+<li>Electricity. In electric service, the difference between net capacity resources and net internal demand; usually expressed in megawatts (MW).</li>
+</ul>
+</li>
+<li>Marginal cost
+<ul>
+<li>Economics & Business. The cost of the additional inputs (labor, capital, energy, and so on) required to produce one additional unit of output, assuming other factors remain constant.</li>
+</ul>
+</li>
+<li>Mega
+<ul>
+<li>Measurement. A prefix meaning “one million” (10<sup>6</sup>); symbol M.</li>
+</ul>
+</li>
+<li>Megajoule (MJ)
+</li>
+<li>Megawatt (MW)
+<ul>
+<li>Electricity. A unit of power equivalent to one million watts (1000 kilowatts); <em>e.g.,</em> the amount of electric energy required to light 10,000 100-watt bulbs.</li>
+</ul>
+</li>
+<li>Megawatt hour (MWh)
+<ul>
+<li>Electricity. A unit of electricity equivalent to the amount of energy produced by one megawatt of power over a period of one hour. Similarly, megawatt-month, megawatt-year.</li>
+</ul>
+</li> 
+<li>Milling
+<ul>
+<li>Materials. 1. The mechanical treating of solid materials, such as grain, to produce a powder. 2. The process of removing valueless material and harmful constituents from ore. 3. The process of producing plane or shaped surfaces by the use of a cutting machine.</li>
+</ul>
+</li>
+<li>Mill tailings
+<ul>
+<li>See Uranium tailings</li>
+</ul>
+</li>
+<li>Mine
+<ul>
+<li>Mining. 1. Any opening or excavation in the earth that is used to extract minerals, coal, ore, or other such material of value. 2. To extract material in this manner.</li>
+</ul>
+</li>
+<li>Mine-mouth (power) plant
+<ul>
+<li>Coal. A large electrical power plant built directly adjacent to the coal mine that is the source of its fuel; often used with lignite and other such coals that are expensive to ship by train. A strategy intended to minimize transportation costs and provide a more reliable supply flow, though in practical use these plants have faced challenges such as environmental regulations or the depletion of the resources at the site.</li>
+</ul>
+</li>
+<li>Nameplate capacity
+<ul>
+<li>See capacity</li>
+</ul>
+</li>
+<li>Natural gas
+<ul>
+<li>Oil & Gas. A mixture of hydrocarbon compounds and small quantities of various nonhydrocarbons, widely used as a fuel throughout the industrialized world; it exists in the gaseous phase or in solution with crude oil in natural underground reservoirs.</li>
+<li>Natural gas is a mixture of naturally occurring compounds that are in a gaseous state at the conditions of temperature and pressure at the earth’s surface. These compounds are mostly simple molecules formed of hydrogen and carbon (thus hydrocarbon). Methane, with molecules formed from four atoms of hydrogen and one of carbon, is the simplest form and generally is the most common compound in the mixture. Ethane, propane, butane, and pentane are slightly more complex compounds with two, three, four, and five carbon atoms respectively in each molecule. Other more complex hydrocarbon compounds can also be part of the mixture. Oil, by contrast, is an even more complex mixture of larger hydrocarbon molecules. Other non-hydrocarbon compounds are also present in natural gas but generally in lesser amounts. These non-hydrocarbon compounds include carbon dioxide, nitrogen, and hydrogen sulfide. Some natural gas is present in fields that produce little or no volume of liquids (non-associated gas). Natural gas is also present in oil fields. In an oil field, natural gas can occur in separate pools or as a gas cap floating on the denser oil (associated gas). It can also be dissolved in the oil (dissolved gas). Some simple hydrocarbon molecules, such as methane, can be formed by inorganic processes; however, most of the natural gas that occurs in commercial gas or oil fields is likely of organic origin. Buried plant or algal material forms natural gas when subjected to sufficient burial and heating (thermogenic gas) or by the action of microbes (biogenic gas).</li>
+</ul>
+</li>
+<li>Natural uranium
+<ul>
+<li>Nuclear. A term for uranium as it is mined from the earth. The composition of this is 99.3 % U-238 and 0.7 % U-235.</li>
+</ul>
+</li>
+<li>Net capacity
+<ul>
+<li>Electricity. The maximum capacity (or effective rating), modified for ambient limitations, that a generating unit, power plant, or electric system can sustain over a specified period, less the capacity used to supply the demand of station service or auxiliary needs.</li>
+</ul>
+</li>
+<li>Net generation
+<ul>
+<li>Electricity. The amount of gross generation from a generating station, less the electrical energy consumed at the station itself for station service or auxiliaries.</li>
+</ul>
+</li>
+<li>Nonrenewable energy
+<ul>
+<li>Renewable/Alternative. An energy source formed and accumulated over a very long period of time in the past, such as a fossil fuel, whose rate of formation is many orders of magnitude slower than the rate of its use, so that it will be depleted in a finite time period at the current rate of consumption. Contrasted with renewable energy sources such as solar energy and wind power.</li>
+</ul>
+</li>
+<li>Nuclear
+<ul>
+<li> 1. Of or relating to the nucleus of an atom. 2. Relating to or powered by nuclear energy. 3. Relating to nuclear weapons and their use in warfare.</li>
+</ul>
+</li>
+<li>Nuclear energy
+<ul>
+<li>Nuclear. Energy released by radioactive decay, through a nuclear reaction, or in the course of fission (splitting) or fusion (fusing) of atomic nuclei.</li>
+</ul>
+</li>
+<li>Nuclear fission
+<ul>
+<li>See fission</li>
+</ul>
+</li>
+<li>Nuclear fuel
+<ul>
+<li>Nuclear. 1. Light elements such as hydrogen, deuterium, tritium, lithium, boron, or beryllium that are capable of fusing or combining to form a nucleus of higher mass number. 2. Special nuclear material capable of sustaining a chain reaction, such as uranium-235.</li>
+</ul>
+</li>
+<li>Nuclear fuel cycle
+<ul>
+<li>Nuclear. The totality of operations necessary to fuel nuclear reactors, including the mining and milling of uranium ores, enrichment of uranium, fabrication and use of nuclear fuel, reprocessing of used nuclear fuel, and disposal or long-term management of radioactive wastes or spent fuel.</li>
+</ul>
+</li>
+<li>Nuclear fuel reprocessing
+<ul>
+<li>Nuclear. The chemical treatment of spent reactor fuel to separate uranium and plutonium from the small quantity of fission product waste products and transuranic elements, leaving a much reduced quantity of high-level waste; the recovered uranium and plutonium may be recycled into new fuel elements.</li>
+</ul>
+</li>
+
+
+
+
 </ol>
