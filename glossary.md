@@ -1,6 +1,6 @@
 <h1>Glossary</h1>
 <h2>Taken/adapted from Cleveland & Morris (2015) Dictionary of Energy, Elsevier, unless otherwise indicated</h2>
-<ol>
+<ul>
 <li>Acid rain
 <ul>
 <li>Environment. The popular term for acid deposition; <em>i.e.,</em> rain or other precipitation that has an excessive concentration of sulfuric or nitric acids.</li>
@@ -848,4 +848,4 @@
 
 
 
-</ol>
+</ul>
