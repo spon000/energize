@@ -1021,7 +1021,7 @@
 </li>
 <li>Wind power plant
 <ul>
-<li>See Wind turbine</li>
+<li>See <a href="#WindTurbine">Wind turbine</a></li>
 </ul>
 </li>
 <li>Wind resource
@@ -1029,7 +1029,7 @@
 <li>Wind. A measure of how much wind energy is potentially available at a given location and height; used to assess the potential power output of a wind turbine.</li>
 </ul>
 </li>
-<li>Wind turbine
+<li><a id="WindTurbine">Wind turbine</a>
 <ul>
 <li>Wind. 1. A wind-driven machine containing curved rotors or blades inside a wheel set vertically on a revolving shaft; wind or air pressure against the blades turns the wheel, and the rotating shaft may then drive a dynamo to produce electrical power. 2. More generally, any device that converts the energy of the wind to electrical or mechanical power.</li>
 </ul>
