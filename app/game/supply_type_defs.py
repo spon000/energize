@@ -154,16 +154,17 @@ prompt_types = [
     'priority': 'danger', 
     'scope': 'company',
     'short_description' : 'Lots of snowfall!',
-    'long_description' : 'A blizzard has struck, and {} of your facilities are expected to be offline for {} days.',
+    'long_description' : 'A blizzard has struck, and {} of your facilities were offline for {} days.',
   },
   {
-    'title' : 'blizzard-unaffected',
-    'category': 'Company Memo', 
+    'title' : 'blizzard-news',
+    'category': 'News Brief', 
     'image': 'default.png', 
-    'priority': 'warning', 
+    'priority': 'information', 
     'scope': 'company',
-    'short_description' : 'Frosty is living the dream.',
-    'long_description' : 'A hurricane has struck, none of your facilities were directly affected.',
+    'short_description' : 'Blizzard knocks out facilities',
+    'long_description' : 'A blizzard has struck and knocked out {} facilities, causing a potential {} MW of capacity to remain offline for {} days.',
+                                                                    #Sum of the nameplate capacity of all generators unavailable during the blizzard event.
   },    
 ]
 
