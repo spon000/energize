@@ -272,7 +272,7 @@
 </li>
 <li><a id="ElectricPower">Electric power</a>
 <ul>
-<li>See <a href="ElectricalEnergy">Electrical energy</a></li>
+<li>See <a href="#ElectricalEnergy">Electrical energy</a></li>
 </ul>
 </li>
 <li><a id="Electricity">Electricity</a>
