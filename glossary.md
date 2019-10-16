@@ -117,8 +117,8 @@
 </li>
 <li><a id="Carbon">Carbon</a>
 <ul>
-<li>Chemistry. A very common non-metallic element having the symbol C, the atomic number 6, an atomic weight of 12.01115, and a melting point about 360&#8451;; the active element of photosynthesis and the key structural component of all living matter.</li>
-<li>Carbon is the sixth most abundant element in the universe and is unique due to its dominant role in the chemistry of life and in the human economy. It is nonmetallic element having the symbol C, the atomic number 6, an atomic weight of 12.01115, and a melting point about 360&#8451;. There are four known allotropes of carbon: amorphous, graphite, diamond, and fullerene. A new fifth allotrope of carbon was recently produced, a spongy solid called a magnetic carbon “nanofoam” that is extremely lightweight and attracted to magnets. Due to carbon's unusual chemical property of being able to bond with itself and a wide variety of other elements, it forms nearly 10 million known compounds. Carbon is present as carbon dioxide (CO<sub>2</sub>) in the atmosphere and dissolved in all natural waters. It is a component of rocks as carbonates of calcium (limestone), magnesium, and iron. The fossil fuels (coal, crude oil, natural gas, oils sands, and shale oils) are chiefly hydrocarbons. The isotope carbon-12 is used as the basis for atomic weights. Carbon-14, an isotope with a half-life of 5730 years, is used to date such materials as wood and archeological specimens. Organic chemistry, a major subfield of chemistry, is the study of carbon and its compounds. Because carbon dioxide is a principal greenhouse gas, the global carbon cycle has become a focus of scientific inquiry, and the management of carbon dioxide emissions from the combustion of fossil fuels is a central technological, economic, and political concern.</li>
+<li>Chemistry. A very common non-metallic element having the symbol C, the atomic number 6, an atomic weight of 12.01115, and a melting point about 360 &#8451;; the active element of photosynthesis and the key structural component of all living matter.</li>
+<li>Carbon is the sixth most abundant element in the universe and is unique due to its dominant role in the chemistry of life and in the human economy. It is nonmetallic element having the symbol C, the atomic number 6, an atomic weight of 12.01115, and a melting point about 360 &#8451;. There are four known allotropes of carbon: amorphous, graphite, diamond, and fullerene. A new fifth allotrope of carbon was recently produced, a spongy solid called a magnetic carbon “nanofoam” that is extremely lightweight and attracted to magnets. Due to carbon's unusual chemical property of being able to bond with itself and a wide variety of other elements, it forms nearly 10 million known compounds. Carbon is present as carbon dioxide (CO<sub>2</sub>) in the atmosphere and dissolved in all natural waters. It is a component of rocks as carbonates of calcium (limestone), magnesium, and iron. The fossil fuels (coal, crude oil, natural gas, oils sands, and shale oils) are chiefly hydrocarbons. The isotope carbon-12 is used as the basis for atomic weights. Carbon-14, an isotope with a half-life of 5730 years, is used to date such materials as wood and archeological specimens. Organic chemistry, a major subfield of chemistry, is the study of carbon and its compounds. Because carbon dioxide is a principal greenhouse gas, the global carbon cycle has become a focus of scientific inquiry, and the management of carbon dioxide emissions from the combustion of fossil fuels is a central technological, economic, and political concern.</li>
 </ul>
 </li>
 <li><a id="CarbonCapture">Carbon capture</a>
@@ -399,7 +399,7 @@
 </li>
 <li><a id="Gas">Gas</a>, natural
 <ul>
-<li>See <a href="#NatGas">natural gas</a></li>
+<li>See <a href="#NatGas">Natural gas</a></li>
 </ul>
 </li>
 <li><a id="GasTurbine">Gas turbine</a>
@@ -440,7 +440,7 @@
 <li><a id="GlocalWarming">Global warming</a>
 <ul>
 <li>Climate Change. 1. Any general increase in the earth’s surface temperatures over an extended period of time. 2. The proposition that in the current era, global temperatures have been slowly rising. This is attributed to the phenomenon of atmospheric gases such as carbon dioxide absorbing long-wave radiation as it is reradiated off the earth’s surface rather than this heat escaping into space, thus making the atmosphere warmer.</li>
-<li>The theory that global climatic change, surface warming in particular, is increasingly caused by human emissions of greenhouse gases, mainly carbon dioxide from fossil fuel burning. Aerosol particles also emitted from fossil fuel and biomass burning are believed to result in cooling, partly masking global warming. However, the dominant effect is warming the entire troposphere (the atmosphere below about 11 kilometers containing most of the air’s mass) by 1.5 to 4.5 degrees Celsius (eventually) if the preindustrial atmospheric CO<sub>2</sub> concentration of 270 ppm were to double. Without natural greenhouse gases (water vapor, carbon dioxide and ozone), the earth would be a frozen iceball. As CO<sub>2</sub> has climbed above 360 ppm from fossil fuel burning, planetary mean temperatures rose to the highest in millennia; with warming amplified in the Arctic, thawing permafrost, thinning sea ice and creating marked recession of glaciers. Also observed, as predicted, is subsurface warming from heat penetrating the sea. Likewise, satellite-derived troposphere temperatures are rising, and the stratospheric cooling, the latter consistent with a CO<sub>2</sub> greenhouse effect. Potential warming of the earth’s surface if the bulk of fossil fuel resources are burned could be as much as 10&#8451;, comparable to mid-Cretaceous climates when the poles were deglaciated and dinosaurs roamed Antarctica. Adverse impacts of such dramatic climate shifts on the biosphere and human economy are incalculable. The challenge for energy technology is slowing, stabilizing, and if possible reversing, fossil fuel burning induced global warming, requiring a revolutionary change in the global energy system.</li>
+<li>The theory that global climatic change, surface warming in particular, is increasingly caused by human emissions of greenhouse gases, mainly carbon dioxide from fossil fuel burning. Aerosol particles also emitted from fossil fuel and biomass burning are believed to result in cooling, partly masking global warming. However, the dominant effect is warming the entire troposphere (the atmosphere below about 11 kilometers containing most of the air’s mass) by 1.5 to 4.5 degrees Celsius (eventually) if the preindustrial atmospheric CO<sub>2</sub> concentration of 270 ppm were to double. Without natural greenhouse gases (water vapor, carbon dioxide and ozone), the earth would be a frozen iceball. As CO<sub>2</sub> has climbed above 360 ppm from fossil fuel burning, planetary mean temperatures rose to the highest in millennia; with warming amplified in the Arctic, thawing permafrost, thinning sea ice and creating marked recession of glaciers. Also observed, as predicted, is subsurface warming from heat penetrating the sea. Likewise, satellite-derived troposphere temperatures are rising, and the stratospheric cooling, the latter consistent with a CO<sub>2</sub> greenhouse effect. Potential warming of the earth’s surface if the bulk of fossil fuel resources are burned could be as much as 10 &#8451;, comparable to mid-Cretaceous climates when the poles were deglaciated and dinosaurs roamed Antarctica. Adverse impacts of such dramatic climate shifts on the biosphere and human economy are incalculable. The challenge for energy technology is slowing, stabilizing, and if possible reversing, fossil fuel burning induced global warming, requiring a revolutionary change in the global energy system.</li>
 </ul>
 </li>
 <li><a id="GWP">Global warming potential</a> (GWP)
@@ -450,13 +450,13 @@
 </li>
 <li><a id="GHGeffect">Greenhouse effect</a>
 <ul>
-<li>Earth Science. The trapping of heat by greenhouse gases (see next) that allow incoming solar radiation to pass through the earth’s atmosphere but prevent the escape to outer space of a portion of the outgoing infrared radiation from the surface and lower atmosphere. This process has kept the earth’s temperature approximately 33&#8451; warmer than it would be otherwise; it occurs naturally but may also be enhanced by certain human activities; <em>e.g.,</em> the burning of fossil fuels.</li>
+<li>Earth Science. The trapping of heat by greenhouse gases (see next) that allow incoming solar radiation to pass through the earth’s atmosphere but prevent the escape to outer space of a portion of the outgoing infrared radiation from the surface and lower atmosphere. This process has kept the earth’s temperature approximately 33 &#8451; warmer than it would be otherwise; it occurs naturally but may also be enhanced by certain human activities; <em>e.g.,</em> the burning of fossil fuels.</li>
 </ul>
 </li>
 <li><a id="GHG">Greenhouse gas</a> (GHG)
 <ul>
 <li>Earth Science.any of the gaseous constituents of the atmosphere, both natural and anthropogenic, that absorb and emit radiation at specific wavelengths within the spectrum of infrared radiation emitted by the earth’s surface, the atmosphere, and clouds. This causes the greenhouse effect.</li>
-<li>A gas that is largely transparent to the visible radiation reaching Earth from the sun but absorbs the thermal, infrared radiation that is radiated outward from the earth’s surface. The energy absorbed in the atmosphere is re-radiated in all directions, warming the earth’s surface. The greenhouse gases H<sub>2</sub>O and CO<sub>2</sub> occur naturally in the atmosphere and make earth's surface temperature approximately 33&#8451; warmer than it would otherwise be. Human activities, such as burning fossil fuels, are now releasing additional greenhouse gases to the atmosphere, creating an enhanced greenhouse effect. Greenhouse gases include H<sub>2</sub>O, CO<sub>2</sub>, N<sub>2</sub>O, ozone, the chlorofluorocarbons, and SF<sub>6</sub>. Greenhouse gases exist in the atmosphere as molecules of three or more atoms. The atoms in the gas molecule vibrate with respect to each other, and the molecules rotate in space. Transitions between different energy levels of vibration and rotation in the molecule are quantized and occur with the absorption or release of infrared radiation. Fourier is generally credited with describing (in 1827) how the earth's surface temperature is controlled by the differential absorption of visible and infrared radiation, but use of the phrase “greenhouse effect” to characterize this phenomena seems to have appeared about 1950. Although the phrase has become entrenched in our vocabulary, it is a bit of a misnomer as the physical processes of the two phenomena are quite different. Greenhouse gases in the atmosphere act to restrict the radiative transfer of energy whereas a glass greenhouse acts primarily by restricting the convective transfer of energy.</li>
+<li>A gas that is largely transparent to the visible radiation reaching Earth from the sun but absorbs the thermal, infrared radiation that is radiated outward from the earth’s surface. The energy absorbed in the atmosphere is re-radiated in all directions, warming the earth’s surface. The greenhouse gases H<sub>2</sub>O and CO<sub>2</sub> occur naturally in the atmosphere and make earth's surface temperature approximately 33 &#8451; warmer than it would otherwise be. Human activities, such as burning fossil fuels, are now releasing additional greenhouse gases to the atmosphere, creating an enhanced greenhouse effect. Greenhouse gases include H<sub>2</sub>O, CO<sub>2</sub>, N<sub>2</sub>O, ozone, the chlorofluorocarbons, and SF<sub>6</sub>. Greenhouse gases exist in the atmosphere as molecules of three or more atoms. The atoms in the gas molecule vibrate with respect to each other, and the molecules rotate in space. Transitions between different energy levels of vibration and rotation in the molecule are quantized and occur with the absorption or release of infrared radiation. Fourier is generally credited with describing (in 1827) how the earth's surface temperature is controlled by the differential absorption of visible and infrared radiation, but use of the phrase “greenhouse effect” to characterize this phenomena seems to have appeared about 1950. Although the phrase has become entrenched in our vocabulary, it is a bit of a misnomer as the physical processes of the two phenomena are quite different. Greenhouse gases in the atmosphere act to restrict the radiative transfer of energy whereas a glass greenhouse acts primarily by restricting the convective transfer of energy.</li>
 </ul>
 </li>
 <li><a id="Grid">Grid</a>
@@ -481,7 +481,7 @@
 </li>
 <li><a id="HeatingDegreeDay">Heating degree day</a>
 <ul>
-<li>See <a href="#DegreeDary">degree day</a></li>
+<li>See <a href="#DegreeDary">Degree day</a></li>
 </ul>
 </li>
 <li><a id="HeatingValue">Heating value</a>
@@ -639,38 +639,38 @@
 <li>See <a href="#UraniumTailings">Uranium tailings</a></li>
 </ul>
 </li>
-<li>Mine
+<li><a id="Mine">Mine</a>
 <ul>
 <li>Mining. 1. Any opening or excavation in the earth that is used to extract minerals, coal, ore, or other such material of value. 2. To extract material in this manner.</li>
 </ul>
 </li>
-<li>Mine-mouth (power) plant
+<li><a id="Mine-mouth">Mine-mouth</a> (power) plant
 <ul>
 <li>Coal. A large electrical power plant built directly adjacent to the coal mine that is the source of its fuel; often used with lignite and other such coals that are expensive to ship by train. A strategy intended to minimize transportation costs and provide a more reliable supply flow, though in practical use these plants have faced challenges such as environmental regulations or the depletion of the resources at the site.</li>
 </ul>
 </li>
-<li>Nameplate capacity
+<li><a id="NameplateCapacity">Nameplate capacity</a>
 <ul>
-<li>See capacity</li>
+<li>See <a href="#Capacity">Capacity</a></li>
 </ul>
 </li>
-<li>Natural gas
+<li><a id="NaturalGas">Natural gas</a>
 <ul>
 <li>Oil & Gas. A mixture of hydrocarbon compounds and small quantities of various nonhydrocarbons, widely used as a fuel throughout the industrialized world; it exists in the gaseous phase or in solution with crude oil in natural underground reservoirs.</li>
 <li>Natural gas is a mixture of naturally occurring compounds that are in a gaseous state at the conditions of temperature and pressure at the earth’s surface. These compounds are mostly simple molecules formed of hydrogen and carbon (thus hydrocarbon). Methane, with molecules formed from four atoms of hydrogen and one of carbon, is the simplest form and generally is the most common compound in the mixture. Ethane, propane, butane, and pentane are slightly more complex compounds with two, three, four, and five carbon atoms respectively in each molecule. Other more complex hydrocarbon compounds can also be part of the mixture. Oil, by contrast, is an even more complex mixture of larger hydrocarbon molecules. Other non-hydrocarbon compounds are also present in natural gas but generally in lesser amounts. These non-hydrocarbon compounds include carbon dioxide, nitrogen, and hydrogen sulfide. Some natural gas is present in fields that produce little or no volume of liquids (non-associated gas). Natural gas is also present in oil fields. In an oil field, natural gas can occur in separate pools or as a gas cap floating on the denser oil (associated gas). It can also be dissolved in the oil (dissolved gas). Some simple hydrocarbon molecules, such as methane, can be formed by inorganic processes; however, most of the natural gas that occurs in commercial gas or oil fields is likely of organic origin. Buried plant or algal material forms natural gas when subjected to sufficient burial and heating (thermogenic gas) or by the action of microbes (biogenic gas).</li>
 </ul>
 </li>
-<li>Natural uranium
+<li><a id="NaturalUranium">Natural uranium</a>
 <ul>
 <li>Nuclear. A term for uranium as it is mined from the earth. The composition of this is 99.3 % U-238 and 0.7 % U-235.</li>
 </ul>
 </li>
-<li>Net capacity
+<li><a id="NetCapacity">Net capacity</a>
 <ul>
 <li>Electricity. The maximum capacity (or effective rating), modified for ambient limitations, that a generating unit, power plant, or electric system can sustain over a specified period, less the capacity used to supply the demand of station service or auxiliary needs.</li>
 </ul>
 </li>
-<li>Net generation
+<li><a id="NetGeneration">Net generation</a>
 <ul>
 <li>Electricity. The amount of gross generation from a generating station, less the electrical energy consumed at the station itself for station service or auxiliaries.</li>
 </ul>
@@ -873,7 +873,7 @@
 </li>
 <li>Sulfur dioxide
 <ul>
-<li>Chemistry. SO<sub>2</sub>, a toxic, irritating, colorless gas that is soluble in water and alcohol; freezes at –72.7&#8451; and boils at –10&#8451; an oxidizing and reducing agent formed naturally by volcanic activity and organic decay. Used as a chemical intermediate, in paper pulping and ore refining, and as a solvent. See also sulfur dioxide pollution, sulfur oxides.</li>
+<li>Chemistry. SO<sub>2</sub>, a toxic, irritating, colorless gas that is soluble in water and alcohol; freezes at –72.7 &#8451; and boils at –10 &#8451; an oxidizing and reducing agent formed naturally by volcanic activity and organic decay. Used as a chemical intermediate, in paper pulping and ore refining, and as a solvent. See also sulfur dioxide pollution, sulfur oxides.</li>
 </ul>
 </li>
 <li>Solar cell
@@ -935,7 +935,7 @@
 </li>
 <li>Uranium
 <ul>
-<li>Chemistry. A metallic element having the symbol U, the atomic number 92, an atomic weight of 238.029, a melting point of 1132&#8451;, and a boiling point of 3818&#8451;; a dense silvery solid with three naturally occurring radioactive isotopes.</li>
+<li>Chemistry. A metallic element having the symbol U, the atomic number 92, an atomic weight of 238.029, a melting point of 1132 &#8451;, and a boiling point of 3818 &#8451;; a dense silvery solid with three naturally occurring radioactive isotopes.</li>
 <li>Uranium is a very heavy metal that constitutes a concentrated energy source that is used in nuclear power. Uranium was apparently formed in super novae about 6.6 billion years ago. It occurs in most rocks in concentrations of 2 to 4 parts per million, and in much lower concentrations in seawater. Its radioactive decay provides the main source of heat inside the earth, causing convection and continental drift. Uranium was discovered in 1789 by Martin Klaproth, a German chemist, in the mineral called pitchblende. It was named after the planet Uranus, which had been discovered eight years earlier. Uranium is the heaviest of all the naturally occurring elements, being 18.7 times as dense as water. The high density of uranium means that it is used in the keels of yachts and as counterweights for aircraft control surfaces, as well as for radiation shielding. ‘Natural’ uranium as found in the earth's crust is a mixture largely of two isotopes: uranium-238 (U-238), accounting for 99.3 % and uranium-235 (U-235) about 0.7 %. The isotope U-235 is important because under certain conditions it can readily be split, yielding a lot of energy. When the nucleus of a U-235 atom captures a neutron it splits in two (fissions), releases energy in the form of heat, and emits two or three neutrons. If enough of these expelled neutrons cause the nuclei of other U-235 atoms to split, releasing further neutrons, a fission ‘chain reaction’ can be achieved. This is the process that occurs in nuclear reactor where the heat is used to make steam to produce electricity. Each fission of a U-235 atom releases about 200 MeV (3.2 x 10<sup>-11</sup> joule)— about 50 million times as much energy as burning an atom of carbon. In other terms, a kilogram of natural uranium used in a typical reactor yields around 20,000 times as much energy as a kilogram of coal, and a kilogram of enriched nuclear fuel yields 160,000 times as much. Fission produces hundreds of different kinds of fission products (isotopes of much lighter elements), most of which are radioactive. In addition, a uranium atom may capture a neutron without splitting, leading the formation of a number of radioactive transuranic elements. These byproducts comprise nuclear waste.</li>
 </ul>
 </li>
@@ -946,7 +946,7 @@
 </li>
 <li>Uranium hexafluoride
 <ul>
-<li>Nuclear. UF<sub>6</sub>, a white solid obtained by chemical treatment of U<sub>3</sub>O<sub>8</sub>, forming a vapor at temperatures above 56&#8451;. It is the form of uranium required for the enrichment process.</li>
+<li>Nuclear. UF<sub>6</sub>, a white solid obtained by chemical treatment of U<sub>3</sub>O<sub>8</sub>, forming a vapor at temperatures above 56 &#8451;. It is the form of uranium required for the enrichment process.</li>
 </ul>
 </li>
 <li>Uranium ore
