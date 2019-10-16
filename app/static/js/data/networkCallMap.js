@@ -117,5 +117,9 @@ define([
       name: "turnRunningDialogHtml",
       path: "/turnrunningdialoghtml" + gid
     },
+    "eventDetailsHtml": {
+      name: "eventDetailsHtml",
+      path: "/eventdetailshtml" + gid
+    },
   });
 });				

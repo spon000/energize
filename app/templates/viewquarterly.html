@@ -183,7 +183,8 @@
     <span id="sidebar-title">
       <h4 class="sidebar-title-heading">Event Items</h4>
       <label class="sidebar-btn open-b">&#9664;</label>
-      <label class="trash-btn">&#128465;</label>
+      <label class="sidebar-btn-window">&#10697;</label>
+      <label class="sidebar-btn-trash">&#128465;</label>
       <h4 class="sidebar-title-heading">Details</h4>
     </span>
 
@@ -194,6 +195,7 @@
     </div>
 
     <div id="quarterly-events-list-sidebar" class="event-sidebar"></div>
+
   </div>
 </div>
 
@@ -236,39 +238,41 @@
   }
 
   .open-b {
-    margin-left: 50%;
+    margin-left: 45%;
     transition: 0.5s;
   }
 
   .close-b {
-    margin-left: -15%;
+    margin-left: 0;
     transition: 0.5s;
   }
 
   .open-sb {
-    width: 500px;
+    width: 400px;
     transition: 0.5s;
   }
 
   .open-t {
-    margin-right: 350px;
+    overflow: scroll;
+    width: 302px;
+    /* margin-right: 350px; */
   }
 
 
   .event-sidebar {
-    height: 238px;
+    height: 239px;
     position: absolute;
-    z-index: 1;
+    z-index: 5;
     top: 305px;
-    right: 20px;
+    right: 22px;
     background-color: #eee;
 
     overflow-x: hidden;
     transition: 0.5s;
-    padding-top: 60px;
+    padding-top: 0px;
     border-style: solid;
     border-width: 2px;
     border-color: #222;
-    border-radius: 5px;
+    /* border-radius: 5px; */
   }
 </style>

@@ -85,6 +85,42 @@ prompt_types = [
     'long_description' : 'We\'d like to congratulate you on your new appointment as CEO of {}. We have confidence that you will help this company prosper within the coming years.',
   },
   {
+    'title' : 'facility-active',
+    'category': 'Company Memo', 
+    'image': 'default.png', 
+    'priority': 'information', 
+    'scope': 'facility',
+    'short_description' : 'Facility is back online.',
+    'long_description' : 'The power facility, {}, has come back online and is available to provide electrical power to the masses.',
+  },
+  {
+    'title' : 'facility-inactive',
+    'category': 'Company Memo', 
+    'image': 'default.png', 
+    'priority': 'danger', 
+    'scope': 'facility',
+    'short_description' : 'Facility has become unavailable.',
+    'long_description' : 'The power facility, {}, is now unavailable to produce electrical power',
+  },
+  {
+    'title': 'generator-condition-bad',
+    'category': 'Company Memo',
+    'image': 'default.png', 
+    'priority': 'warning', 
+    'scope': 'generator',
+    'short_description' : 'A generator has been made unavailable.',
+    'long_description' : 'A generator within facility, {}, has degraded to a condition which makes it inefficient to run. It has been made unavailable to the facility.',
+  },
+  {
+    'title': 'generator-built',
+    'category': 'Company Memo',
+    'image': 'default.png', 
+    'priority': 'information', 
+    'scope': 'generator',
+    'short_description' : 'A new generator has been built.',
+    'long_description' : 'A new generator has finished building and is now available for use in facility, {}.',
+  },
+  {
     'title' : 'heatwave',
     'category': 'News Brief', 
     'image': 'default.png', 
@@ -129,12 +165,5 @@ prompt_types = [
     'short_description' : 'Frosty is living the dream.',
     'long_description' : 'A hurricane has struck, none of your facilities were directly affected.',
   },    
-
-
-
-
-
-  
- 
 ]
 

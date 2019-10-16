@@ -808,4 +808,18 @@ def turn_running_dialog_html():
   game = Game.query.filter_by(id=gid).first()
 
   return render_template("runningturn.html")
+
+# ###############################################################################  
+#
+# ###############################################################################
+@game.route("/eventdetailshtml", methods=["GET", "POST"])
+@login_required
+def event_details_html():
+  gid = request.args.get('gid', None)
+  prompt_id = request.args.get('prmtid', None)
+
+  game = Game.query.filter_by(id=gid).first()
+  prompt = Prompt.query.filter_by(id=prompt_id).first()
+
+  return render_template("eventdetails.html", prompt=prompt, format_date=format_date)  
   

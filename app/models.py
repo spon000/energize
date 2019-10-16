@@ -359,6 +359,7 @@ class Prompt(db.Model):
   id_company = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
   id_game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)  
 
+
   # Data
   date = db.Column(db.Integer, default=0)
   date_string = db.Column(db.String(40))
@@ -367,7 +368,6 @@ class Prompt(db.Model):
   read = db.Column(db.Boolean, default=False)
   resolved = db.Column(db.Boolean, default=False)
   response = db.Column(db.Integer)
-  scope_name = db.Column(db.String(40))
 
   short_description = db.Column(db.String(70))
   long_description = db.Column(db.String(300))
@@ -398,7 +398,6 @@ class Prompt(db.Model):
       f"Long Descrip: {self.long_description}\n" 
     )    
 
-
 #########################################################################################
 # PromptType Model
 class PromptType(db.Model):
@@ -407,11 +406,14 @@ class PromptType(db.Model):
   # Data
   category = db.Column(db.Enum("Company Memo", "News Brief", "Projections"), default="Company Memo", nullable=False)
   image = db.Column(db.String(30), nullable=False, default='default.png')
-  priority = scope = db.Column(db.Enum("information", "warning", "danger"), default="information", nullable=False)
+  priority = db.Column(db.Enum("information", "warning", "danger"), default="information", nullable=False)
   scope = db.Column(db.Enum("company", "facility", "generator", "other"), default="company", nullable=False)
-  title = db.Column(db.String(30))
+  scope_check = db.Column(db.String(30))
+  scope_state = db.Column(db.String(30))
+
+  title = db.Column(db.String(40))
     
-  short_description = db.Column(db.String(40))
+  short_description = db.Column(db.String(60))
   long_description = db.Column(db.String(300))
 
   # Relational Data

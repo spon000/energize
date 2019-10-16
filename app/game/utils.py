@@ -1,25 +1,7 @@
 from math import floor, ceil
-
-# date modifiers
-
-# This must match the default in the Game model in app/models.py
-zero_year = 1920
-
-quarters_per_year = 4
-turns_per_year = quarters_per_year
-
-months_per_year = 12
-months_per_quarter = 3
-
-days_per_year = 360
-days_per_quarter = 90
-days_per_month = 30
-
-hours_per_year = 8640
-hours_per_quarter = 2160
-hours_per_turn = 2160
-hours_per_month = 720
-hours_per_day = 24
+from app.game.constants import  zero_year, quarters_per_year, turns_per_year, quarters_per_year, months_per_year, months_per_quarter
+from app.game.constants import  days_per_year, days_per_quarter, days_per_month, hours_per_year, hours_per_quarter, hours_per_turn
+from app.game.constants import  hours_per_month,hours_per_day
 
 ####################################################################
 # Date utilities

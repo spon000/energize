@@ -22,7 +22,9 @@ define([
           this._elementIdQuarterlyEventsTable = "quarterly-events-list-table";
           this._quarterlyDialogHtml = null
           this._quarterlyDialog = null;
-          this._eventSelected = true;
+          this._eventSelected = false;
+          this._sideBarOpen = false;
+          this._trashEventsOn = false;
           this._events = null;
 
 
@@ -60,6 +62,7 @@ define([
         /* *********************************************************************************** */
         _createEvents() {
           $("#" + this._elementIdQuarterlyEventsMain).find(".sidebar-btn").on("click", this, this._sidebar);
+          $("#" + this._elementIdQuarterlyEventsMain).find(".sidebar-btn-trash").on("click", this, this._trashEvents);
         }
 
         /* *********************************************************************************** */
@@ -70,13 +73,15 @@ define([
           let button = evt.currentTarget;
           let scope = evt.data;
 
-          if (!scope._eventSelected)
-            return;
+          // if (!scope._eventSelected)
+          //   return;
 
           if ($(button).hasClass("open-b")) {
+            scope._sidebarStatus(true);
             $(button).html("&#9654;");
           }
           else {
+            scope._sidebarStatus(false);
             $(button).html("&#9664;");
           }
 
@@ -84,6 +89,36 @@ define([
           $(button).toggleClass("close-b");
           $("#" + scope._elementIdQuarterlyEventsSidebar).toggleClass("open-sb");
           $("#" + scope._elementIdQuarterlyEventsTable).toggleClass("open-t");
+        }
+
+        /* *********************************************************************************** */
+        _trashEvents(evt) {
+          console.log("_trashEvents()... ", evt);
+        }
+
+        /* *********************************************************************************** */
+        _sidebarStatus(open) {
+          this._sideBarOpen = open;
+
+          if (open) {
+            let eventDetailsHtml = $("#" + this._elementIdQuarterlyEventsSidebar).find("#event-details")
+
+            if ($(eventDetailsHtml))
+              $(eventDetailsHtml).removeClass("event-details-hide");
+            else
+              $(eventDetailsHtml).addClass("event-details-hide");
+          }
+        }
+
+        _addEventToSidebar(html) {
+
+          if (this._sideBarOpen)
+            $(html).removeClass("event-details-hide");
+          else
+            $(html).addClass("event-details-hide");
+
+          $("#" + this._elementIdQuarterlyEventsSidebar).empty();
+          $("#" + this._elementIdQuarterlyEventsSidebar).append(html);
         }
 
 
@@ -150,10 +185,12 @@ define([
             // console.log("event_types = ", this._eventTypes);
 
             event_table_data.push({
+              id: event.id,
               priority: event_type.priority,
               type: event_type.category,
               date: event.date_string,
               subject: event.short_description,
+              scope: this,
             });
           });
 
@@ -168,27 +205,22 @@ define([
               },
 
               {
+                title: "Subject", field: "subject", width: 300,
+              },
+
+              {
                 title: "Type", field: "type", width: 200, align: "center",
                 formatter: this._type_cell,
               },
 
               {
-                title: "Date", field: "date", width: 100,
-              },
-
-
-              {
-                title: "Subject", field: "subject", width: 300,
+                title: "Date", field: "date", width: 155,
               },
             ],
 
-            selectable: true,
-            rowSelected: (row) => {
-              console.log("row selected ", row);
-            },
-            rowClick: (row) => {
-              console.log("row clicked ", row)
-            }
+            selectable: 1,
+            rowSelected: this._table_row_selected,
+
           }
 
           return new Tabulator("#" + this._elementIdQuarterlyEventsTable, eventTableDef);
@@ -212,5 +244,18 @@ define([
         _type_cell(cell, formatterParams = null) {
           return ("[" + cell.getValue() + "]")
         }
+
+        /* *********************************************************************************** */
+        _table_row_selected(row) {
+          let data = row.getData();
+          let scope = data.scope;
+
+          scope._modelData.getEventDetailsHtml(data.id).then((html) => {
+            console.log("eventDetails html = ", html);
+            scope._addEventToSidebar(html);
+          });
+          console.log("row selected ", data);
+        }
+
       });
   });

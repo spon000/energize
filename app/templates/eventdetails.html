@@ -1,0 +1,83 @@
+<style>
+  #event-details {
+    display: grid;
+    grid-gap: 0px;
+    grid-template-columns: 400px;
+    grid-template-rows: 30px 50px 150px;
+    margin: 0;
+    background-color: #efefef;
+    overflow: auto;
+  }
+
+  #event-details-type {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #event-details-type h5 {
+    text-align: center;
+  }
+
+  #event-details-subject {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  #event-details-subject label {
+    margin: 0px;
+  }
+
+  #event-details-subject hr {
+    /* margin: 5px 0 15px 0; */
+    width: 100%;
+    color: black;
+    margin: 5px 0px 15px 0px;
+  }
+
+  #event-details-subject .highlight {
+    font-weight: bold;
+  }
+
+
+  #event-details-message {
+    grid-column: 1;
+    grid-row: 3;
+    margin: 15px 5px 0px 1px;
+  }
+
+  .event-details-hide {
+    display: none;
+  }
+</style>
+
+
+<div id="event-details" class="grid-box event-details-hide">
+
+  <div id="event-details-type">
+    <h5>{{ prompt.prompt_type.category }}</h5>
+  </div>
+
+  <div id="event-details-subject" class="container">
+
+    <div class="row">
+      <label class="sep col-lg-2 highlight">Date: </label>
+      <label class="sep col-lg-5">{{ format_date(prompt.date, "Y Q") }} </label>
+    </div>
+
+    <div class="row">
+      <label class="sep col-lg-2 highlight">Subject: </label>
+      <label class="sep col-lg-10">{{ prompt.short_description }} </label>
+    </div>
+    <div class="row">
+      <hr/>
+    </div>
+    <div class="row"></div>
+  </div>
+
+  <div id="event-details-message" class="">
+    <div class="row">
+      <label class="sep col-lg-12">{{ prompt.long_description }}</label>
+    </div>
+  </div>
+
+</div>

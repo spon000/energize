@@ -232,5 +232,15 @@ define([
         });
       }
 
+      getEventDetailsHtml(promptId) {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.eventDetailsHtml.path + "prmtid=" + promptId)
+          loaded.then((results) => {
+            // console.log("resultes = ", results);
+            resolve(results)
+          });
+        });
+      }
+
     });
 });

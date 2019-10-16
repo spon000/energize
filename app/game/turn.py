@@ -6,6 +6,9 @@ from math import trunc
 import scipy
 import scipy.signal
 import scipy.stats
+
+import app.game.constants as cons
+
 # import matplotlib as mpl
 # mpl.use('Agg')
 # import matplotlib.pyplot as plt
@@ -20,20 +23,90 @@ from shapely.geometry.polygon import Polygon
 from app.game.prompts import assign_prompt
 from app.game.sio_outgoing import shout_game_turn_interval
 from app.game.utils import get_age
+from app.game.events import quarterly_events, daily_events, hourly_events
+
 
 # ###############################################################################  
 #
 # ###############################################################################
 def initialize_turn(game, mods):
-  modify_facility_states(game)
-  modify_generator_states(game)
+  pass
+# ###############################################################################  
+#
+# ###############################################################################
+def check_generator_hourly(game, state, hour):
+  pass
+
+
+# ###############################################################################  
+#
+# ###############################################################################
+def check_generator_daily(game, state, day):
+  pass
+
+# ###############################################################################  
+#
+# ###############################################################################
+def check_generator_quarterly(game, state):
+  generators = Generator.query.filter_by(id_game=game.id).all()
+  for generator in generators:
+
+    if generator.state == "new":
+      generator.state="building"
+      generator.build_turn -= 1  
+
+    elif generator.state == "building":
+      generator.build_turn -= 1
+
+      if generator.build_turn <= 0:  
+        generator.state="available"
+        generator.prod_turn += 1
+        set_state_vars(state, mods, game.id)
+        state = get_state_vars(state, mods, game.id)
+
+    elif generator.state == "available":
+
+      if generator.condition < 0.20:
+        generator.state = "unavailable"
+        set_state_vars(state, mods, game.id)
+        state = get_state_vars(state, mods, game.id)
+      else:
+        generator.prod_turn += 1
+
+    elif generator.state == "start_decom":
+      generator.state = "decommissioning"
+      generator.decom_turn -= 1
+
+    elif generator.state == "decommissioning":
+       generator.decom_turn -= 1
+       if generator.decom_turn <= 0:
+         generator.state = "decommissioned"           
+
+  return state
   
-  return
 
 # ###############################################################################  
 #
 # ###############################################################################  
-def modify_facility_states(game):
+def check_facility_hourly(game, hour):
+  pass
+
+
+# ###############################################################################  
+#
+# ###############################################################################  
+def check_facility_daily(game, day):
+  facilities = Facility.query.filter_by(id_game=game.id, state='inactive').all()
+  for facility in facilities:
+    facility.counter -= 1
+    if facility.counter <= 0:
+      facility.counter = 0
+      facility.state = 'active'
+
+# ###############################################################################  
+#
+# ###############################################################################  
+def check_facility_quarterly(game):
   facilities = Facility.query.filter_by(id_game=game.id).all()
   for facility in facilities:
 
@@ -43,48 +116,77 @@ def modify_facility_states(game):
 
     elif facility.state == "building":
       facility.build_turn -= 1
-      if facility.build_turn <= 0: #facility.facility_type.build_time:
+
+      if facility.build_turn <= 0: 
         facility.state="active"
         facility.prod_turn += 1
 
     elif facility.state == "active":
-      facility.prod_turn += 1
+      facility.prod_turn += 1  
+  
+  
 
-  return
 
 # ###############################################################################  
 #
-# ###############################################################################
-def modify_generator_states(game):
-  generators = Generator.query.filter_by(id_game=game.id).all()
-  for generator in generators:
+# ###############################################################################  
+# def modify_facility_states(game):
+#   facilities = Facility.query.filter_by(id_game=game.id).all()
+#   for facility in facilities:
 
-    if generator.state == "new":
-      generator.state="building"
-      generator.build_turn -= 1
+#     if facility.state == "new":
+#       facility.state="building"
+#       facility.build_turn -= 1
 
-    elif generator.state == "building":
-      generator.build_turn -= 1
-      if generator.build_turn <= 0:  #>= generator.generator_type.build_time:
-        generator.state="available"
-        generator.prod_turn += 1
+#     elif facility.state == "building":
+#       facility.build_turn -= 1
+#       if facility.build_turn <= 0: 
+#         facility.state="active"
+#         facility.prod_turn += 1
 
-    elif generator.state == "available":
-      if generator.condition < 0.20:
-        generator.state = "unavailable"
-      else:
-        generator.prod_turn += 1
-      
-    elif generator.state == "start_decom":
-      generator.state = "decommissioning"
-      generator.decom_turn -= 1
+#     elif facility.state == "active":
+#       facility.prod_turn += 1
 
-    elif generator.state == "decommissioning":
-       generator.decom_turn -= 1
-       if generator.decom_turn <= 0:
-         generator.state = "decommissioned"
+#     elif facility.state=='inactive' and facility.counter > 0:
+#       facility.counter -= 1
+#       if facility.counter == 0:
+#         facility.state='active'
 
-  return
+#   return
+
+# # ###############################################################################  
+# #
+# # ###############################################################################
+# def modify_generator_states(game):
+#   generators = Generator.query.filter_by(id_game=game.id).all()
+#   for generator in generators:
+
+#     if generator.state == "new":
+#       generator.state="building"
+#       generator.build_turn -= 1
+
+#     elif generator.state == "building":
+#       generator.build_turn -= 1
+#       if generator.build_turn <= 0:  #>= generator.generator_type.build_time:
+#         generator.state="available"
+#         generator.prod_turn += 1
+
+#     elif generator.state == "available":
+#       if generator.condition < 0.20:
+#         generator.state = "unavailable"
+#       else:
+#         generator.prod_turn += 1
+
+#     elif generator.state == "start_decom":
+#       generator.state = "decommissioning"
+#       generator.decom_turn -= 1
+
+#     elif generator.state == "decommissioning":
+#        generator.decom_turn -= 1
+#        if generator.decom_turn <= 0:
+#          generator.state = "decommissioned"
+
+#   return
 
 # ###############################################################################  
 #
@@ -132,25 +234,25 @@ def add_population_growth(state):
 # ###############################################################################  
 #
 # ###############################################################################
-def age_generators(state,gid):
+# def age_generators(state, gid):
 
-  i = state['i']
-  generators = Generator.query.all()
-  for gen in generators:
-    if gen.state == 'building':
-      if gen.build_turn>0:
-        gen.build_turn -= 1
-      if gen.build_turn<=0:
-        gen.state = 'available'
-        gen.build_turn  = 0
-        set_state_vars(db,state,mods)
-        state = get_state_vars(state,mods)
-    if gen.state == 'available' and gen.condition<0.20:
-      gen.state = 'unavailable'
-      set_state_vars(db,state,mods)
-      state = get_state_vars(state,mods)
+#   i = state['i']
+#   generators = Generator.query.filter_by(id_game=gid).all()
+#   for gen in generators:
+#     if gen.state == 'building':
+#       if gen.build_turn > 0:
+#         gen.build_turn -= 1
+#       if gen.build_turn <= 0:
+#         gen.state = 'available'
+#         gen.build_turn  = 0
+#         set_state_vars(state, mods)
+#         state = get_state_vars(state, mods, gid)
+#     if gen.state == 'available' and gen.condition < 0.20:
+#       gen.state = 'unavailable'
+#       set_state_vars(state, mods)
+#       state = get_state_vars(state, mods, gid)
 
-  return state
+#   return state
 
 def caculate_generator_cost(generator, state):
   # this already happens within the ISO for now
@@ -159,13 +261,13 @@ def caculate_generator_cost(generator, state):
 # ###############################################################################  
 #
 # ###############################################################################
-def age_facilities(gid):
-
-  for facility in Facility.query.all():
-    if facility.state=='inactive' and facility.counter > 0:
-      facility.counter -= 1
-      if facility.counter == 0:
-        facility.state='active'
+# def age_facilities(gid):
+  
+#   for facility in Facility.query.filter_by(id_game=gid).all():
+#     if facility.state=='inactive' and facility.counter > 0:
+#       facility.counter -= 1
+#       if facility.counter == 0:
+#         facility.state='active'
 
 
 def calculate_facility_cost(facility, state):
@@ -178,21 +280,33 @@ def calculate_facility_cost(facility, state):
 # turn process
 def run_turn(game, mods):
   state = {}
-  state['i'] = game.turn_number * 90 * 24
-  state = get_state_vars(state, mods)
+  state['i'] = game.turn_number * cons.hours_per_turn
+  state = get_state_vars(state, mods, game.id)
   mods = massage_mods(mods)
 
   filename = "history" + str(game.id) + ".txt"
   file = open(filename,'w')
 
+  file.write("+" * 80 +"\n")
+  file.write(f"state = {state}")
+
+  check_facility_quarterly(game)
+  state = check_generator_quarterly(game, state)
+  quarterly_events(game, mods)
+
   for day in range(90):
     shout_game_turn_interval(game.id, {'statusMsg': 'Calculating days...', 'interval': day, 'total': 90})
+    check_facility_daily(game, day)
+    check_generator_daily(game, state, day)
     # file.write("+" * 80 +"\n")
     # file.write(f"day: {day} ----  {datetime.now().time()}\n")
     # file.write("+" * 80 + "\n")
 
     for hr in range(24):
       # file.write(f"hr({hr})...    {datetime.now().time()}\n")
+      check_facility_hourly(game, hr)
+      check_generator_hourly(game, state, hr)
+
       state = iso(mods, state, file)
       state['i'] += 1
 
@@ -294,10 +408,10 @@ def massage_mods(mods):
 # ###############################################################################
 #
 # ###############################################################################
-def get_state_vars(state, mods):
+def get_state_vars(state, mods, gid):
   i = state['i']
 
-  gens        = Generator.query.filter(Generator.build_turn == 0, Generator.state == 'available').all()
+  gens        = Generator.query.filter(Generator.id_game == gid, Generator.build_turn == 0, Generator.state == 'available').all()
   ng          = len(gens)
   availCap    = np.zeros(ng, dtype='float')
   fuel_costs  = np.zeros(ng, dtype='float')
@@ -312,7 +426,6 @@ def get_state_vars(state, mods):
   pn          = np.zeros(ng, dtype='object')
 
   for j in range(ng):
-
     jgen           = gens[j]
     fac            = jgen.facility
     facCap         = float(np.sum([kgen.generator_type.nameplate_capacity for kgen in fac.generators if kgen.state == "available"]))
@@ -356,211 +469,6 @@ def get_state_vars(state, mods):
   })
 
 # ###############################################################################  
-# roll_for_events():
-#   
-#   
-#   this function runs every hour, so probabilities should be scaled accordingly
-# ###############################################################################
-def roll_for_events(game,db,mods,state):
-
-  i = state['i']
-  if game.turn_number%4==1:
-    # Spring, nice weather, nothing bad ever happens in spring
-    pass
-
-  if game.turn_number%4==2:
-    # Summer, 40% chance of heatwave
-    # roll random number to decide if a new heatwave starts
-    quarterlyProb = 1.5
-    hourlyProb    = quarterlyProb / (90.0*24.0)
-    if np.random.uniform(0,1)<hourlyProb or True:
-      # roll random numbers to decide heatwave severity and duration, increase demand by 10-25% for 4-12 days
-      dur  = 4+np.random.randint(9)
-      peak = np.random.uniform(0.10,0.25)
-
-      # create event object with message describing heatwave
-      # push event notification to all companies
-      # event = Prompt( id_type=1, description=desc, start=i, end=i+dur*24 )
-      # desc = 'A heatwave has struck and is expected to last for %i days, increasing energy demand by as much as %i percent' % (dur,np.ceil(peak*100))
-
-      for company in Company.query.filter_by(id_game=game.id).all():
-        # event = assign_prompt('heatwave', game, company, focus="company", category="warning", description=desc, start=i, end=i+dur*24)
-        event = assign_prompt('heatwave', game, company, {'start': i, 'end': (i+dur*24)}, [dur, np.ceil(peak*100)])
-        db.session.add(event)
-
-      # event.companies = Company.query.filter_by(id_game=game.id).all()
-      # create randomly fluctuating timeseries to represent increase in energy demand due to heat
-      x1 = np.linspace(0,14,6)
-      y1 = np.random.uniform(0.2,0.5,6)
-      y1[0] = 0
-      y1[-1] = 0
-      y1 = y1*(1.0/(1+np.exp(-10*(x1-1))))*(1.0-1.0/(1+np.exp(-10*(x1-dur))))
-      x2  = np.linspace(0,14,14*24)
-      y2  = scipy.interpolate.interp1d(x1,y1,kind='cubic')(x2)
-      y2 *= (1.0/(1+np.exp(-10*(x2-1))))*(1.0-1.0/(1+np.exp(-10*(x2-dur))))
-      y2 /= np.max(y2)
-      y2 *= peak
-      y2 += 1.0
-      # update the energy demand accordingly
-      for jj in range(len(mods['ed'])):
-        for kk in range(14*24):
-          mods['ed'][jj][0][i+kk] *= y2[kk]
-      # push event object to database
-      # db.session.add(event)
-      # db.session.commit()
-      # in the future, the location of the heatwave would also be decided here
-      # therefore the demand of individual cities might become too high for the transmission lines in some places
-      # aint no tranmission network yet so we'll ignore that for now
-
-  if game.turn_number%4==3:
-    # Fall, 25% probability of hurricane
-    # roll random number to decide if hurricane happens
-    quarterlyProb = 2.00
-    hourlyProb    = quarterlyProb / (90.0*24.0)
-    if np.random.uniform(0,1)<hourlyProb or True:
-      # roll random duration, location (has to be coastal)
-      dur  = 4+np.random.randint(9)
-      sev  = np.random.uniform(30,70)
-      # determine set of facilities affected (ie knocked offline)
-      x = [75,50,20,10,30,35,15,12,5,5]
-      y = [120,105,100,90,85,75,55,40,20,5]
-      cl = coastal_length(x,y)
-      dc = np.random.uniform(0,cl)
-      dS = dc-sev
-      dN = dc+sev
-      if dS<0: dS=0
-      if dN>cl: dN=cl
-      xc,yc=coastal_dist_to_xy(x,y,dc)
-      xS,yS=coastal_dist_to_xy(x,y,dS)
-      xN,yN=coastal_dist_to_xy(x,y,dN)
-      xi = xc + sev*1.5
-      yi = yc + np.random.normal(0,0.2*sev,1)
-      polyx = [0, 0, xS, xi, xN, 0,  0]
-      polyy = [yc,yS,yS, yi, yN, yN, yc]
-      polygon = Polygon( zip(polyx,polyy) )
-      for company in Company.query.all():
-        # count facilities that are in the impacted polygon
-        off_facs = []
-        for facility in Facility.query.all():
-          if company.player_number==facility.player_number:
-            point = Point(facility.column, facility.row)
-            if polygon.contains(point):
-              off_facs += [facility]
-        if len(off_facs)>0:
-          desc = 'A hurricane has struck, and %i of your facilities are expected to be offline for %i days' % (len(off_facs),dur)
-          # event = Prompt( id_game=game.id, id_company=company.id, focus="company", category="danger", description=desc, start=game.turn_number, end=game.turn_number+dur)
-          turn_hours = get_age(game.turn_number)
-          event = assign_prompt('hurricane-affected', game, company, {'start': turn_hours, 'end': turn_hours + dur}, [dur, np.ceil(peak*100)])
-          # event.companies += [company]
-          db.session.add(event)
-          # db.session.commit()
-        else:
-          desc = 'A hurricane has struck, none of your facilities were directly affected'
-          event = Prompt(id_game=game.id, id_company=company.id, focus="company", category="information", description=desc, start=i, end=i+dur*24)
-          # event.companies += [company]
-          db.session.add(event)
-          # db.session.commit()
-      for facility in Facility.query.all():
-        point = Point(facility.column, facility.row)
-        if polygon.contains(point):
-          facility.state='inactive'
-          facility.counter=dur
-
-      '''plt.figure()
-      im = plt.imread("./app/static/img/world-map-240x120.png")
-      implot = plt.imshow(im,origin='upper')
-      plt.plot(x,y,c='b')
-      plt.scatter(xS,yS,c='r')
-      plt.scatter(xN,yN,c='r')
-      plt.scatter(xi,yi,c='r')
-      plt.plot( polyx, polyy, '--r' )
-      polygon = Polygon( zip(polyx,polyy) )
-      for city in City.query.all():
-        point = Point(city.column, city.row)
-        if polygon.contains(point):
-          plt.scatter(city.column,city.row,s=20,c='red')
-        plt.scatter(city.column,city.row,s=5,c='black')
-      for facility in Facility.query.all():
-        point = Point(facility.column, facility.row)
-        if polygon.contains(point):
-          plt.scatter(facility.column,facility.row,s=20,c='red')
-        else:
-          plt.scatter(facility.column,facility.row,s=20,c='black')
-        plt.scatter(facility.column,facility.row,s=5,c='gray')
-      plt.xlim([0,240])
-      plt.ylim([0,120])
-      plt.gca().invert_yaxis()
-      plt.savefig('hurricane.eps',format='eps',bbox_inches='tight')
-      plt.close()'''
-
-    #desc = 'Blizzards are expected next quarter, consider weatherizing your facilities')
-    #event = Event( title='Blizzard warning', desc=desc, start=game.turn_number, end=game.turn_number )
-    #event.companies += Company.query.all()
-    #db.session.add(event)
-    #db.session.commit()
-
-  if game.turn_number%4==0:
-    # Winter, 25% probability of blizzard
-    quarterlyProb = 0.75
-    hourlyProb    = quarterlyProb / (90.0*24.0)
-    if np.random.uniform(0,1)<hourlyProb or True:
-      # roll random duration, location (has to be coastal)
-      dur  = 4+np.random.randint(9)
-      # determine set of facilities affected (ie knocked offline)
-      polyx = [0, 0, 80, 160, 240,  240, 0]
-      polyy = [0, np.random.uniform(20,60), np.random.uniform(20,60), np.random.uniform(20,60), np.random.uniform(20,60), 0, 0]
-      polygon = Polygon( zip(polyx,polyy) )
-      for company in Company.query.all():
-        # count facilities that are in the impacted polygon
-        off_facs = []
-        for facility in Facility.query.all():
-          if company.player_number==facility.player_number:
-            point = Point(facility.column, facility.row)
-            if polygon.contains(point) or facility.facility_type.maintype=='coal':
-              off_facs += [facility]
-        if len(off_facs)>0:
-          desc = 'A blizzard has struck, and %i of your facilities are expected to be offline for %i days' % (len(off_facs),dur)
-          event = Prompt( id_game=game.id, id_company=company.id, focus="company", category="danger", description=desc, start=i, end=i+dur*24)
-          # event = Prompt( id_game=game.id, id_company=company.id, id_type=3, description=desc, start=i, end=i+dur*24 )
-          db.session.add(event)
-          # db.session.commit()
-        else:
-          desc = 'A blizzard has struck, none of your facilities were directly affected'
-          event = Prompt( id_game=game.id, id_company=company.id, focus="company", category="information", description=desc, start=i, end=i+dur*24)
-          # event = Prompt( id_game=game.id, id_company=company.id, id_type=3, description=desc, start=i, end=i+dur*24 )
-          db.session.add(event)
-          # db.session.commit()
-      for facility in Facility.query.all():
-        point = Point(facility.column, facility.row)
-        if polygon.contains(point):
-          facility.state='inactive'
-          facility.counter=dur
-
-      '''plt.figure()
-      im = plt.imread("./app/static/img/world-map-240x120.png")
-      implot = plt.imshow(im,origin='upper')
-      plt.plot( polyx, polyy, '--r' )
-      polygon = Polygon( zip(polyx,polyy) )
-      for city in City.query.all():
-        point = Point(city.column, city.row)
-        if polygon.contains(point):
-          plt.scatter(city.column,city.row,s=20,c='red')
-        plt.scatter(city.column,city.row,s=5,c='black')
-      for facility in Facility.query.all():
-        point = Point(facility.column, facility.row)
-        if polygon.contains(point) or facility.facility_type.maintype=='coal':
-          plt.scatter(facility.column,facility.row,s=20,c='red')
-        else:
-          plt.scatter(facility.column,facility.row,s=20,c='black')
-        plt.scatter(facility.column,facility.row,s=5,c='gray')
-      plt.xlim([0,240])
-      plt.ylim([0,120])
-      plt.gca().invert_yaxis()
-      plt.savefig('blizzard.eps',format='eps',bbox_inches='tight')
-      plt.close()'''
-
-
-# ###############################################################################  
 #
 # ###############################################################################
 def set_state_vars(state, mods):
@@ -569,14 +477,19 @@ def set_state_vars(state, mods):
     gens[j].duty_cycles = state['dc'][j]
     gens[j].condition   = state['cn'][j]
   db.session.add_all(gens)
-  db.session.commit()
 
+# ###############################################################################  
+#
+# ###############################################################################
 def coastal_length(x,y):
   d=0.0
   for i in range(len(x)-1):
     d += ((x[i]-x[i+1])**2+(y[i]-y[i+1])**2)**0.5
   return d
 
+# ###############################################################################  
+#
+# ###############################################################################
 def coastal_dist_to_xy(x,y,d0):
   d=0.0
   for i in range(len(x)-1):
