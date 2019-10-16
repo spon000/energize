@@ -845,6 +845,196 @@
 <li>A regulation that requires a minimum market share for electricity generated from energy sources that have desirable environmental characteristics. While these are normally understood to be sunlight, wind, geothermal, waves, tides, hydropower, and organic matter, the definition varies somewhat between jurisdictions. Large hydropower is sometimes excluded while municipal solid waste, even if low in organic matter, is sometimes included. Some jurisdictions even include cogeneration of heat and power produced from natural gas combustion, as a way of valuing the much higher energy efficiency. The RPS may allow participants to trade among themselves in achieving the minimum market share requirement at the market-wide level, which in Europe sometimes involves the trading of green energy certificates. Because it specifies a physical requirement, the RPS is referred to as a quantity-based policy. This is in contrast to price-based policies such as environmental taxes or subsidies (in the form of above-market feed-in tariffs), both of which improve the relative economic advantage of renewables relative to fuels associated with emissions or extra risks of damage.</li>
 </ul>
 </li>
+<li>Reprocessing
+<ul>
+<li>Nuclear. The chemical separation of spent nuclear fuel into constituent parts, typically the contained plutonium, fission products, and uranium.</li>
+</ul>
+</li>
+<li>Reserve capacity
+<ul>
+<li>Electricity. The generating capacity that a utility operator has in excess of maximum demand.</li>
+</ul>
+</li>
+<li>Resources
+<ul>
+<li>Consumption & Efficiency. Anything that has value for human use, especially a natural resource such as water, trees, coal, oil, and so on.</li>
+</ul>
+</li> 
+<li><a href="http://www.businessdictionary.com/definition/revenue.html">Revenue</a>
+<ul>
+<li>The income generated from sale of goods or services, or any other use of capital or assets, associated with the main operations of an organization before any costs or expenses are deducted. Revenue is shown usually as the top item in an income (profit and loss) statement from which all charges, costs, and expenses are subtracted to arrive at net income. Also called sales, or (in the UK) turnover.</li>
+</ul>
+</li>
+<li>Separative work
+<ul>
+<li>Nuclear. A measure of the effort required in an enrichment facility to separate uranium of a given U-235 or U-238 content into two fractions, one with a higher percentage and one with a lower percentage.</li>
+</ul>
+</li>
+<li>Separative work unit (SWU)
+<ul>
+<li>Nuclear.A complex unit that measures the quantity of separative work when feed and product quantities are expressed in kilograms. The requirement to enrich the annual fuel loading for a typical 1000 MWe light water reactor is about 100-120,000 SWU.</li>
+</ul>
+</li>
+<li>Sulfur dioxide
+<ul>
+<li>Chemistry. SO<sub>2</sub>, a toxic, irritating, colorless gas that is soluble in water and alcohol; freezes at –72.7&#8451; and boils at –10&#8451; an oxidizing and reducing agent formed naturally by volcanic activity and organic decay. Used as a chemical intermediate, in paper pulping and ore refining, and as a solvent. See also sulfur dioxide pollution, sulfur oxides.</li>
+</ul>
+</li>
+<li>Solar cell
+<ul>
+<li>Solar. Any material that converts sunlight directly into electricity.</li>
+<li>A solar cell is any material that converts sunlight directly into electricity. This property of materials is known as the photoelectric effect, first described in 1905 by Albert Einstein in his Nobel prize winning research. The first solar cell capable of generating substantial amounts of power and the sire to today's booming photovoltaic industry emerged from pioneering semiconductor research done at Bell Laboratories in the 1940s and early 1950s. Out of this research also came the transistor, probably the most important technical discovery of the last century, which has dramatically transformed virtually all aspects of human life. Experimenting with one of these new devices, Gerald Pearson, a Bell scientist, shined light on it and to his amazement recorded a significant amount of electricity produced by the silicon. In just a few short years, silicon solar cells enabled satellites to run almost indefinitely, revolutionizing commercial, military, and scientific space applications essential to modern life. On Earth silicon solar cells have brought abundant clean water, electricity, and telephone services to many in remote regions who had hitherto done without. Roof-top solar cell programs in the developed world promise to revolutionize the way we use electricity with each building becoming its own power plant interacting with the electric utility grid, or acting as a stand-alone system.</li>
+</ul>
+</li>
+<li>Solar electricity
+<ul>
+<li>Solar. Any method of producing electricity from solar energy, as through direct conversion of sunlight into electricity, or by using focused sunlight to heat a working fluid. Also, solar electric power.</li>
+</ul>
+</li>
+<li>Solar energy
+<ul>
+<li>Solar. Useful energy that is immediately derived from the sun; <em>e.g.,</em> a system that collects and uses the heat of the sun to warm a building or to generate electricity.</li>
+<li>Earth Science. in the larger sense, any energy source that can be ultimately traced to the action of the sun.</li>
+</ul>
+</li>
+<li>Solar farm
+<ul>
+<li>Solar. A large solar energy facility that is thought of as “harvesting” renewable energy in a manner analogous to the way food crops are harvested from an agricultural farm.</li>
+</ul>
+</li>
+<li>Solar panel
+<ul>
+<li>See Photovoltaic module</li>
+</ul>
+</li>
+<li>Solar power
+<ul>
+<li>See Solar electricity</li>
+</ul>
+</li>
+<li>Spot market
+<ul>
+<li>Economics & Business. A market in which commodities, such as crude oil, are purchased in cash for immediate delivery (<em>i.e.,</em> bought “on the spot”). Thus, spot price, spot purchase.</li>
+</ul>
+</li>
+<li>Spot price pool
+<ul>
+<li>Electricity. A neutral and independent organization with no interest in generating facilities that provides an open-access spot market for power.</li>
+</ul>
+</li>
+<li>Subbituminous coal
+<ul>
+<li>Coal. A black to dark brown coal that ranks above lignite and below bituminous coal, used mainly as fuel for steam-electric power generation. It has a higher carbon content and lower moisture content than lignite. The heat content of subbituminous coal generally ranges from 16 to 24 million Btu per ton on a moist, mineral-matter-free basis.</li>
+</ul>
+</li>
+<li>Utility
+<ul>
+<li>Economics & Business. An entity that provides a basic service to the public, such as water, energy, transportation, waste disposal, or telecommunications, and that typically is subject to government regulation.</li>
+</ul>
+</li> 
+<li>Utility-scale
+<ul>
+<li>Electricity. A term for generators, especially wind and solar, of sufficient size to be used to generate power for grid-based distribution and use, as opposed to residential- or commercial-scale.</li>
+</ul>
+</li>
+<li>Uranium
+<ul>
+<li>Chemistry. A metallic element having the symbol U, the atomic number 92, an atomic weight of 238.029, a melting point of 1132&#8451;, and a boiling point of 3818&#8451;; a dense silvery solid with three naturally occurring radioactive isotopes.</li>
+<li>Uranium is a very heavy metal that constitutes a concentrated energy source that is used in nuclear power. Uranium was apparently formed in super novae about 6.6 billion years ago. It occurs in most rocks in concentrations of 2 to 4 parts per million, and in much lower concentrations in seawater. Its radioactive decay provides the main source of heat inside the earth, causing convection and continental drift. Uranium was discovered in 1789 by Martin Klaproth, a German chemist, in the mineral called pitchblende. It was named after the planet Uranus, which had been discovered eight years earlier. Uranium is the heaviest of all the naturally occurring elements, being 18.7 times as dense as water. The high density of uranium means that it is used in the keels of yachts and as counterweights for aircraft control surfaces, as well as for radiation shielding. ‘Natural’ uranium as found in the earth's crust is a mixture largely of two isotopes: uranium-238 (U-238), accounting for 99.3 % and uranium-235 (U-235) about 0.7 %. The isotope U-235 is important because under certain conditions it can readily be split, yielding a lot of energy. When the nucleus of a U-235 atom captures a neutron it splits in two (fissions), releases energy in the form of heat, and emits two or three neutrons. If enough of these expelled neutrons cause the nuclei of other U-235 atoms to split, releasing further neutrons, a fission ‘chain reaction’ can be achieved. This is the process that occurs in nuclear reactor where the heat is used to make steam to produce electricity. Each fission of a U-235 atom releases about 200 MeV (3.2 x 10<sup>-11</sup> joule)— about 50 million times as much energy as burning an atom of carbon. In other terms, a kilogram of natural uranium used in a typical reactor yields around 20,000 times as much energy as a kilogram of coal, and a kilogram of enriched nuclear fuel yields 160,000 times as much. Fission produces hundreds of different kinds of fission products (isotopes of much lighter elements), most of which are radioactive. In addition, a uranium atom may capture a neutron without splitting, leading the formation of a number of radioactive transuranic elements. These byproducts comprise nuclear waste.</li>
+</ul>
+</li>
+<li>Uranium enrichment
+<ul>
+<li>See Enrichment</li>
+</ul>
+</li>
+<li>Uranium hexafluoride
+<ul>
+<li>Nuclear. UF<sub>6</sub>, a white solid obtained by chemical treatment of U<sub>3</sub>O<sub>8</sub>, forming a vapor at temperatures above 56&#8451;. It is the form of uranium required for the enrichment process.</li>
+</ul>
+</li>
+<li>Uranium ore
+<ul>
+<li>Nuclear. Rock containing uranium minerals in concentrations that can be mined economically, typically 1 to 4 pounds of U<sub>3</sub>O<sub>8</sub> per ton or 0.05–0.20 % U<sub>3</sub>O<sub>8</sub>.</li>
+</ul>
+</li>
+<li>Uranium reserves
+<ul>
+<li>Nuclear. Estimated quantities of uranium in known mineral deposits of such size, grade, and configuration that the uranium could be recovered at or below a specified production cost, employing current mining and processing technology and under current law and regulations.</li>
+</ul>
+</li>
+<li>Uranium tailings
+<ul>
+<li>Nuclear. Residue materials left over from the processing of uranium ore in a mill. These residues contain several naturally occurring radioactive elements, such as uranium, thorium, radium, polonium, and radon.</li>
+</ul>
+</li>
+<li>Variable cost
+<ul>
+<li>See variable operating cost</li>
+</ul>
+</li>
+<li>Variable operating cost
+<ul>
+<li>A variable cost is incurred by a firm as it changes its level of output. Essentially, a firm pays more to produce more. Variable costs are inputs that can be easily adjusted such as the purchase of raw materials for manufacture. For power plants, variable operating costs are usually defined on a per unit electricity generation basis.</li>
+</ul>
+</li>
+<li>Watt
+<ul>
+<li>Thermodynamics. A rate of doing work or converting energy, symbol W. It is the metric measuring unit; a rate of doing work of one joule per second is one watt. In electrical power it is equivalent to the current in amperes multiplied by the electrical potential in volts.</li>
+</ul>
+</li>
+<li>Watt hour
+<ul>
+<li>Thermodynamics. A unit of energy equal to the work done by one watt over a time of one hour; symbol Wh.</li>
+</ul>
+</li>
+<li>Wind energy
+<ul>
+<li>Wind. The energy contained in the movement of air masses; in human energy use traditionally captured by means of the sails of a ship or the vanes of a windmill, and currently by mechanical blades similar to airplane propellers.</li>
+</ul>
+</li>
+<li>Wind farm or windfarm
+<ul>
+<li>Wind. An array or system of multiple wind turbines at a given site, used to capture wind energy for the production of bulk electricity for a grid. So called because of the sense of “harvesting” wind as if it were a farm crop.</li>
+<li>A wind farm (often also called a wind park) is a cluster of wind turbines that acts and is connected to the power system as a single electricity producing power station. Generally it is expected that a wind farm consists of more than three wind turbines. Modern wind farms may have capacities in the order of hundreds of MW, and are installed offshore as well as on land. Modern wind farms generally are connected to the high voltage transmission system, in contrast to the early application of wind energy for electricity production with wind turbines individually connected to the low-voltage to medium-voltage distribution system. Hence, modern wind farms are considered power plants with responsibilities for control, stability, and power balance. Thus, wind farms are required to contribute to the control of voltage, frequency and reactive power needs in the power system and stay on-line during less critical grid faults, and to help maintain the stability of the power system. While wind farm production cannot exceed the power given by the instantaneous wind resource, capabilities for regulating the power output at time scales consistent with the power system needs, powering up and down, are also included in order to assist with balancing and stabilizing the power system. Most of the other technical issues with wind farms are associated with the close spacing of multiple turbines. The close spacing implies that extraction of energy by wind turbines upwind will reduce the wind speed and increase the turbulence, which may cause reduced efficiency and higher loads on downwind turbines. Another technical issue for large wind farms is the grid connection and the integration into the power system. Large wind farms are very visible, especially at land and in coastal areas and this together with a number of environmental concerns, such as possible disturbance of migrating birds, play an important role in the wind farm planning process and can result in selection of sites with less than optimal wind conditions. However, good wind conditions are essential for the economics viability of any wind project, and methods for accurately predicting wind climates at specific sites worldwide are constantly being improved.</li>
+</ul>
+</li>
+<li>Wind power
+<ul>
+<li>Wind. 1. Electricity produced by a wind turbine, measured in watts. Wind power depends on the wind speed raised to the third power (wind speed cubed). 2. See wind energy.</li>
+</ul>
+</li>
+<li>Wind power class
+<ul>
+<li>Wind. A categorization of the quality of the wind resource base at different sites, based on wind power density at a given height (typically 10 meters). The classes range from 1 to 7, with class 1 having power densities of 0–100 W/m<sup>2</sup>, and class 7 having power densities of more than 1000 W/m .</li>
+</ul>
+</li>
+<li>Wind power density
+<ul>
+<li>Wind. The average wind power over one square meter in a vertical plane perpendicular to the wind direction; expressed in watts per square meter.</li>
+</ul>
+</li>
+<li>Wind power distribution
+<ul>
+<li>Wind. A description of the percentage of time that the wind blows at various wind speeds over the course of an average year. In lieu of precise data for a site, the Weibull or Rayleigh distributions are used to estimate wind power.</li>
+</ul>
+</li>
+<li>Wind power plant
+<ul>
+<li>See Wind turbine</li>
+</ul>
+</li>
+<li>Wind resource
+<ul>
+<li>Wind. A measure of how much wind energy is potentially available at a given location and height; used to assess the potential power output of a wind turbine.</li>
+</ul>
+</li>
+<li>Wind turbine
+<ul>
+<li>Wind. 1. A wind-driven machine containing curved rotors or blades inside a wheel set vertically on a revolving shaft; wind or air pressure against the blades turns the wheel, and the rotating shaft may then drive a dynamo to produce electrical power. 2. More generally, any device that converts the energy of the wind to electrical or mechanical power.</li>
+</ul>
+</li>
+
 
 
 
