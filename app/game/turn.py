@@ -35,6 +35,23 @@ def initialize_turn(game, mods):
 #
 # ###############################################################################
 def check_generator_hourly(game, state, hour):
+        if generator.build_turn <= 0:  
+        generator.state="available"
+        generator.prod_turn += 1
+        set_state_vars(state, mods, game.id)
+        state = get_state_vars(state, mods, game.id)
+        #if available (and chosen...so may need to go somewhere else): "OM" = 'fixed_cost_to_operate'*'nameplate_capacity'+'variable_cost_to_operate'*'capacity??'
+        ##check term names...especially the 
+
+    elif generator.state == "available":
+
+      if generator.condition < 0.20:
+        generator.state = "unavailable"
+        set_state_vars(state, mods, game.id)
+        state = get_state_vars(state, mods, game.id)
+      else:
+        generator.prod_turn += 1
+
   pass
 
 
@@ -57,14 +74,15 @@ def check_generator_quarterly(game, state):
 
     elif generator.state == "building":
       generator.build_turn -= 1
+      #if building, expenses are: "Construction" = 'fixed_cost_to_build'*'nameplate_capacity'/'buildtime'
 
       if generator.build_turn <= 0:  
         generator.state="available"
         generator.prod_turn += 1
         set_state_vars(state, mods, game.id)
         state = get_state_vars(state, mods, game.id)
-
-    elif generator.state == "available":
+      elif generator.state == "available":
+         #if available, expenses are: "OM" = 'fixed_cost_to_operate'*'nameplate_capacity'
 
       if generator.condition < 0.20:
         generator.state = "unavailable"
