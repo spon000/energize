@@ -1,0 +1,57 @@
+<style>
+  /* ******************************************************************* 
+   * Metrics style        
+   ******************************************************************* */
+  .metrics-content {}
+
+  .metrics-title {
+    margin-left: 50px;
+  }
+
+  .sub-metric {
+    display: inline-block;
+    width: 100px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .sub-metric a {
+    color: grey;
+    text-decoration: underline;
+  }
+
+  .sub-metric a:hover {
+    color: grey;
+    text-decoration: underline;
+  }
+
+  .societal-link {
+    margin-left: 20px;
+  }
+</style>
+
+
+<div class="container metrics-content">
+  <div class="row">
+    <label class="metrics-title">Company-Wide "health" metrics</label>
+  </div>
+
+  <div class="row">
+    <div class="sub-metric">
+      <img src="{{ url_for('static', filename='img/icons/environmental.png') }}" alt="Environmental" />
+      <a href="#" class="">Environmental</a>
+    </div>
+
+    <div class="sub-metric">
+      <img src="{{ url_for('static', filename='img/icons/societal.png') }}" alt="Societal" />
+      <a href="#" class="societal-link">Societal</a>
+    </div>
+
+    <div class="sub-metric">
+      <img src="{{ url_for('static', filename='img/icons/technology.png') }}" alt="Technology" />
+      <a href="#" class="">Technological</a>
+    </div>
+  </div>
+</div>

@@ -38,19 +38,22 @@ define([
           this._elementIdPortfolioChart = "portfolio-graph-chart";
           this._elementIdPortfolioFacilityTable = "portfolio-facility-list-table";
           this._elementIdTotalCompanyCapacity = "pfs-total-company-capacity";
+          this._elementIdTotalConstructCapacity = "pfs-total-construction-capacity";
           this._portfolioDialogHtml = null
           this._portfolioDialog = null;
           this._facilities = null;
           this._facilityTypes = null;
           this._facilityCapacities = null;
+          this._facilityConstructCapacities = null;
 
 
           this._getDialogData().then((data) => {
             this._facilities = data[0].facilities;
             this._facilityCapacities = data[0].facility_capacities;
+            this._facilityConstructCapacities = data[0].facility_build_capacities;
             this._facilityTypes = data[1].facility_types;
             this._portfolioDialogHtml = data[2];
-            // console.log("ready to open dialog...", data);
+            console.log("ready to open dialog...", data);
 
             this._openPortfolioDialog(this, this._createGraphAndTable)
           });
@@ -105,15 +108,30 @@ define([
           // console.log("types = ", ownedTypes);
           scope._createChartOfOwnedFacilityTypes(ownedTypes);
           scope._createTotalCompanyCapacity();
+          scope._createTotalConstructCapacity();
           scope._createFacilityListTable();
           scope._createEvents();
         }
 
 
         /* *********************************************************************************** */
+        _createOperatingBudget() {
+        }
+
+        /* *********************************************************************************** */
+        _createCompanyAssets() {
+        }
+
+        /* *********************************************************************************** */
         _createTotalCompanyCapacity() {
-          let capString = this._getTotalCompanyCapacity() + " GW";
+          let capString = (this._getTotalCompanyCapacity() + " MW");
           $("#" + this._elementIdTotalCompanyCapacity).html(capString);
+        }
+
+        /* *********************************************************************************** */
+        _createTotalConstructCapacity() {
+          let conCapString = this._getTotalCompanyConstructionCapacity() + " MW";
+          $("#" + this._elementIdTotalConstructCapacity).html(conCapString);
         }
 
         /* *********************************************************************************** */
@@ -223,6 +241,14 @@ define([
           return this._facilityCapacities.find(fac => fac.facility_id == facility.id).facility_capacity;
         }
 
+        _getTotalFacilityBuildCapacity(facility) {
+          return this._facilityCapacities.find(fac => fac.facility_id == facility.id).facility_build_capacity;
+        }
+
+        _getTotalCompanyConstructionCapacity() {
+          return this._numberWithCommas(this._facilityCapacities.reduce((totalConCap, facConCap) => totalConCap += parseInt(facConCap.facility_build_capacity), 0));
+        }
+
         _getTotalCompanyCapacity() {
           return this._numberWithCommas(this._facilityCapacities.reduce((totalCap, facCap) => totalCap += parseInt(facCap.facility_capacity), 0));
         }
@@ -254,7 +280,7 @@ define([
               name: facility.name,
               typeIcon: this._getTypeIcon(facility),
               status: this._getStatus(facility),
-              cap: parseInt(this._getTotalFacilityCapacity(facility)),
+              cap: null,
               prof: profit,
               age: age,
               cond: condition,
@@ -268,7 +294,7 @@ define([
             data: facility_table_data,
             columns: [
               {
-                title: "Name", field: "name", align: "center", width: 100,
+                title: "Name", field: "name", align: "center", width: 110,
                 formatter: this._name_cell,
                 // formatterParams: {
                 //   scope: this
@@ -285,27 +311,28 @@ define([
               },
 
               {
-                title: "Capacity", field: "cap", align: "center", width: 110,
+                title: "Capacity", field: "cap", align: "left", width: 150,
                 formatter: this._capacity_cell,
                 formatterParams: {
-                  formatWithCommas: this._numberWithCommas
+                  scope: this,
+                  formatWithCommas: this._numberWithCommas,
                 }
               },
 
               {
-                title: "Profit", field: "prof", width: 100,
+                title: "Profit", field: "prof", width: 80,
                 formatter: this._color_cell,
                 formatterParams: {}
               },
 
               {
-                title: "Age", field: "age", width: 100,
+                title: "Age", field: "age", width: 80,
                 formatter: this._color_cell,
                 formatterParams: {}
               },
 
               {
-                title: "Condition", field: "cond", width: 100,
+                title: "Condition", field: "cond", width: 80,
                 formatter: this._color_cell,
                 formatterParams: {}
               },
@@ -320,7 +347,13 @@ define([
         // Table formater helpers
         /* *********************************************************************************** */
         _capacity_cell(cell, formatterParams) {
-          return (formatterParams.formatWithCommas(cell.getValue()) + " MW");
+          let facility = cell.getData().facility;
+          let scope = formatterParams.scope;
+          let avail_cap = parseInt(scope._getTotalFacilityCapacity(facility))
+          let build_cap = parseInt(scope._getTotalFacilityBuildCapacity(facility))
+          let capacity_string = formatterParams.formatWithCommas(avail_cap) + " MW (" + formatterParams.formatWithCommas(build_cap) + " MW)";
+
+          return capacity_string;
         }
 
         _name_cell(cell, formatterParams) {

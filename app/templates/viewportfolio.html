@@ -25,7 +25,7 @@
   }
 
   #portfolio-summary div {
-    margin-top: 30px;
+    margin-top: 15px;
   }
 
   #portfolio-summary .row {
@@ -38,11 +38,13 @@
     font-size: 15px;
     font-weight: bold;
     padding-left: 0;
+    margin-left: -10px;
   }
 
   #portfolio-summary .value {
     font-size: 14px;
-    padding-left: 0;
+    padding: 0;
+    margin-left: -20px;
   }
 
   /* ******************************************************************* 
@@ -67,6 +69,7 @@
     border-radius: 5px;
   }
 
+  /*
   .portfolio-metrics-title {
     margin-left: 50px;
   }
@@ -80,9 +83,23 @@
     margin-bottom: 0;
   }
 
+  .portfolio-sub-metric a {
+    color: grey;
+    text-decoration: underline;
+  }
+
+  .portfolio-sub-metric a:hover {
+    color: grey;
+    text-decoration: underline;
+  }
+
   .societal-link {
     margin-left: 20px;
-  }
+  } */
+
+  /* .inactive-link {
+    text-decoration: none;
+  } */
 
 
   /* ******************************************************************* 
@@ -91,16 +108,21 @@
   #portfolio-options {
     grid-column: 2;
     grid-row: 3;
-    background-color: #fff;
+    background-color: #efefef;
     color: black;
     border-style: solid;
     border-width: 1px;
     border-radius: 5px;
   }
 
+  #portfolio-options label {
+    margin: 5px 0 0 30px;
+  }
+
   #portfolio-options select {
-    background-color: lightgray;
+    background-color: #f3f5da;
     width: 250px;
+    margin-left: 30px;
   }
 
 
@@ -146,47 +168,31 @@
     <div class="container">
 
       <div class="row">
-        <label class="field col-lg-8">Operating Budget:</label>
-        <label class="value col-lg-4">{{ format_money(company.balance) }}</label>
+        <label class="field col-lg-9">Operating Budget:</label>
+        <label class="value col-lg-3">{{ format_money(company.balance) }}</label>
       </div>
 
       <div class="row">
-        <label class="field col-lg-8">Company Assets:</label>
-        <label class="value col-lg-4">{{ format_money(0) }}</label>
+        <label class="field col-lg-9">Company Assets:</label>
+        <label class="value col-lg-3">{{ format_money(0) }}</label>
       </div>
 
       <div class="row">
-        <label class="field col-lg-8">Total Nameplate Capacity:</label>
-        <label id="pfs-total-company-capacity" class="value col-lg-4">1000 GW</label>
+        <label class="field col-lg-9">Total Nameplate Capacity:</label>
+        <label id="pfs-total-company-capacity" class="value col-lg-3"></label>
+      </div>
+
+      <div class="row">
+        <label class="field col-lg-9">Capacity Under Construction:</label>
+        <label id="pfs-total-construction-capacity" class="value col-lg-3"></label>
       </div>
 
     </div>
   </div>
 
   <div id="portfolio-metrics" class="grid-box">
-    <div class="container">
-
-      <div class="row">
-        <label class="portfolio-metrics-title">Company-Wide "health" metrics</label>
-      </div>
-      <div class="row">
-        <div class="portfolio-sub-metric">
-          <img src="{{ url_for('static', filename='img/icons/environmental.png') }}" alt="Environmental" />
-          <a href="#" class="">Environmental</a>
-        </div>
-        <div class="portfolio-sub-metric">
-          <img src="{{ url_for('static', filename='img/icons/societal.png') }}" alt="Societal" />
-          <a href="#" class="societal-link">Societal</a>
-        </div>
-        <div class="portfolio-sub-metric">
-          <img src="{{ url_for('static', filename='img/icons/technology.png') }}" alt="Technology" />
-          <a href="#" class="">Technological</a>
-        </div>
-      </div>
-
-    </div>
+    {% include 'metrics.html' %}
   </div>
-
 
   <div id="portfolio-graph" class="grid-box">
     <canvas id="portfolio-graph-chart" width="340" height="145"></canvas>

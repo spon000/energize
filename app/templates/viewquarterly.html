@@ -45,27 +45,6 @@
     border-radius: 5px;
   }
 
-  .quarterly-metrics-content {
-    margin-top: 15px;
-  }
-
-  .quarterly-metrics-title {
-    margin-left: 50px;
-  }
-
-  .quarterly-sub-metric {
-    display: inline-block;
-    width: 100px;
-    margin-left: 5px;
-    margin-right: 5px;
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-
-  .societal-link {
-    margin-left: 20px;
-  }
-
 
   /* ******************************************************************* 
    * Events Title style        
@@ -104,8 +83,6 @@
   }
 </style>
 
-
-
 <div id="quarterly-content">
 
   <div id="quarterly-summary" class="grid-box">
@@ -113,13 +90,13 @@
 
       <div class="row summary-row">
         <label class="field col-lg-7">Expenses:</label>
-        <label class="value col-lg-5">{{ format_money(0) }}</label>
+        <label class="value col-lg-5">{{ format_money( fac_const + gen_const) }}</label>
       </div>
 
       <div class="row summary-row">
         <label class="sep col-lg-1"></label>
         <label class="field col-lg-6">Construction:</label>
-        <label class="value col-lg-1">{{ format_money(0) }}</label>
+        <label class="value col-lg-1">{{ format_money( fac_const + gen_const) }}</label>
       </div>
 
       <div class="row summary-row">
@@ -153,28 +130,7 @@
   </div>
 
   <div id="quarterly-metrics" class="grid-box">
-    <div class="container quarterly-metrics-content">
-
-      <div class="row">
-        <label class="quarterly-metrics-title">Company-Wide "health" metrics</label>
-      </div>
-
-      <div class="row">
-        <div class="quarterly-sub-metric">
-          <img src="{{ url_for('static', filename='img/icons/environmental.png') }}" alt="Environmental" />
-          <a href="#" class="">Environmental</a>
-        </div>
-        <div class="quarterly-sub-metric">
-          <img src="{{ url_for('static', filename='img/icons/societal.png') }}" alt="Societal" />
-          <a href="#" class="societal-link">Societal</a>
-        </div>
-        <div class="quarterly-sub-metric">
-          <img src="{{ url_for('static', filename='img/icons/technology.png') }}" alt="Technology" />
-          <a href="#" class="">Technological</a>
-        </div>
-      </div>
-
-    </div>
+    <br/> {% include 'metrics.html' %}
   </div>
 
   <div id="quarterly-events-list-heading" class="grid-box"><label>Event List (Click on an event name for more details)</label></div>

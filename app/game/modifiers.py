@@ -1,5 +1,7 @@
 import numpy as np
 import pickle
+import json
+
 from app import celery
 # import math
 # import time
@@ -15,6 +17,7 @@ mods_filename_extension = '.pkl'
 
 def init_modifiers(game, cities):
   t  = np.linspace(0, game.total_years, game.total_years * 4 * 90 * 24)
+  # t  = np.linspace(0, 1, 1 * 4 * 90 * 24)
   cc = cloud_cover(t)
   ri = rain_intensity(cc)
   su = sun_up(t)
@@ -22,7 +25,7 @@ def init_modifiers(game, cities):
 
   fp = fuel_prices(t)
   pg = pop_growth(t, cities)
-  ed = energy_demand(t, pg, su, cc)
+  ed = np.array(energy_demand(t, pg, su, cc))
 
   modifiers = {
     'cc':cc,

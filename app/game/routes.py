@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from flask_socketio import send
 import json
 import math 
+import numpy as np
 
 from sqlalchemy import func
 from sqlalchemy.orm.session import make_transient
@@ -382,14 +383,16 @@ def player_facilities():
   facility_capacities = list()
   for facility in facilities:
     elegible_generators = list(filter(lambda generator : generator.state == 'available' or generator.state == 'unavailable', facility.generators))
+    building_generators = list(filter(lambda generator : generator.state == 'new' or generator.state == 'building', facility.generators))
     facility_capacities.append({
       "facility_id": str(facility.id),
       "facility_capacity": str((sum(list(gen.generator_type.nameplate_capacity for gen in elegible_generators)))),
+      "facility_build_capacity": str((sum(list(gen.generator_type.nameplate_capacity for gen in building_generators)))),
     })
 
   return jsonify({
     'facilities': facilities_serialized,
-    'facility_capacities': facility_capacities
+    'facility_capacities': facility_capacities,
   })
 
 # ###############################################################################  
@@ -778,11 +781,21 @@ def quarterly_html():
   gid = request.args.get('gid', None)
   company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
   facilities = Facility.query.filter_by(id_game=gid, id_company=company.id, state="active").all()
-  # print(f"*"*80)
+  generators = ([facility.generators for facility in facilities])
+  gs = []
+  for gens in generators:
+    gs += gens
+  
+
+  # fac_construction = db.session.query(db.func.sum(Facility.construction)).filter_by(id_game=gid, id_company=company.id).scalar()
+  fac_construction = sum([fac.construction for fac in facilities])
+  gen_construction = np.sum([gen.construction for gen in gs])
   
   return render_template(
     "viewquarterly.html",
     format_money=convert_to_money_string,
+    fac_const=fac_construction,
+    gen_const=gen_construction,
     company=company
   )
 
