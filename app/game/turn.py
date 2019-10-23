@@ -97,8 +97,9 @@ def check_generator_quarterly(game):
     elif generator.state == "decommissioning":
        generator.decom_turn -= 1
        if generator.decom_turn <= 0:
-         generator.state = "decommissioned"    
+         generator.state = "decommissioned"
 
+    
   db.session.commit()
   return 
   
@@ -353,7 +354,7 @@ def run_turn(game, mods):
       check_facility_hourly(game, hr)
       check_generator_hourly(game, state, hr)
 
-      state = iso(mods, state, file)
+      state = iso(mods, state, file, game.id)
 
       # filedebug.write("+" * 80 +"\n")
       # filedebug.write(f"i = {i}\n")
@@ -364,6 +365,24 @@ def run_turn(game, mods):
       # db.session.commit()
       # roll_for_events(game,db,mods,state)
 
+
+    # Construction Expenses
+  companies = Company.query.filter_by(id_game=game.id).all()
+  for company in companies:
+
+    facilities = Facility.query.filter_by(id_game=company.id_game, id_company=company.id).all()
+    generators = ([facility.generators for facility in facilities])
+    gs = []
+    for gens in generators:
+      gs += gens
+    
+    # fac_construction = db.session.query(db.func.sum(Facility.construction)).filter_by(id_game=gid, id_company=company.id).scalar()
+    fac_construction = sum([fac.construction for fac in facilities])
+    gen_construction = np.sum([gen.construction for gen in gs])
+
+    company.balance += - (fac_construction + gen_construction)    
+
+    
   db.session.commit()
 
   file.close()
@@ -374,7 +393,7 @@ def run_turn(game, mods):
 # ###############################################################################
 #
 # ###############################################################################
-def iso(mods, state, file):
+def iso(mods, state, file, gid):
 
   # file.write(f"\tiso start  {datetime.now().time()}\n")
   i           = state['i']
@@ -433,7 +452,9 @@ def iso(mods, state, file):
       # file.write('gen %s %i %i %f %f %f %f %f %f %f %f\n' % (mt,i,id,state['dc'][j],state['cn'][j],state['opMaint_gen'][j],state['opMaint_fac'][j],state['fuel_costs'][j],gen_profit[j],state['aoc'][j],state['availCap'][j]) )
       # file.close()
 
-  for company in Company.query.all():
+  
+  # construct_expenses = fac_construction + gen_construction
+  for company in Company.query.filter_by(id_game=gid).all():
     company.balance += np.sum(player_profit[str(company.player_number)])
 
   # if i%61==0:

@@ -780,7 +780,7 @@ def portfolio_html():
 def quarterly_html():
   gid = request.args.get('gid', None)
   company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
-  facilities = Facility.query.filter_by(id_game=gid, id_company=company.id, state="active").all()
+  facilities = Facility.query.filter_by(id_game=gid, id_company=company.id).all()
   generators = ([facility.generators for facility in facilities])
   gs = []
   for gens in generators:
