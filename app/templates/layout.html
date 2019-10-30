@@ -12,7 +12,7 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tabulator.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/topmenu_game.css') }}">
+  <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/topmenu_game.css') }}"> -->
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/user_messages.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/infobox.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/selectbox.css') }}">
@@ -27,26 +27,7 @@
 
     <body id="">
       <div id="game">
-        <div id="game-top-menu" class="top-menu">
-          <a id="portfolio-btn" class="company-btn push-up" href="#">{{ company.name }}<br/> <label> (portfolio) </label></a>
-          <a class="budget-btn push-up" href="#">Balance: <label> {{ format_money(company.balance) }} </label> </a>
-          <a class="market-btn push-up" href="#"> World Market</a>
-          <a class="social-btn" href="#"> Social</a>
-          <a id="quarterly-report-btn" class="q-report-btn push-up" href="#"> Quarterly Report</a>
-          <a class="turn-btn push-up" href="#"> {{ current_game_date }}
-            <br/>
-            <label> Turn: {{ game.turn_number }} </label>
-          </a>
-          {% include 'nextturnbutton.jinja' %}
-          <div>
-            <!-- Grid Column place holder -->
-          </div>
-          <!-- <div id="build-facility-btn"></div> -->
-          <a class="build-btn push-up" id="build-facility-btn" href="#">Build Facility</a>
-          <a class="help-btn" href="#">Help</a>
-          <a class="options-btn" href="#">Options</a>
-        </div>
-
+        {% include 'topmenu.jinja' %}
         <div id="info-dialog"></div>
         <div>
           {% block middle_content %} {% endblock middle_content %}

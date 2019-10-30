@@ -18,7 +18,7 @@ from shapely.geometry.polygon import Polygon
 from app.game.prompts import assign_prompt
 from app.game.sio_outgoing import shout_game_turn_interval
 
-from app.game.utils import get_age
+from app.game.utils import get_age, add_commas_to_number
 
 # ###############################################################################  
 # ###############################################################################
@@ -33,6 +33,10 @@ def daily_events(game):
 # ###############################################################################  
 # ###############################################################################
 def quarterly_events(game, mods):
+
+  # Don't check for events on turn 0
+  if game.turn_number == 0:
+    return
 
   # Winter events
   if game.turn_number % cons.quarters_per_year == cons.winter:
@@ -106,16 +110,16 @@ def check_heatwave(game, mods, probability = .40):
 def check_hurricane(game, mods, probability = .25):
     # Roll random number to decide if hurricane happens
 
-    dur_days = 4 + np.random.randint(9)
+    dur_days = 2 + np.random.randint(7)
     dur_hours = dur_days * cons.hours_per_day
     start_day = np.random.randint(cons.days_per_quarter - 15)
-    end_day = start_day + dur_days    
+    end_day = start_day + dur_days 
 
     check = np.random.uniform(0, 1)
     print("*"*80)
     print(f"Hurricane... {int(check*100)}%")
     if check < probability:
-      # roll random duration, location (has to be coastal)
+      # roll random severity
       sev  = np.random.uniform(30, 70)
       # determine set of facilities affected (ie knocked offline)
       x = [75 ,50 ,20 ,10,30,35,15,12 ,5,5]
@@ -182,7 +186,7 @@ def check_blizzard(game, mods, probability = .25):
         # count facilities that are in the impacted polygon
         off_facs = []
 
-        for facility in Facility.query.filter_by(id_company=company.id).all():
+        for facility in Facility.query.filter_by(id_company=company.id, state='active').all():
           point = Point(facility.column, facility.row)
 
           if polygon.contains(point) or facility.facility_type.maintype=='coal':
@@ -190,7 +194,17 @@ def check_blizzard(game, mods, probability = .25):
             facility.state='inactive'
             facility.counter = dur_days
 
+
         if len(off_facs) > 0:
+          # capacity_amount = sum(fac.facility_type.nameplate_capacity for fac in off_facs if fac.state = 'inactive')
+          # capacity_amount = 0
+          # for fac in off_facs:
+          #   for gen in fac.generators:
+          #     if gen.state == 'available':
+          #       capacity_amount += gen.generator_type.nameplate_capacity
+          capacity_amount = sum(gen.generator_type.nameplate_capacity for fac in off_facs for gen in fac.generators if gen.state == 'available')
+          
+          # event = assign_prompt('blizzard-affected', game, company, {'start': start_day, 'end': end_day}, [len(off_facs), add_commas_to_number(capacity_amount), dur_days])          
           event = assign_prompt('blizzard-affected', game, company, {'start': start_day, 'end': end_day}, [len(off_facs), dur_days])          
           db.session.add(event)
         else:

@@ -47,6 +47,8 @@ define([
           this._keys = new Keys();
           this._turn = new Turn();
           this._getInitialStates();
+
+          evtEmitter.emit('quarterly_report_btn');
         }
 
         _initializeWebSocket() {
@@ -73,6 +75,7 @@ define([
           webSocketCalls.listenForMessage('run_game_turn', 'running_game_turn');
           webSocketCalls.listenForMessage('player_cancel_run_turn', 'cancel_ready_turn_dialog');
           webSocketCalls.listenForMessage('game_turn_complete', 'game_turn_complete');
+          webSocketCalls.listenForMessage('force_all_clients_reload', 'force_client_reload');
           webSocketCalls.listenForMessage('game_turn_interval', 'game_turn_interval');
 
         }
@@ -114,9 +117,22 @@ define([
             msgBox.postMessage({ 'msg': msg });
           });
 
+          evtEmitter.on('force_run_turn', (data) => {
+            webSocketCalls.sendMessageEmit('force_run_turn', { gameId: globalGameId });
+          });
+
           evtEmitter.on('game_turn_complete', (data) => {
+            // window.onload(() => {
+            //   console.log("")
+            //   evtEmitter.emit('open_quarterly_report');
+            // });
             location.reload();
           });
+
+          evtEmitter.on('force_client_reload'), (data) => {
+            location.reload();
+          }
+
         }
       });
   });

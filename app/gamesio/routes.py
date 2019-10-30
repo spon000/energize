@@ -132,7 +132,7 @@ def on_player_next_turn(data):
 @sio.on('player_is_ready')
 def on_player_is_ready(data):
   data = json.loads(data)
-  game = game = Game.query.filter_by(id=data['gameId']).first()
+  game = Game.query.filter_by(id=data['gameId']).first()
   company = Company.query.filter_by(id_user=current_user.id, id_game=data['gameId']).first()
   company.state = "ready"
   db.session.commit()
@@ -147,13 +147,40 @@ def on_player_is_ready(data):
 
     msg = "Running the next turn!"
     shout_players_message(
-        game.id, 
-        msg
+      game.id, 
+      msg
     )    
+
     shout_run_game_turn(game.id)
     run_turn(game)
 
   return 
+
+# ###############################################################################  
+#
+# ###############################################################################  
+@sio.on('force_run_turn') 
+def force_run_turn(data):
+  data = json.loads(data)
+  game = Game.query.filter_by(id=data['gameId']).first()
+
+  game.state="runturn"
+  Company.query.filter_by(id_game=game.id).update(dict(state="ready"))
+
+  db.session.commit()
+  shout_game_state(game.id, game.state)
+  shout_player_state(game.id, "ready", players=[1,2,3,4,5])
+
+  msg = "Running the next turn!"
+  shout_players_message(
+    game.id, 
+    msg
+  )    
+
+  shout_run_game_turn(game.id)
+  run_turn(game)
+
+  return
 
 # ###############################################################################  
 #

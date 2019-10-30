@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import json
 
 from sqlalchemy import func
 from app import db
@@ -16,6 +17,8 @@ from app.game.history import init_history_table
 from app.game.utils import date_to_hours, hours_to_date, date_to_date_str
 # Constants
 from app.game.utils import hours_per_turn, hours_per_year
+
+from app.gamesio.routes import force_run_turn
 
 #######################################################################################
 # Main function
@@ -45,7 +48,7 @@ def init_game_models(game):
 
   # Generate empty history table (file)
   #init_history_table(game)
-   
+  
   return True
 
 #######################################################################################

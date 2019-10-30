@@ -39,6 +39,10 @@ define([
           let keyCode = evt.originalEvent.code;
           if (evt.shiftKey)
             keyCode += "+Shift"
+          if (evt.altKey)
+            keyCode += "+Alt"
+          if (evt.ctrlKey)
+            keyCode += "+Ctrl"
           evtEmitter.emit(keyMapEmitters[keyCode])
         }
       });

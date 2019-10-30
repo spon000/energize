@@ -339,7 +339,7 @@ def run_turn(game, mods):
 
   check_facility_quarterly(game)
   check_generator_quarterly(game)
-  # quarterly_events(game, mods)
+  quarterly_events(game, mods)
 
   for day in range(90):
     shout_game_turn_interval(game.id, {'statusMsg': 'Calculating days...', 'interval': day, 'total': 90})
