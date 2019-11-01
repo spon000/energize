@@ -112,7 +112,7 @@ def init_facilities(game):
         # The fid is used to assign the initial generators to the initial facilities. It's only used when creating a new
         # game.
         fid = facility['fid'],
-        name = "Facility #" + str(index),
+        name = "Facility #" + str(facility['fid']),
         state = facility['state'],
         player_number = facility['player'],
         build_turn = facility_type.build_time,

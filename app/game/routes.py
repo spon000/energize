@@ -69,6 +69,11 @@ def joingame(gid, name):
   assigned_company.name = name
   assigned_company.player_type = "human"
   assigned_company.id_user = current_user.id
+  company_facilities = Facility.query.filter_by(id_game=game.id,id_company=assigned_company.id).all()
+
+  for facility in company_facilities:
+    facility.name = assigned_company.name + " (facility #" + str(facility.id) + ")"
+    
   prompt = assign_prompt('welcome', game, assigned_company, {'resolved': True}, [assigned_company.name])
 
   db.session.add(prompt)
