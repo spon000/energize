@@ -11,3 +11,6 @@ app/games.db
 # Ignore all the history files that get generated via the application
 **/history?.txt
 
+# Ingore debug file
+**/debug.txt
+
