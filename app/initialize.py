@@ -20,7 +20,7 @@ def initialize_db(app):
   # db.drop_all()
 
   # Recreate fresh tables.
-  init_table(User, db)
+  # init_table(User, db)
   init_table(Game, db)
   init_table(Company, db)
   init_table(City, db)
@@ -42,19 +42,19 @@ def initialize_db(app):
 
 
   # Create dummy user.
-  u1 = User(
-    password = bcrypt.generate_password_hash("122130124032").decode('utf-8'),
-    companies_max = 5
-  )
+  # u1 = User(
+  #   password = bcrypt.generate_password_hash("122130124032").decode('utf-8'),
+  #   companies_max = 5
+  # )
 
-  u2 = User(
-    username = 'Patrick',
-    email = 'pat@g.clemson.edu',
-    companies_max = 5,
-    password = bcrypt.generate_password_hash("test").decode('utf-8')
-  )
-  db.session.add(u1)
-  db.session.add(u2)
+  # u2 = User(
+  #   username = 'Patrick',
+  #   email = 'pat@g.clemson.edu',
+  #   companies_max = 5,
+  #   password = bcrypt.generate_password_hash("test").decode('utf-8')
+  # )
+  # db.session.add(u1)
+  # db.session.add(u2)
 
   # game = Game(
   #   name = 'Dummy Game',

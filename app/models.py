@@ -103,7 +103,7 @@ class Company(db.Model):
   score = db.Column(db.Integer, nullable=False, default=0)
   balance = db.Column(db.Float, nullable=False, default=1000000000)
   quarter_net = db.Column(db.Float, default=0)
-  global_bid_policy = db.Column(db.Enum("MC", "LCOE", "Fixed"), default="Fixed")
+  global_bid_policy = db.Column(db.Enum("MC", "LCOE", "Fixed"), default="MC")
   global_maintenance_policy = db.Column(db.Enum("Routine", "Proactive", "Reactive"), default="Routine")
   state = db.Column(db.Enum("view", "build", "waiting", "ready"), default="view")
   cost_operational = db.Column(db.Float, default=0)

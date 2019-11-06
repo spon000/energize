@@ -448,7 +448,7 @@ define([
           modelData.deleteFacility(facilityId).then((results) => {
             this._canvasModel.facilityLayer.removeFacilityTile(facilityId);
             this._canvasModel.playerMarkerLayer.removeMarkerTile(facilityId);
-            this._dialogStatus = "viewing";
+            this._dialogStatus = "popup";
             // console.log("this._dialogStatus = ", this._dialogStatus);
           });
         }

@@ -169,11 +169,24 @@ define([
         /* *********************************************************************************** */
         _createEvents() {
           $(".portfolio-facility-name-link").on("click", this, this._viewFacility);
-
+          $(".option-bid-policy").on("change", this, this._changeBidPolicy);
+          $(".option-mnt-policy").on("change", this, this._changeMaintPolicy);
         }
 
         /* *********************************************************************************** */
         // Event functions
+        /* *********************************************************************************** */
+        _changeBidPolicy(evt) {
+          let scope = evt.data;
+          scope._modelData.updateGlobalBidPolicy(evt.currentTarget.value)
+        }
+
+        /* *********************************************************************************** */
+        _changeMaintPolicy(evt) {
+          let scope = evt.data;
+          scope._modelData.updateGlobalMaintPolicy(evt.currentTarget.value)
+        }
+
         /* *********************************************************************************** */
         _viewFacility(evt) {
           console.log("_viewFacility() evt = ", evt);

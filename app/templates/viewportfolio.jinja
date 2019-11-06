@@ -4,6 +4,7 @@
     grid-gap: 5px;
     grid-template-columns: 350px 350px;
     grid-template-rows: 120px 30px 120px 30px 240px;
+    overflow: hidden;
   }
 
   .grid-box {
@@ -22,16 +23,20 @@
     border-style: solid;
     border-width: 1px;
     border-radius: 5px;
+    position: static;
+
   }
 
   #portfolio-summary div {
     margin-top: 15px;
+    position: static;
   }
 
   #portfolio-summary .row {
     margin: 0;
     padding: 0;
     height: 20px;
+    position: static;
   }
 
   #portfolio-summary .field {
@@ -39,12 +44,14 @@
     font-weight: bold;
     padding-left: 0;
     margin-left: -10px;
+    position: static;
   }
 
   #portfolio-summary .value {
     font-size: 14px;
     padding: 0;
     margin-left: -20px;
+    position: static;
   }
 
   /* ******************************************************************* 
@@ -123,6 +130,10 @@
     background-color: #f3f5da;
     width: 250px;
     margin-left: 30px;
+  }
+
+  #portfolio-options option.disabled {
+    color: lightgray;
   }
 
 
@@ -205,15 +216,21 @@
         <label>Company-wide electricity bid policy:</label>
       </div>
       <div class="row">
-        <select>
-          {% for bid_option in bid_options %}
-          <!---->
-          {% if bid_option == company.global_bid_policy %}
-          <option value="{{bid_option}}" selected>{{ bid_option}}</option>
-          {% else %}
-          <option value="{{bid_option}}">{{ bid_option}}</option>
-          {% endif %}
-          <!---->
+        <select class="option-bid-policy">
+          {% for bid_option in bid_options %} 
+
+            {% if bid_option.disabled == true %} 
+              {% set disabled = 'disabled' %} 
+            {% else %} 
+              {% set disabled = '' %}
+            {% endif %}
+
+            {% if bid_option.name == company.global_bid_policy %}
+              <option value="{{bid_option.name}}" {{ disabled }} selected>{{ bid_option.name }}</option>
+            {% else %}
+              <option value="{{bid_option.name}}" {{ disabled }}>{{ bid_option.name }}</option>
+            {% endif %}
+            
           {% endfor %}
         </select>
       </div>
@@ -222,7 +239,7 @@
         <label>Company-wide maintenance policy:</label>
       </div>
       <div class="row">
-        <select>
+        <select class="option-mnt-policy">
           {% for maint_option in maint_options %}
           <!---->
           {% if maint_option == company.global_maintenance_policy %}

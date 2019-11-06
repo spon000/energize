@@ -49,8 +49,7 @@ define([
           this._turn = new Turn();
           this._getInitialStates();
 
-          if (this.showQR) {
-            console.log("showQR = ", showQR);
+          if (this._showQR) {
             evtEmitter.emit('quarterly_report_btn');
           }
 

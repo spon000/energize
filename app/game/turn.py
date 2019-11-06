@@ -246,7 +246,10 @@ def finalize_turn(game, mods, state):
   
   for company in game.companies:
       company.state = "view"
-      company.show_QR = True
+      if game.turn_number > 1:
+        company.show_QR = True
+      else:
+        company.show_QR = False
 
   db.session.commit()
 

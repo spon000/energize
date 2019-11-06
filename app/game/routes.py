@@ -17,6 +17,7 @@ from app.game.utils import format_date, convert_to_money_string, get_age, turns_
 from app.game.modifiers import load_modifiers
 from app.game.prompts import assign_prompt
 from app.game.sio_outgoing import shout_game_turn_complete, shout_new_facility, shout_update_facility, shout_delete_facility
+from app.gamesio.routes import force_run_turn
 
 game = Blueprint('game', __name__)
 #################################################################################  
@@ -37,6 +38,9 @@ def initgame(gid, name):
   if init_game_models(game) == True:
     game.state = "new"
     db.session.commit()
+    print("-"*80)
+    print("creating game...")
+    force_run_turn(json.dumps({'gameId': game.id, 'initialTurn': True}))
   else:
     flash(f'Error creating game (code:012)','danger')
     return render_template("title.html")    
@@ -59,9 +63,13 @@ def joingame(gid, name):
     return render_template("title.html")
   
   # if the number of ai companies is the max number of companies than this game is new.
-  if len(ai_companies) == game.companies_max:
-    game.state = "new"
-    db.session.commit()
+  # if len(ai_companies) == game.companies_max:
+  #   game.state = "new"
+  #   db.session.commit()
+
+
+  # if game.state == "runturn":
+  #   return render_template("initgamewait.jinja", name=name, gid=game.id)
 
   # get a random ai company and assign it to the player.
   seed()
@@ -671,6 +679,36 @@ def update_generators():
 # ###############################################################################  
 #
 # ###############################################################################
+@game.route("/updateglobalbidpolicy", methods=["GET", "POST"])
+@login_required
+def update_global_bid_policy():
+  gid = request.args.get('gid', None)
+  option = request.args.get('option', None)
+  company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
+
+  company.global_bid_policy = option
+  db.session.commit()
+
+  return jsonify({'status': 'success'})
+
+# ###############################################################################  
+#
+# ###############################################################################
+@game.route("/updateglobalmaintpolicy", methods=["GET", "POST"])
+@login_required
+def update_global_maint_policy():
+  gid = request.args.get('gid', None)
+  option = request.args.get('option', None)
+  company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
+
+  company.global_maintenance_policy = option
+  db.session.commit()
+
+  return jsonify({'status': 'success'})
+
+# ###############################################################################  
+#
+# ###############################################################################
 @game.route("/deletegenerator", methods=["GET", "POST"])
 @login_required
 def delete_generator(): 
@@ -771,10 +809,14 @@ def portfolio_html():
   # print(f"generator[0].generator_type = {generators[0].generator_type}")
 
   return render_template(
-    "viewportfolio.html",
+    "viewportfolio.jinja",
     format_money=convert_to_money_string,
     company=company,
-    bid_options=["MC", "LCOE", "Fixed"],
+    bid_options=[
+      {'name':"MC", 'disabled': False},
+      {'name':"LCOE", 'disabled': False},
+      {'name':"Fixed", 'disabled': True},
+    ],
     maint_options=["Routine", "Proactive", "Reactive"]
   )
 # ###############################################################################  

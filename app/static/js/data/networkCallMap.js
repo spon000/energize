@@ -73,6 +73,14 @@ define([
       name: "updateGenerators",
       path: "/updategenerators" + gid
     },
+    "updateGlobalBidPolicy": {
+      name: "updateGlobalBidPolicy",
+      path: "/updateglobalbidpolicy" + gid
+    },
+    "updateGlobalMaintPolicy": {
+      name: "updateGlobalMaintPolicy",
+      path: "/updateglobalmaintpolicy" + gid
+    },
     "deleteGenerator": {
       name: "deleteGenerator",
       path: "/deletegenerator" + gid

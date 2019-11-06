@@ -8,9 +8,9 @@ define([
     keyMapEmitters = {
       "Minus": "zoomOut",
       "Equal": "zoomIn",
-      "KeyB": "build_facility_btn",
-      "KeyT": "next_turn_btn",
-      "KeyT+Shift": "force_run_turn",
+      // "KeyB": "build_facility_btn",
+      // "KeyT": "next_turn_btn",
+      "KeyT+Alt+Ctrl": "force_run_turn",
       "KeyP": "portfolio_btn",
       "KeyQ": "quarterly_report_btn",
       "ArrowDown": "moveMapDown",

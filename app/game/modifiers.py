@@ -16,6 +16,18 @@ mods_filename_prefix = 'modifiers'
 mods_filename_extension = '.pkl'
 
 def init_modifiers(game, cities):
+
+  # if modifiers file exists then load it instead of 
+  # creating new one.
+  mods_file = open(get_filename(game.id), 'rb')
+  if mods_file != None:
+    mods_file.close()
+    return None
+    
+  print("-"*80)
+  print("initializing Modifiers...")
+  print("-"*80)
+
   t  = np.linspace(0, game.total_years, game.total_years * 4 * 90 * 24)
   # t  = np.linspace(0, 1, 1 * 4 * 90 * 24)
   cc = cloud_cover(t)

@@ -73,6 +73,28 @@ define([
         });
       }
 
+      updateGlobalBidPolicy(option) {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.updateGlobalBidPolicy.path + "option=" + option);
+
+          loaded.then((results) => {
+            // console.log("updateGlobalBidPolicy resultes = ", results);
+            resolve(results)
+          });
+        });
+      }
+
+      updateGlobalMaintPolicy(option) {
+        return new Promise(resolve => {
+          const loaded = $.get(networkCallMap.updateGlobalMaintPolicy.path + "option=" + option);
+
+          loaded.then((results) => {
+            // console.log("updateGlobalMaintPolicy resultes = ", results);
+            resolve(results)
+          });
+        });
+      }
+
       /////////////////////////////////////////////////////////////////////
       // Delete records in the database
       deleteFacility(fid) {
