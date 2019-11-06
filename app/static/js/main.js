@@ -127,5 +127,6 @@ require([
 ], function (Game) {
   console.log("global game id = ", globalGameId);
   console.log("global player number = ", globalPlayerNumber);
-  game = new Game(globalGameId, globalPlayerNumber);
+  console.log("show_QR = ", show_QR);
+  game = new Game(globalGameId, globalPlayerNumber, show_QR);
 });

@@ -15,5 +15,5 @@ app/games.db
 **/debug.txt
 
 # Ignore virtual environment directory
-venv/
+venv**/
 

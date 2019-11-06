@@ -43,8 +43,8 @@ def init_game_models(game):
   init_generators(game)
 
   # create modifiers table for all the iterations of the game.
-  # cities = City.query.filter_by(id_game=game.id).all()
-  # init_modifiers(game, cities)
+  cities = City.query.filter_by(id_game=game.id).all()
+  init_modifiers(game, cities)
 
   # Generate empty history table (file)
   #init_history_table(game)

@@ -23,8 +23,9 @@ define([
   ) {
     return (
       class Game {
-        constructor(gameId, playerNum) {
+        constructor(gameId, playerNum, showQR) {
           this._gameRoomName = 'game' + globalGameId;
+          this._showQR = showQR;
           this._canvasModel = null;
           this._canvasView = null;
           this._canvasController = null;
@@ -48,7 +49,11 @@ define([
           this._turn = new Turn();
           this._getInitialStates();
 
-          evtEmitter.emit('quarterly_report_btn');
+          if (this.showQR) {
+            console.log("showQR = ", showQR);
+            evtEmitter.emit('quarterly_report_btn');
+          }
+
         }
 
         _initializeWebSocket() {
@@ -124,7 +129,7 @@ define([
           evtEmitter.on('game_turn_complete', (data) => {
             // window.onload(() => {
             //   console.log("")
-            //   evtEmitter.emit('open_quarterly_report');
+            // evtEmitter.emit('open_quarterly_report');
             // });
             location.reload();
           });

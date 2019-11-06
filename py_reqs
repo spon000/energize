@@ -23,6 +23,7 @@ Flask-SQLAlchemy==2.3.2
 Flask-WTF==0.14.2
 geos==0.2.2
 greenlet==0.4.15
+gunicorn==19.9.0
 importlib-metadata==0.23
 isort==4.3.21
 itsdangerous==1.1.0

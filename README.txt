@@ -15,57 +15,6 @@ sudo apt-get install libmysqlclient-dev
 # install virtual environment program
 pip3 install virtualenv
 
-######################################################################################
-# Pull source of project from github.com and put in directory under ~/development
-######################################################################################
-
-# Move into development directory
-cd ~/development
-
-# Clone github repository. This will automatically create the project folder.
-git clone https://github.com/spon000/energize.git
-
-# Note: If the project directory exists and the source has been pulled, but you
-# need to update to the latest source available then issue the git pull command
-# from within the project directory.
-git pull
-
-
-######################################################################################
-# 1) Creating virtual environment and activating it. 
-# 2) Install all required python packages.
-######################################################################################
-
-# Determine where the python executable that we want to copy to our virtual environment
-# is located.
-which python3 
-# output --> /<location of python3 executable> ex: "/usr/bin/python3"
-
-# Create virtual environment and copy python install so that we 
-# don't accidently mess with the production python.
-
-# change into development project directory
-cd ~/develop/energize
-virtualenv -p /usr/bin/python3 venv
-
-# To activate the virtual environment...
-# from outside development directory:
-source ~/develop/virtual_environments/energize/bin/activate
-
-# from inside development directory:
-source venv/bin/activate
-
-# command prompt should contain the name of the virtual environment
-# ex: (venv) ubuntu@ip-172-31-17-53:~$
-
-# Once you have virtual environment activated install all required 
-# python packages specified in py_reqs_dev:
-pip install -r ~/develop/energize/py_reqs_dev
-
-# If you need to add or remove a package from the venv make sure 
-# to update the py_reqs aftwerwards with the following command:
-pip freeze > py_reqs_dev
-
 
 ######################################################################################
 # Installing Nginx on Ubuntu 18.04
@@ -125,5 +74,68 @@ sudo ufw status
 
 # More stuff to do like creating server blocks:
 # https://phoenixnap.com/kb/install-nginx-on-ubuntu
+
+
+######################################################################################
+# Pull source of project from github.com and put in directory under ~/development
+######################################################################################
+
+# Move into development directory
+cd ~/development
+
+# Clone github repository. This will automatically create the project folder.
+git clone https://github.com/spon000/energize.git
+
+# Note: If the project directory exists and the source has been pulled, but you
+# need to update to the latest source available then issue the git pull command
+# from within the project directory.
+git pull
+
+
+######################################################################################
+# 1) Creating virtual environment and activating it. 
+# 2) Install all required python packages.
+######################################################################################
+
+# Determine where the python executable that we want to copy to our virtual environment
+# is located.
+which python3 
+# output --> /<location of python3 executable> ex: "/usr/bin/python3"
+
+# Create virtual environment and copy python install so that we 
+# don't accidently mess with the production python.
+
+# change into development project directory
+cd ~/develop/energize
+virtualenv -p /usr/bin/python3 venv
+
+# To activate the virtual environment...
+# from outside development directory:
+source ~/develop/virtual_environments/energize/bin/activate
+
+# from inside development directory:
+source venv/bin/activate
+
+# command prompt should contain the name of the virtual environment
+# ex: (venv) ubuntu@ip-172-31-17-53:~$
+
+# Once you have virtual environment activated install all required 
+# python packages specified in py_reqs_dev:
+pip install -r ~/develop/energize/py_reqs_dev
+
+# If you need to add or remove a package from the venv make sure 
+# to update the py_reqs aftwerwards with the following command:
+pip freeze > py_reqs_dev
+
+######################################################################################
+# running the development server 
+######################################################################################
+
+# Initialize the database
+python run.py init
+
+# Start the Flask development server (under port 5000)
+python run.py
+
 
 

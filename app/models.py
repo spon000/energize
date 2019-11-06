@@ -108,6 +108,7 @@ class Company(db.Model):
   state = db.Column(db.Enum("view", "build", "waiting", "ready"), default="view")
   cost_operational = db.Column(db.Float, default=0)
   joined_game = db.Column(db.Boolean, default=False)
+  show_QR = db.Column(db.Boolean, default=False)
 
   # Relational data
   game = db.relationship('Game')

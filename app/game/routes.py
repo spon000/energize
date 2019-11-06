@@ -79,7 +79,7 @@ def joingame(gid, name):
   db.session.add(prompt)
   db.session.commit()    
 
-  return redirect(url_for('game.loadgame' , gid=gid))
+  return redirect(url_for('game.loadgame', gid=gid))
 
 #################################################################################  
 # loadgame: Load into the main game screen.
@@ -790,7 +790,10 @@ def quarterly_html():
   gs = []
   for gens in generators:
     gs += gens
-  
+
+  # So the QR will not show up after every browser reload.
+  company.show_QR = False
+  db.session.commit()
 
   # fac_construction = db.session.query(db.func.sum(Facility.construction)).filter_by(id_game=gid, id_company=company.id).scalar()
   fac_construction = sum([fac.construction for fac in facilities])

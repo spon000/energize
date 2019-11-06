@@ -4,9 +4,15 @@
   <script type=text/javascript>
     const globalGameId = {{game.id}}
     const globalPlayerNumber = {{company.player_number}}
+    {% if company.show_QR %}
+      const show_QR = true;
+    {% else %}
+      const show_QR = false;
+    {% endif %}
+
   </script>
   <script data-main="{{ url_for('static', filename='js/main.js') }}" src="{{ url_for('static', filename='js/lib/requirejs/require.2.3.5.min.js') }}">
-  </script> 
+  </script>
 {% endblock head_script %} 
 
 {% block middle_content %}
