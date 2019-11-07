@@ -327,10 +327,15 @@ define([], function () {
       <div class="bidpolicy-selectbox">
         <select genid="{{genId}}">
         {{#each bidp_opts}}
-          {{#if_eq ../bidp this}}
-            <option value="{{this}}" selected="selected"> {{this}} </option>
+          {{#if this.disabled}}
+            {{assign 'disabled' 'disabled'}}
           {{else}}
-            <option value="{{this}}"> {{this}} </option>
+            {{assign 'disabled' ''}}
+          {{/if}}
+          {{#if_eq ../bidp this.name}}
+            <option value="{{this.name}}" {{@root.disabled}} selected="selected"> {{this.name}} </option>
+          {{else}}
+            <option value="{{this.name}}" {{@root.disabled}}> {{this.name}} </option>
           {{/if_eq}}
         {{/each}}
         </select>

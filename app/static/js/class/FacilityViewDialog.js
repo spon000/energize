@@ -73,7 +73,12 @@ define([
           this._powerTypes = null;
           this._resourceTypes = null;
           this._generatorStateList = ["new", "building", "paused", "available", "unavailable", "decommissioning", "decommissioned"];
-          this._bidPolicyOptions = ["Company Wide", "MC", "LCOE", "Fixed"];
+          this._bidPolicyOptions = [
+            { name: "Company Wide", disabled: false },
+            { name: "MC", disabled: false },
+            { name: "LCOE", disabled: false },
+            { name: "Fixed", disabled: true },
+          ];
           this._maintPolicyOptions = ["Company Wide", "Routine", "Proactive", "Reactive"];
 
           // Ugh. Find a better way than this.
@@ -203,6 +208,16 @@ define([
           Handlebars.registerHelper('if_eq', function (arg1, arg2, options) {
             return ("" + arg1 == "" + arg2) ? options.fn(this) : options.inverse(this);
           });
+
+          // Register Handlebars helper that allows you to set a variable
+          // https://stackoverflow.com/questions/24736938/is-it-possible-to-assign-a-parameter-value-within-handlebars-templates-without-u
+          Handlebars.registerHelper('assign', function (varName, varValue, options) {
+            if (!options.data.root) {
+              options.data.root = {};
+            }
+            options.data.root[varName] = varValue;
+          });
+
 
           let compiledTemplate = Handlebars.compile(FacilityViewTmplt.facilityView);
           this._facilityViewWindowHtml = $(compiledTemplate());

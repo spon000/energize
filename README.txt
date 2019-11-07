@@ -5,8 +5,8 @@
 # Here are some of the steps taken to create the python environment for
 # energize.
 
-# install latest version of pip for python 3
-python3 -m pip install --upgrade pip
+# install pip3 for python3 (if it's not already installed)
+sudo apt install python3-pip
 
 # If using mysql the run the following commands
 sudo apt-get install mysql-server
