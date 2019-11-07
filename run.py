@@ -13,9 +13,8 @@ if __name__ == "__main__":
   if len(sys.argv) > 1:
     if sys.argv[1] == 'init':
       initialize_db(app)
-    elif sys.argv[1] == 'initrun':
-      initialize_db(app)
-      run = True
+    elif sys.argv[1] == 'init_u':
+      initialize_db(app, True)
   else:
     run = True
       

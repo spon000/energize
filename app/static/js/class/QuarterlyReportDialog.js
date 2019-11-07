@@ -250,6 +250,7 @@ define([
         _table_row_selected(row) {
           let data = row.getData();
           let scope = data.scope;
+          console.log("_table_row_selected")
 
           scope._modelData.getEventDetailsHtml(data.id).then((html) => {
             // console.log("eventDetails html = ", html);
