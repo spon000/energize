@@ -2,6 +2,7 @@ import numpy as np
 import pickle
 import json
 
+from os import path
 from app import celery
 # import math
 # import time
@@ -19,9 +20,7 @@ def init_modifiers(game, cities):
 
   # if modifiers file exists then load it instead of 
   # creating new one.
-  mods_file = open(get_filename(game.id), 'rb')
-  if mods_file != None:
-    mods_file.close()
+  if path.exists(get_filename(game.id)):
     return None
     
   print("-"*80)

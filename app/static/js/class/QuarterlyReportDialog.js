@@ -32,7 +32,7 @@ define([
             this._events = data[0].prompts;
             this._eventTypes = data[0].prompt_types;
             this._quarterlyDialogHtml = data[1];
-            console.log("_getDialogData()  data = ", data);
+            // console.log("_getDialogData()  data = ", data);
             this._openQuarterlyDialog(this)
             this._createEvents();
             this._createEventListTable();
@@ -77,11 +77,11 @@ define([
           //   return;
 
           if ($(button).hasClass("open-b")) {
-            scope._sidebarStatus(true);
+            // scope._sidebarStatus(true);
             $(button).html("&#9654;");
           }
           else {
-            scope._sidebarStatus(false);
+            // scope._sidebarStatus(false);
             $(button).html("&#9664;");
           }
 
@@ -98,6 +98,7 @@ define([
 
         /* *********************************************************************************** */
         _sidebarStatus(open) {
+          console.log("sidebarStatus...", open)
           this._sideBarOpen = open;
 
           if (open) {
@@ -251,10 +252,10 @@ define([
           let scope = data.scope;
 
           scope._modelData.getEventDetailsHtml(data.id).then((html) => {
-            console.log("eventDetails html = ", html);
+            // console.log("eventDetails html = ", html);
             scope._addEventToSidebar(html);
           });
-          console.log("row selected ", data);
+          // console.log("row selected ", data);
         }
 
       });

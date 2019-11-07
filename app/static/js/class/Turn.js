@@ -99,7 +99,7 @@ define([
                   text: "Cancel",
                   click: function (evt, scope) {
                     $(this).dialog("close");
-                    console.log("evt =", scope)
+                    // console.log("evt =", scope)
                     clearInterval(this._timerInterval);
                     webSocketCalls.sendMessageEmit('cancel_run_turn', { gameId: globalGameId });
                   }
@@ -143,7 +143,7 @@ define([
         _updateRunningTurnDialog(scope, data) {
           let status = data.socketio_data.status;
           let width = Math.floor(((status.interval / status.total) * 100))
-          console.log("_updateRunningTurnDialog() = ");
+          // console.log("_updateRunningTurnDialog() = ");
 
 
           $("#" + this._elementIdRunningTurnDialog).find(".progress-bar").css("width", width + "%")

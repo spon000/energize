@@ -62,7 +62,7 @@ define([
           /* *************************************************************************** */
           // Connecting to server. Session ID is returned
           /* *************************************************************************** */
-          webSocketCalls.initializeSocket(document.domain, location.port);
+          webSocketCalls.initializeSocket(document.domain, 5000 /*location.port*/);
 
           /* *************************************************************************** */
           // Setup all the socket calls for which we'll be listening.
