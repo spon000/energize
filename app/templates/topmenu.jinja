@@ -24,11 +24,7 @@
   text-decoration: none;
 }
 
-{# .no-hover {
-  background-color: yellow;
-  color: red;
-  text-decoration: none;
-} #}
+
 
 .top-menu .company-btn  label {
   font-size: 12px;  
@@ -146,6 +142,7 @@ a.running {
 <div id="game-top-menu" class="top-menu">
   <a id="portfolio-btn" class="company-btn push-up" href="#">{{ company.name }}<br/> <label> (portfolio) </label></a>
   <a class="budget-btn push-up no-hover" href="#">Balance: <label> {{ format_money(company.balance) }} </label> </a>
+  {# <a class="demand-btn push-up no-hover" href="#">Previous Demand: <label> {{ None }} </label> </a> #}
   <a class="market-btn push-up no-hover" href="#"> World Market</a>
   <a class="social-btn no-hover" href="#"> Social</a>
   <a id="quarterly-report-btn" class="q-report-btn push-up" href="#"> Quarterly Report</a>

@@ -18,15 +18,20 @@ define([
         constructor() {
           this._modelData = new ModelData();
           this._elementIdQuarterlyEventsMain = "quarterly-events-list-main";
-          this._elementIdQuarterlyEventsSidebar = "quarterly-events-list-sidebar";
           this._elementIdQuarterlyEventsTable = "quarterly-events-list-table";
+          this._elementIdQuarterlyEventsSidebar = "quarterly-events-list-sidebar";
+
+          this._elementIdSidebarContentEvent = "sidebar-content-event";
+          this._elementIdSidebarContentDefault = "sidebar-content-default";
+
+
+
           this._quarterlyDialogHtml = null
           this._quarterlyDialog = null;
           this._eventSelected = false;
-          this._sideBarOpen = false;
           this._trashEventsOn = false;
           this._events = null;
-
+          this._sideBarHtml = null;
 
           this._getDialogData().then((data) => {
             this._events = data[0].prompts;
@@ -61,65 +66,75 @@ define([
 
         /* *********************************************************************************** */
         _createEvents() {
-          $("#" + this._elementIdQuarterlyEventsMain).find(".sidebar-btn").on("click", this, this._sidebar);
-          $("#" + this._elementIdQuarterlyEventsMain).find(".sidebar-btn-trash").on("click", this, this._trashEvents);
+          $("#" + this._elementIdQuarterlyEventsMain).find(".sidebar-open-close-btn").on("click", this, this._sidebarOpenBtn);
+          $("#" + this._elementIdQuarterlyEventsMain).find(".sidebar-btn-trash").on("click", this, this._sidebarTrashBtn);
+          $("#" + this._elementIdQuarterlyEventsMain).find(".sidebar-btn-popout").on("click", this, this._sidebarPopoutBtn);
         }
 
         /* *********************************************************************************** */
         // Event functions
         /* *********************************************************************************** */
-        _sidebar(evt) {
+        _sidebarOpenBtn(evt) {
           console.log("sidebar testing...", evt);
           let button = evt.currentTarget;
           let scope = evt.data;
 
-          // if (!scope._eventSelected)
-          //   return;
+          if ($(button).hasClass("closed-b"))
+            scope._sidebarActionOpen()
+          else
+            scope._sidebarActionClose()
 
-          if ($(button).hasClass("open-b")) {
-            // scope._sidebarStatus(true);
-            $(button).html("&#9654;");
+        }
+
+        /* *********************************************************************************** */
+        _sidebarTrashBtn(evt) {
+          console.log("_sidebarTrashBtn... ", evt);
+        }
+
+        _sidebarPopoutBtn(evt) {
+          console.log("_sidebarPopoutBtn... ", evt);
+        }
+
+
+        _sidebarActionOpen() {
+          console.log("_sidebarActionOpen... ");
+          $(".sidebar-open-close-btn").html("&#9654;");
+          $(".sidebar-open-close-btn").removeClass("closed-b");
+          $(".sidebar-open-close-btn").addClass("opened-b");
+          $("#" + this._elementIdQuarterlyEventsSidebar).removeClass("closed-sb");
+          $("#" + this._elementIdQuarterlyEventsSidebar).addClass("opened-sb");
+
+          if (this._eventSelected) {
+            $("#" + this._elementIdSidebarContentEvent).removeClass("no-show");
+            $("#" + this._elementIdSidebarContentDefault).addClass("no-show");
           }
           else {
-            // scope._sidebarStatus(false);
-            $(button).html("&#9664;");
-          }
-
-          $(button).toggleClass("open-b");
-          $(button).toggleClass("close-b");
-          $("#" + scope._elementIdQuarterlyEventsSidebar).toggleClass("open-sb");
-          $("#" + scope._elementIdQuarterlyEventsTable).toggleClass("open-t");
-        }
-
-        /* *********************************************************************************** */
-        _trashEvents(evt) {
-          console.log("_trashEvents()... ", evt);
-        }
-
-        /* *********************************************************************************** */
-        _sidebarStatus(open) {
-          console.log("sidebarStatus...", open)
-          this._sideBarOpen = open;
-
-          if (open) {
-            let eventDetailsHtml = $("#" + this._elementIdQuarterlyEventsSidebar).find("#event-details")
-
-            if ($(eventDetailsHtml))
-              $(eventDetailsHtml).removeClass("event-details-hide");
-            else
-              $(eventDetailsHtml).addClass("event-details-hide");
+            $("#" + this._elementIdSidebarContentEvent).addClass("no-show");
+            $("#" + this._elementIdSidebarContentDefault).removeClass("no-show");
           }
         }
 
-        _addEventToSidebar(html) {
+        _sidebarActionClose() {
+          $(".sidebar-open-close-btn").html("&#9664;");
+          $(".sidebar-open-close-btn").addClass("closed-b");
+          $(".sidebar-open-close-btn").removeClass("opened-b");
+          $("#" + this._elementIdQuarterlyEventsSidebar).removeClass("opened-sb");
+          $("#" + this._elementIdQuarterlyEventsSidebar).addClass("closed-sb");
 
-          if (this._sideBarOpen)
-            $(html).removeClass("event-details-hide");
+          $("#" + this._elementIdSidebarContentEvent).addClass("no-show");
+          $("#" + this._elementIdSidebarContentDefault).addClass("no-show");
+        }
+
+        _addEventToSidebar(html = null) {
+
+          $("#" + this._elementIdSidebarContentEvent).empty();
+
+          if (html) {
+            $("#" + this._elementIdSidebarContentEvent).append(html);
+            this._sidebarActionOpen();
+          }
           else
-            $(html).addClass("event-details-hide");
-
-          $("#" + this._elementIdQuarterlyEventsSidebar).empty();
-          $("#" + this._elementIdQuarterlyEventsSidebar).append(html);
+            this._sidebarActionClose();
         }
 
 
@@ -221,7 +236,7 @@ define([
 
             selectable: 1,
             rowSelected: this._table_row_selected,
-
+            rowDeselected: this._table_row_deselected,
           }
 
           return new Tabulator("#" + this._elementIdQuarterlyEventsTable, eventTableDef);
@@ -250,13 +265,20 @@ define([
         _table_row_selected(row) {
           let data = row.getData();
           let scope = data.scope;
-          console.log("_table_row_selected")
 
           scope._modelData.getEventDetailsHtml(data.id).then((html) => {
-            // console.log("eventDetails html = ", html);
+            scope._eventSelected = true;
             scope._addEventToSidebar(html);
           });
-          // console.log("row selected ", data);
+        }
+
+        /* *********************************************************************************** */
+        _table_row_deselected(row) {
+          let data = row.getData();
+          let scope = data.scope;
+
+          scope._eventSelected = false;
+          scope._addEventToSidebar();
         }
 
       });

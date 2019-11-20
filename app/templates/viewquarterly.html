@@ -82,6 +82,11 @@
   #quarterly-events-list-main hr {
     margin: 2px;
   }
+
+  .summary-row .value {
+    font-size: 13px;
+    font-weight: bold;
+  }
 </style>
 
 <div id="quarterly-content">
@@ -123,8 +128,8 @@
       </div>
 
       <div class="row summary-row">
-        <label class="field col-lg-7">Net Worth:</label>
-        <label class="value col-lg-5">{{ format_money(0) }}</label>
+        <label class="field col-lg-7">Balance:</label>
+        <label class="value col-lg-5">{{ format_money(company.balance) }}</label>
       </div>
 
     </div>
@@ -139,7 +144,7 @@
   <div id="quarterly-events-list-main" class="grid-box">
     <span id="sidebar-title">
       <h4 class="sidebar-title-heading">Event Items</h4>
-      <label class="sidebar-btn open-b">&#9664;</label>
+      <label class="sidebar-open-close-btn closed-b">&#9664;</label>
       <label class="sidebar-btn-window">&#10697;</label>
       <label class="sidebar-btn-trash">&#128465;</label>
       <h4 class="sidebar-title-heading">Details</h4>
@@ -151,15 +156,36 @@
       <p>There are no events to display...</p>
     </div>
 
-    <div id="quarterly-events-list-sidebar" class="event-sidebar"></div>
+    <div id="quarterly-events-list-sidebar" class="event-sidebar closed-sb">
+      <div id="sidebar-content-default" class="no-show default-content">
+        <br/>
+        <h3>Event Details Window</h3>
+        <br/>
+        <br/>
+        <h5>click on event item in table.</h5>
+      </div>
+      <div id="sidebar-content-event" class="no-show event-content"></div>
+    </div>
 
   </div>
 </div>
 
 
 <style>
-  #quarterly-events-list-sidebar {
-    /* width: 0; */
+  .closed-sb {
+    margin: 0;
+    width: 0px;
+    transition: 0.5s;
+  }
+
+  .opened-sb {
+    margin: 0;
+    width: 400px;
+    transition: 0.5s;
+  }
+
+  .no-show {
+    display: none;
   }
 
   #quarterly-events-list-table {
@@ -194,12 +220,12 @@
     width: 300px;
   }
 
-  .open-b {
+  .closed-b {
     margin-left: 45%;
     transition: 0.5s;
   }
 
-  .close-b {
+  .opened-b {
     margin-left: 0;
     transition: 0.5s;
   }
@@ -216,25 +242,34 @@
   }
 
   .event-sidebar {
-    height: 239px;
+
+    height: 240px;
     position: absolute;
     z-index: 5;
     top: 305px;
     right: 22px;
     background-color: #eee;
 
-    overflow-x: hidden;
+    overflow: hidden;
     transition: 0.5s;
     padding-top: 0px;
     border-style: solid;
     border-width: 2px;
     border-color: #222;
-    opacity: .1;
+    opacity: .15;
   }
 
   .event-sidebar:hover {
-
     opacity: 1;
     /* border-radius: 5px; */
+  }
+
+  .default-content {
+    margin: 5px;
+    text-align: center;
+  }
+
+  .event-content {
+    display: inline;
   }
 </style>

@@ -1,54 +1,46 @@
-{% extends "home.html" %}
+{% extends "home.jinja" %} {% block middle_content %}
 
-{% block middle_content %}
-
-  <script>
-    $(function() {
-      $("#dialog").dialog();
-    });
-  </script>
-  <div class="middle-area title-image"> </div>
-  <div id="dialog" title="Join A Game">
-    <div class="container">
-      <div class='content-section newgame-form'>
-        <form method="POST" action="">
+<script>
+  $(function () {
+    $("#dialog").dialog();
+  });
+</script>
+<div class="middle-area title-image"> </div>
+<div id="dialog" title="Join A Game">
+  <div class="container">
+    <div class='content-section newgame-form'>
+      <form method="POST" action="">
         {{ form.hidden_tag() }}
-          <fieldset class="form-group">
-            <div class="form-group">
-              {{ form.availablegames.label(class="form-control-label") }}
-              {% if form.availablegames.errors %}
-                {{ form.availablegames(class="form-control form-control-lg is-invalid") }}
-                <div class="invalid-feedback">
-                  {% for error in form.availablegames.errors %}
-                    <span> {{ error }} </span>
-                  {% endfor %}
-                </div>
-              {% else %}
-                {{ form.availablegames(class="form-control form-control-lg") }}
-              {% endif %}
-            </div>
-
-            <div class="form-group">
-              {{ form.companyname.label(class="form-control-label") }}
-              {% if form.companyname.errors %}
-                {{ form.companyname(class="form-control form-control-lg is-invalid") }}
-                <div class="invalid-feedback">
-                  {% for error in form.companyname.errors %}
-                    <span> {{ error }} </span>
-                  {% endfor %}
-                </div>
-              {% else %}
-                {{ form.companyname(class="form-control form-control-lg") }}
-              {% endif %}
-            </div> 
-          </fieldset>
+        <fieldset class="form-group">
           <div class="form-group">
-            {{ form.submit(class="btn btn-outline-info") }}
+            {{ form.availablegames.label(class="form-control-label") }} {% if form.availablegames.errors %} {{ form.availablegames(class="form-control
+            form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.availablegames.errors %}
+              <span> {{ error }} </span>
+              {% endfor %}
+            </div>
+            {% else %} {{ form.availablegames(class="form-control form-control-lg") }} {% endif %}
           </div>
-                
-        </form>
-      </div>
+
+          <div class="form-group">
+            {{ form.companyname.label(class="form-control-label") }} {% if form.companyname.errors %} {{ form.companyname(class="form-control
+            form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.companyname.errors %}
+              <span> {{ error }} </span>
+              {% endfor %}
+            </div>
+            {% else %} {{ form.companyname(class="form-control form-control-lg") }} {% endif %}
+          </div>
+        </fieldset>
+        <div class="form-group">
+          {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+
+      </form>
     </div>
   </div>
+</div>
 
 {% endblock middle_content %}
