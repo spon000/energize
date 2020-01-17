@@ -15,6 +15,11 @@
     margin-right: 5px;
     margin-top: 0;
     margin-bottom: 0;
+
+  }
+
+  .sub-metric img {
+    filter: grayscale(100%);
   }
 
   .sub-metric a {
@@ -35,23 +40,21 @@
 
 <div class="container metrics-content">
   <div class="row">
-    <label class="metrics-title">Company-Wide "health" metrics</label>
+    <label class="metrics-title">Company-Wide "Health" Metrics: TBD</label>
   </div>
 
   <div class="row">
     <div class="sub-metric">
-      <img src="{{ url_for('static', filename='img/icons/environmental.png') }}" alt="Environmental" />
-      <a href="#" class="">Environmental</a>
+      <img src="{{ url_for('static', filename='img/icons/environmental.png') }}" title="Environmental" alt="Environmental" />
     </div>
 
     <div class="sub-metric">
-      <img src="{{ url_for('static', filename='img/icons/societal.png') }}" alt="Societal" />
-      <a href="#" class="societal-link">Societal</a>
+      <img src="{{ url_for('static', filename='img/icons/societal.png') }}" title="Societal" alt="Societal" />
+
     </div>
 
     <div class="sub-metric">
-      <img src="{{ url_for('static', filename='img/icons/technology.png') }}" alt="Technology" />
-      <a href="#" class="">Technological</a>
+      <img src="{{ url_for('static', filename='img/icons/technology.png') }}" title="Technological" alt="Technology" />
     </div>
   </div>
 </div>

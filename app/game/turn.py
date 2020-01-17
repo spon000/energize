@@ -1,5 +1,7 @@
 import numpy as np
+import logging as lg
 from math import trunc
+
 # import pickle
 # import math
 # import time
@@ -69,40 +71,73 @@ def check_generator_quarterly(game):
 
   for generator in generators:
     generator.construction = 0.0
+    generator.om_cost = 0.0
+    generator.revenue = 0.0
 
+    # Check for new generator construction....
     if generator.state == "new":
       generator.state="building"
       generator.build_turn -= 1 
       generator.construction = qtr_gen_const_cost(generator.generator_type)
 
-    elif generator.state == "building":
-      generator.build_turn -= 1
-      generator.construction = qtr_gen_const_cost(generator.generator_type)
-
+      # In case it only takes 1 turn to build (not likely except in test cases)
       if generator.build_turn <= 0:  
         generator.state="available"
         generator.prod_turn += 1
-
-    elif generator.state == "available":
+ 
+      continue
       
+    # Check to see if generator is currently building
+    if generator.state == "building":
+      generator.build_turn -= 1
+      generator.construction = qtr_gen_const_cost(generator.generator_type)
+
+      # If building is complete make the generator available for next quarter.
+      if generator.build_turn <= 0:  
+        generator.state="available"
+        generator.prod_turn += 1
+        
+      continue
+
+
+    # Check to see if generator is being decomissioned.
+    if generator.decom_start == True:
+      generator.decom_start = False
+      generator.state = "decommissioning"
+      generator.facility.decomission += generator.generator_type.decomission_cost
+      generator.decom_turn -= 1
+
+      # In case it only takes 1 turn to decomission (not likely except in test cases).
+      if generator.decom_turn <= 0:
+         generator.state = "decommissioned"
+
+      continue
+      
+   
+    # Check to see if generator is in process of being decomissioned.
+    if generator.state == "decommissioning":
+      generator.decom_turn -= 1
+      generator.facility.decomission += generator.generator_type.decomission_cost
+      
+      # If time is up mark it as decomissioned.
+      if generator.decom_turn <= 0:
+        generator.state = "decommissioned"
+
+      continue
+
+    # Check to see if generator is available for use
+    if generator.state == "available":
+      
+      # Check generator condition. Make if unavailable  when it's lower than 20%
       if generator.condition < 0.20:
         generator.state = "unavailable"
       else:
         generator.prod_turn += 1
 
-    elif generator.state == "start_decom":
-      generator.state = "decommissioning"
-      generator.decom_turn -= 1
-
-    elif generator.state == "decommissioning":
-       generator.decom_turn -= 1
-       if generator.decom_turn <= 0:
-         generator.state = "decommissioned"
-
+      continue
     
   db.session.commit()
   return 
-  
 
 # ###############################################################################  
 #
@@ -116,6 +151,7 @@ def check_facility_hourly(game, hour):
 # ###############################################################################  
 def check_facility_daily(game, day):
   facilities = Facility.query.filter_by(id_game=game.id, state='inactive').all()
+  # print(f"num inactive facilities = {len(facilities)}")
   for facility in facilities:
     facility.counter -= 1
     if facility.counter <= 0:
@@ -129,6 +165,9 @@ def check_facility_quarterly(game):
   facilities = Facility.query.filter_by(id_game=game.id).all()
   for facility in facilities:
     facility.construction = 0.0
+    facility.decomission = 0.0
+    facility.om_cost = 0.0
+    facility.revenue = 0.0
 
     if facility.state == "new":
       facility.state="building"
@@ -137,12 +176,10 @@ def check_facility_quarterly(game):
 
     elif facility.state == "building":
       facility.build_turn -= 1
+      facility.construction = qtr_fac_const_cost(facility.facility_type)
 
       if facility.build_turn <= 0: 
         facility.state="active"
-        facility.prod_turn += 1
-      else:
-        facility.construction = qtr_fac_const_cost(facility.facility_type)
 
     elif facility.state == "active":
       facility.prod_turn += 1  
@@ -160,6 +197,12 @@ def qtr_fac_const_cost(facility_type):
 # ############################################################################### 
 def qtr_gen_const_cost(generator_type):
    return generator_type.fixed_cost_build * generator_type.nameplate_capacity / generator_type.build_time
+
+# ###############################################################################  
+#
+# ############################################################################### 
+def qtr_gen_decom_cost(generator_type):
+   return generator_type.decomission_cost
 
 # ###############################################################################  
 #
@@ -321,16 +364,18 @@ def calculate_company_cost():
 # turn process
 def run_turn(game, mods):
   state = {}
+  tallies = {}
+  # all_states = []
   state['i'] = game.turn_number * cons.hours_per_turn
-  state = get_state_vars(state, mods, game.id)
+  # state = get_state_vars(state, mods, game.id)
   # mods = massage_mods(mods)
 
   filename = "history" + str(game.id) + ".txt"
   file = open(filename,'w')
-  filedebug = open("debug.txt", 'w')
+  # filedebug = open("debug.txt", 'w')
 
-  file.write("+" * 80 +"\n")
-  file.write(f"state = {state}")
+  # file.write("+" * 80 +"\n")
+  # file.write(f"state = {state}")
 
   i = state['i']
  
@@ -344,7 +389,8 @@ def run_turn(game, mods):
   check_facility_quarterly(game)
   check_generator_quarterly(game)
   quarterly_events(game, mods)
-
+  
+  file.write("+" * 80 +"\n")
   for day in range(90):
     shout_game_turn_interval(game.id, {'statusMsg': 'Calculating days...', 'interval': day, 'total': 90})
     check_facility_daily(game, day)
@@ -354,20 +400,52 @@ def run_turn(game, mods):
     # file.write("+" * 80 + "\n")
 
     for hr in range(24):
-      filedebug.write(f"hr({hr})...    {datetime.now().time()}\n")
+      # filedebug.write(f"day({day}) hr({hr})...    {datetime.now().time()}\n")
       check_facility_hourly(game, hr)
       check_generator_hourly(game, state, hr)
+      state = get_state_vars(state, mods, game.id)
 
+      # file.write(f"length of gens is {len(state['gens'])} for hr: {hr}")
+
+      for j in range(len(state['gens'])):
+        gen = state['gens'][j]
+        fac = gen.facility
+        gen.om_cost += state['opMaint_gen'][j]
+        fac.om_cost += state['opMaint_fac'][j]
+
+
+      # file.write("+" * 80 +"\n")
+      # file.write(f"state = {state}")           
+      
+      # if hr == 1 and day % 3 == 0:
+      # state = iso(mods, state, filedebug, game.id, True)
       state = iso(mods, state, file, game.id)
+      # else:
+      #   state = iso(mods, state, file, game.id)
 
-      # filedebug.write("+" * 80 +"\n")
-      # filedebug.write(f"i = {i}\n")
-      # filedebug.write(f"state = {state}")
-
+      # all_states.append(state.copy())
       state['i'] += 1
 
       # db.session.commit()
       # roll_for_events(game,db,mods,state)
+  # filedebug.write("\n\n")
+  # for hour_state in all_states:
+  #   filedebug.write(f"i = {hour_state['i']}\n")
+  #   filedebug.write(f"number of generators = {len(hour_state['gens'])}\n")
+  # filedebug.write("\n\n")
+  # filedebug.write("+" * 80 + "\n")
+  # filedebug.write(f"i = {all_states['i']}\n")
+  # filedebug.write(f"number of generators = {len(all_states['gens'])}\n")
+
+
+  # for st in all_states:  
+  #   filedebug.write(f"{st['i']} ,")
+  
+  # filedebug.write("\n" + "+" * 80 + "\n\n")
+
+  # for index, gen in enumerate(state['gens']):
+  #   gen.condition = state['cngens'][index]
+  #   gen.om_cost = state[]
 
 
     # Construction Expenses
@@ -382,22 +460,25 @@ def run_turn(game, mods):
     
     # fac_construction = db.session.query(db.func.sum(Facility.construction)).filter_by(id_game=gid, id_company=company.id).scalar()
     fac_construction = sum([fac.construction for fac in facilities])
+    fac_decomission = sum([fac.decomission for fac in facilities])
+    om_facilities = sum([fac.om_cost for fac in facilities])
     gen_construction = np.sum([gen.construction for gen in gs])
+    om_generators = sum([gen.om_cost for gen in gs])
 
-    company.balance += - (fac_construction + gen_construction)    
+    company.balance += - (fac_construction + gen_construction + fac_decomission + om_facilities + om_generators)
 
     
   db.session.commit()
 
   file.close()
-  filedebug.close()
+  # filedebug.close()
   return state
 
 
 # ###############################################################################
 #
 # ###############################################################################
-def iso(mods, state, file, gid):
+def iso(mods, state, file, gid, debug=False):
 
   # file.write(f"\tiso start  {datetime.now().time()}\n")
   i           = state['i']
@@ -408,7 +489,7 @@ def iso(mods, state, file, gid):
   supply = 0
   price  = 0
   kk     = 0
-  
+
   for j in jj:
     if supply < demand:
       supply += state['availCap'][j]
@@ -417,6 +498,13 @@ def iso(mods, state, file, gid):
 
   onOff=[]
   profit=[]
+  player_revenue = {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": [],
+    "5": []
+  }
   player_profit = {
     "1": [],
     "2": [],
@@ -429,9 +517,11 @@ def iso(mods, state, file, gid):
 
   for j in range(ng):
     if mc[j] < price:
+      revenue = price * state['availCap'][j]
+      player_revenue[state['pn'][j]] += [revenue]
       profit = (price - state['opMaint_gen'][j] - state['opMaint_fac'][j] - state['fuel_costs'][j]) * state['availCap'][j]
       player_profit[state['pn'][j]] += [profit]
-      gen_profit[j]         = profit
+      # gen_profit[j]         = profit
       state['dc'][j] += state['availCap'][j]
       term1  = state['availCap'][j]/float(state['nc'][j]*state['life'][j])
       term2  = term1*0.05
@@ -441,25 +531,48 @@ def iso(mods, state, file, gid):
       #print('after',state['cn'][j])
       if state['cn'][j]<0.00: state['cn'][j]=0.0
       if state['cn'][j]>1.00: state['cn'][j]=1.0
+     
       #exit()
 
     else:
-      loss = ( state['opMaint_gen'][j] + state['opMaint_fac'][j] ) * state['availCap'][j]
-      player_profit[state['pn'][j]] += [loss]
-      gen_profit[j]         = loss
+      player_revenue[state['pn'][j]] += [0]
+      loss = (state['opMaint_gen'][j] + state['opMaint_fac'][j] ) * state['availCap'][j]
+      player_profit[state['pn'][j]] += [-loss]
+      # gen_profit[j] = loss
 
-    if i%61==0:
-      id   = state['gens'][j].id
-      mt   = state['types'][j]
-      if mt=='natural gas': mt = 'natgas'
+    # if i%61==0:
+    #   id   = state['gens'][j].id
+    #   mt   = state['types'][j]
+      # if mt=='natural gas': mt = 'natgas'
       # file = open('log.txt','a')
       # file.write('gen %s %i %i %f %f %f %f %f %f %f %f\n' % (mt,i,id,state['dc'][j],state['cn'][j],state['opMaint_gen'][j],state['opMaint_fac'][j],state['fuel_costs'][j],gen_profit[j],state['aoc'][j],state['availCap'][j]) )
       # file.close()
 
+  # if debug:
+    # file.write("\n\n")
+    # file.write("+" * 180 + "\n")
+    # file.write(f"\ni = {i}")
+    # file.write(f"\ngen = {state['gens'][52]}")
+    # file.write(f"\nsupply = {supply}")
+    # file.write(f"\ndemand = {demand}")
+    # file.write(f"\nprice = {price}")
+    # file.write(f"\nsum opMaint_gen = {sum(state['opMaint_gen'])}")
+    # file.write(f"\nsum opMaint_fac = {sum(state['opMaint_fac'])}")
+    # file.write(f"\nsum fuel_costs = {sum(state['fuel_costs'])}")
+    # file.write(f"\nloss = {loss}")
+    # file.write(f"\nplayer_profit  = {player_profit}")
+    # file.write(f"\ngen_profit  = {gen_profit}")
+    # file.write(f"\nng = {ng}")
+    # file.write(f"\nmc = {mc}")
+    # file.write(f"\njj = {jj}")
+    # file.write("\n")
+    # file.write("+" * 180 + "\n\n")
   
   # construct_expenses = fac_construction + gen_construction
   for company in Company.query.filter_by(id_game=gid).all():
-    company.balance += np.sum(player_profit[str(company.player_number)])
+    company.balance += player_profit[str(company.player_number)][-1]
+    company.profit += player_profit[str(company.player_number)][-1]
+    company.revenue += player_revenue[str(company.player_number)][-1]
 
   # if i%61==0:
   #   # file=open('log.txt','a')
@@ -491,6 +604,9 @@ def get_state_vars(state, mods, gid):
   i = state['i']
 
   gens        = Generator.query.filter(Generator.id_game == gid, Generator.build_turn == 0, Generator.state == 'available').all()
+
+  # remove all generators that belong to facilities which are not available.
+  gens        = list(filter(lambda gen: gen.facility.state == 'active', gens))
   ng          = len(gens)
   availCap    = np.zeros(ng, dtype='float')
   fuel_costs  = np.zeros(ng, dtype='float')
@@ -521,6 +637,7 @@ def get_state_vars(state, mods, gid):
     types[j]       = facType.maintype
     life[j]        = jgen.generator_type.lifespan * cons.hours_per_quarter         #90.0 * 24.0
     aoc[j]         = jgen.generator_type.fixed_cost_build / life[j]
+    
 
     if types[j] in ['nuclear','coal','natural gas']:
       heat_cont     = float(genType.resource_type.energy_content)

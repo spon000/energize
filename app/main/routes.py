@@ -27,9 +27,14 @@ def creategame():
 
   # ************ After submission *************
   if form.validate_on_submit():
+    if current_user.state == "creating":
+      flash(f'You are already creating a game. please wait for game to finish initializing','warning')
+      return render_template("title.html")
+      
     num_companies = Company.query.filter_by(id_user=current_user.id).count()
     
     if num_companies < current_user.companies_max:
+      # current_user.state = "creating"
       game = Game(name=form.gamename.data)
       db.session.add(game)
       db.session.commit()

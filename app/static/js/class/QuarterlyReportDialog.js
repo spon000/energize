@@ -152,6 +152,7 @@ define([
             height: 680,
             position: {},
             modal: true,
+            resizable: false,
             open: (evt, ui) => {
               if (openFunction)
                 openFunction(scope);
@@ -216,7 +217,7 @@ define([
             data: event_table_data,
             columns: [
               {
-                title: "!", field: "priority", width: 20, align: "center",
+                title: "", field: "priority", width: 20, align: "center",
                 formatter: this._priority_cell,
               },
 
@@ -246,13 +247,13 @@ define([
         _priority_cell(cell, formatterParams = null) {
           switch (cell.getValue()) {
             case "information":
-              return "!"
+              return `<div class="event-indicator-circle event-info">!</div>`
             case "warning":
-              return "!"
+              return `<div class="event-indicator-circle event-warn">!</div>`
             case "danger":
-              return "!"
+              return `<div class="event-indicator-circle event-problem">!</div>`
             default:
-              return "!"
+              return `<div class="event-indicator-circle event-information">!</div>`
           }
         }
 

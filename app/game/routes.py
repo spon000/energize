@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from flask_socketio import send
 import json
 import math 
+import threading
 import numpy as np
 
 from sqlalchemy import func
@@ -37,14 +38,18 @@ def initgame(gid, name):
 
   if init_game_models(game) == True:
     game.state = "new"
+    current_user.state = "creating"
     db.session.commit()
     print("-"*80)
     print("creating game...")
+    flash(f'Game is initializing. Please wait...','warning')
     force_run_turn(json.dumps({'gameId': game.id, 'initialTurn': True}))
   else:
     flash(f'Error creating game (code:012)','danger')
     return render_template("title.html")    
 
+  game.state = "playing"
+  db.session.commit()
   return redirect(url_for('game.joingame' , gid=gid, name=name))
 
 #################################################################################  
@@ -53,6 +58,8 @@ def initgame(gid, name):
 @login_required
 def joingame(gid, name):
   game = Game.query.filter_by(id=gid).first()
+  current_user.state = "playing"
+  db.session.commit()
   
   # Get all the ai companies in this game. They are eligible for a human player to take control.
   ai_companies = Company.query.filter(Company.id_game == game.id, Company.player_type == "ai").all()
@@ -67,6 +74,8 @@ def joingame(gid, name):
   #   game.state = "new"
   #   db.session.commit()
 
+  if game.state == "new":
+    flash(f'Game is initializing. Please wait...','warning')
 
   # if game.state == "runturn":
   #   return render_template("initgamewait.jinja", name=name, gid=game.id)
@@ -840,12 +849,18 @@ def quarterly_html():
   # fac_construction = db.session.query(db.func.sum(Facility.construction)).filter_by(id_game=gid, id_company=company.id).scalar()
   fac_construction = sum([fac.construction for fac in facilities])
   gen_construction = np.sum([gen.construction for gen in gs])
+  decom_cost = sum([fac.decomission for fac in facilities])
+  om_costs = sum([fac.om_cost for fac in facilities]) + sum([gen.om_cost for gen in gs])
+  total_expenses = fac_construction + gen_construction + decom_cost + om_costs
   
   return render_template(
     "viewquarterly.html",
     format_money=convert_to_money_string,
     fac_const=fac_construction,
     gen_const=gen_construction,
+    decom_cost=decom_cost,
+    om_costs=om_costs,
+    total_expenses=total_expenses,
     company=company
   )
 

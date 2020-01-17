@@ -210,6 +210,7 @@ define([
               height: 700,
               position: {},
               modal: true,
+              resizable: false,
               open: (evt, ui) => {
                 if (openFunction)
                   openFunction(scope);

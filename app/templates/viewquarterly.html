@@ -96,7 +96,7 @@
 
       <div class="row summary-row">
         <label class="field col-lg-7">Expenses:</label>
-        <label class="value col-lg-5">{{ format_money( fac_const + gen_const) }}</label>
+        <label class="value col-lg-5">{{ format_money(total_expenses) }}</label>
       </div>
 
       <div class="row summary-row">
@@ -108,23 +108,23 @@
       <div class="row summary-row">
         <label class="sep col-lg-1"></label>
         <label class="field col-lg-6">OM:</label>
-        <label class="value col-lg-1">{{ format_money(0) }}</label>
+        <label class="value col-lg-1">{{ format_money(om_costs) }}</label>
       </div>
 
       <div class="row summary-row">
         <label class="sep col-lg-1"></label>
         <label class="field col-lg-6">Decom:</label>
-        <label id="" class="value col-lg-1">{{ format_money(0) }}</label>
+        <label id="" class="value col-lg-1">{{ format_money(decom_cost) }}</label>
       </div>
 
       <div class="row summary-row">
         <label class="field col-lg-7">Revenue:</label>
-        <label class="value col-lg-5">{{ format_money(0) }}</label>
+        <label class="value col-lg-5">{{ format_money(company.revenue) }}</label>
       </div>
 
       <div class="row summary-row">
         <label class="field col-lg-7">Profit:</label>
-        <label class="value col-lg-5">{{ format_money(0) }}</label>
+        <label class="value col-lg-5">{{ format_money(company.profit) }}</label>
       </div>
 
       <div class="row summary-row">
@@ -271,5 +271,37 @@
 
   .event-content {
     display: inline;
+  }
+
+  .event-indicator-circle {
+    border-radius: 50%;
+    /* padding: 1px; */
+    border-width: 2px;
+    border-style: solid;
+
+    background-color: lightgray
+  }
+
+  .event-indicator-triangle {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid red;
+  }
+
+  .event-warn {
+    color: black;
+    border-color: rgb(233, 221, 114);
+  }
+
+  .event-problem {
+    background-color: rgb(247, 169, 169);
+    color: black;
+  }
+
+  .event-info {
+    color: black;
+    border-color: black;
   }
 </style>

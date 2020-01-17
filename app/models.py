@@ -24,7 +24,8 @@ class User(db.Model, UserMixin):
   password = db.Column(db.String(60), nullable=False)
   companies_max = db.Column(db.Integer, nullable=False, default=4)
   current_company = db.Column(db.Integer, nullable=False, default=0)
-  
+  state = db.Column(db.Enum("creating", "playing", "unknown"), default="unknown")
+    
   # Relational data
   companies = db.relationship('Company')
 
@@ -102,11 +103,12 @@ class Company(db.Model):
   name = db.Column(db.String(30), nullable=False, default='Company #')
   score = db.Column(db.Integer, nullable=False, default=0)
   balance = db.Column(db.Float, nullable=False, default=1000000000)
-  quarter_net = db.Column(db.Float, default=0)
+  revenue = db.Column(db.Float, default=0)
+  profit = db.Column(db.Float, default=0)
   global_bid_policy = db.Column(db.Enum("MC", "LCOE", "Fixed"), default="MC")
   global_maintenance_policy = db.Column(db.Enum("Routine", "Proactive", "Reactive"), default="Routine")
   state = db.Column(db.Enum("view", "build", "waiting", "ready"), default="view")
-  cost_operational = db.Column(db.Float, default=0)
+  
   joined_game = db.Column(db.Boolean, default=False)
   show_QR = db.Column(db.Boolean, default=False)
 
@@ -164,6 +166,7 @@ class Facility(db.Model):
   om_cost = db.Column(db.Float, default=0)
   revenue = db.Column(db.Float,default=0)
   construction = db.Column(db.Float, default=0)
+  decomission = db.Column(db.Float, default=0)
   column = db.Column(db.Integer, default=0)
   row = db.Column(db.Integer, default=0)
   layer = db.Column(db.Integer, default=2)

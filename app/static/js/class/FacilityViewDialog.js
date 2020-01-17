@@ -407,7 +407,7 @@ define([
         // Generator Decom Checkbox event
         /* *********************************************************************************** */
         _startDecomCheckBox(evt) {
-          console.log("_startDecomCheckBox()...");
+          // console.log("_startDecomCheckBox()...");
           let scope = evt.data;
           let genId = $(evt.currentTarget).attr('genid');
 
@@ -503,7 +503,7 @@ define([
 
         /* *********************************************************************************** */
         _addGeneratorUpdateToModifyList(scope, genId, keyValues = {}) {
-          console.log("_addGeneratorUpdateToModifyList() scope, genId, keyValues = ", scope, genId, keyValues);
+          // console.log("_addGeneratorUpdateToModifyList() scope, genId, keyValues = ", scope, genId, keyValues);
           let genIndex = scope._updatedGenerators.findIndex(gen => gen.id == genId)
 
           if (genIndex <= -1)
@@ -521,19 +521,19 @@ define([
         /* *********************************************************************************** */
         _applyUpdates(evt) {
           let scope = evt.data;
-          console.log("_updatedFacility", scope._updatedFacility);
-          console.log("_updatedGenerators", scope._updatedGenerators);
+          // console.log("_updatedFacility", scope._updatedFacility);
+          // console.log("_updatedGenerators", scope._updatedGenerators);
 
           if (Object.keys(scope._updatedFacility).length > 0) {
             scope._modelData.updateFacility(scope._facilityId, scope._updatedFacility).then((facility) => {
-              console.log("_applyUpdates() Facility was updated", facility);
+              // console.log("_applyUpdates() Facility was updated", facility);
               scope._updatedFacility = {};
             })
           }
 
           if (scope._updatedGenerators.length > 0) {
             scope._modelData.updateGenerators(scope._facilityId, scope._updatedGenerators).then((generators) => {
-              console.log("_applyUpdates() Generators were updated", generators);
+              // console.log("_applyUpdates() Generators were updated", generators);
               scope._updatedGenerators = [];
               scope._refreshGeneratorListTable(scope);
               scope._refreshModifyListTable(scope);
@@ -1160,7 +1160,12 @@ define([
           let scope = formatterParams.scope;
           let html = ""
 
-          // if (cell.getData().state != "decommissioned" && cell.getData().state != "decommissioning") {
+
+          if (cell.getData().state == "decommissioned" || cell.getData().state == "decommissioning") {
+            html = `<label> Not Available</label>`
+            return html;
+          }
+
           if (!scope._decomissionFacilityOn) {
             let templateParms = {
               genId: cell.getData().id,
@@ -1181,7 +1186,11 @@ define([
           let scope = formatterParams.scope;
           let html = ""
 
-          // if (cell.getData().state != "decommissioned" && cell.getData().state != "decommissioning") {
+          if (cell.getData().state == "decommissioned" || cell.getData().state == "decommissioning") {
+            html = `<label> Not Available</label>`
+            return html;
+          }
+
           if (!scope._decomissionFacilityOn) {
             let templateParms = {
               genId: cell.getData().id,
