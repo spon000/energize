@@ -1,9 +1,17 @@
+import logging
+import time
+
+# Setup logging parms
+format = "%(asctime)s: %(filename)s: %(lineno)d: %(message)s"
+logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
+
 from app import db 
 from app.models import Prompt, PromptType
 from app.game.utils import get_current_game_date, format_date
 
 
-def assign_prompt(title, game, company, prompt_fields, description_parms):
+def assign_prompt(title, game, company, prompt_fields, description_parms=[]):
+  logging.info(f"{title}, {game.name}, {company.name}, {prompt_fields}, {description_parms}")
   prompt_type = PromptType.query.filter_by(title=title).first()
   prompt_keys = prompt_fields.keys()
 

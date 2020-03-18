@@ -59,7 +59,8 @@
    ******************************************************************* */
   #portfolio-graph {
     grid-column: 1;
-    grid-row: 2 / span 2;
+    grid-row: 2 / span 2; 
+   
     border-style: solid;
     border-width: 1px;
     border-radius: 5px;
@@ -76,39 +77,63 @@
     border-radius: 5px;
   }
 
-  /*
-  .portfolio-metrics-title {
-    margin-left: 50px;
+  .portfolio-graph-chart {
+    margin-top: 0px;
   }
 
-  .portfolio-sub-metric {
-    display: inline-block;
-    width: 100px;
-    margin-left: 5px;
-    margin-right: 5px;
-    margin-top: 0;
+  .portfolio-graph-tabs {
+    list-style-type: none;
+    margin-left: 3px;
+   /* margin-right: 15px; */
     margin-bottom: 0;
+    border-bottom: 1px solid black;
+    padding: 0;
+    display: flex;
+    
   }
 
-  .portfolio-sub-metric a {
-    color: grey;
-    text-decoration: underline;
+  .portfolio-graph-tab {
+    border: 1px solid black;
+    margin: 1px;
+    border-bottom: none;
   }
 
-  .portfolio-sub-metric a:hover {
-    color: grey;
-    text-decoration: underline;
+  .portfolio-graph-tab.active {
+    border-color: white;
+    color: white;
+    background: darkgray;
   }
 
-  .societal-link {
-    margin-left: 20px;
-  } */
+  .portfolio-graph-tab:hover {
+    background-color: lightgray;
+   }
 
-  /* .inactive-link {
+
+  .portfolio-graph-tab a {
+    text-align: center;
+    padding: 2px;
     text-decoration: none;
-  } */
+    color: inherit;
 
+  }
 
+  #portfolio-chart-title-row {
+    margin: 3px;
+    margin-bottom: 5px;
+    height: 20px;
+    display: flex;
+  }
+
+  #portfolio-chart-title {
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: underline overline;
+    
+  }
+
+ 
   /* ******************************************************************* 
    * Options style        
    ******************************************************************* */
@@ -179,7 +204,7 @@
     <div class="container">
 
       <div class="row">
-        <label class="field col-lg-9">Operating Budget:</label>
+        <label class="field col-lg-9">Available Funds:</label>
         <label class="value col-lg-3">{{ format_money(company.balance) }}</label>
       </div>
 
@@ -206,7 +231,14 @@
   </div>
 
   <div id="portfolio-graph" class="grid-box">
-    <canvas id="portfolio-graph-chart" width="340" height="145"></canvas>
+    <div id="portfolio-chart-title-row" class="row">
+      <ul class="portfolio-graph-tabs">
+        <li class="active portfolio-graph-tab" value="numData" title="Number of Facilities"><a href="#">Facilities</a></li>
+        <li class="portfolio-graph-tab" value="capData" title="Nameplate Capacities (MW)"><a href="#">Capacity</a></li>
+      </ul>
+      <div id="portfolio-chart-title">Number of Facilities</div>
+    </div>
+    <canvas id="portfolio-graph-chart" class="" width="340" height="120"></canvas>
   </div>
 
   <div id="portfolio-options" class="grid-box">

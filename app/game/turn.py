@@ -1,5 +1,7 @@
 import numpy as np
-import logging as lg
+import logging
+import time
+
 from math import trunc
 
 # import pickle
@@ -26,8 +28,12 @@ from app.game.prompts import assign_prompt
 from app.game.sio_outgoing import shout_game_turn_interval
 from app.game.utils import get_age
 from app.game.events import quarterly_events, daily_events, hourly_events
+from app.game.modifiers import debug_output_modifiers
 
 
+# Setup logging parms
+format = "%(asctime)s: %(filename)s: %(lineno)d: %(message)s"
+logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
 # ###############################################################################  
 #
 # ###############################################################################
@@ -378,7 +384,11 @@ def run_turn(game, mods):
   # file.write(f"state = {state}")
 
   i = state['i']
- 
+
+  file.write(f"Start of run_turn. state[\'i\'] = {state['i']}\n")
+  file.write("+" * 80 +"\n\n")
+
+   
 
   # filedebug.write(f"mods['ed'] = {mods['ed']}\n")
   # mods_squeeze = 
@@ -386,24 +396,48 @@ def run_turn(game, mods):
   # demand = np.sum(mods['ed'].squeeze()[:,i])
   # filedebug.write(f"demand = {demand}\n")
 
+  file.write(f"check_facility_quarterly()... gameId = {game.id}\n")
   check_facility_quarterly(game)
+  file.write(f"check_generator_quarterly()... gameId = {game.id}\n")
   check_generator_quarterly(game)
+  file.write(f"quaterly_events()... gameId = {game.id}\n")
   quarterly_events(game, mods)
-  
-  file.write("+" * 80 +"\n")
-  for day in range(90):
-    shout_game_turn_interval(game.id, {'statusMsg': 'Calculating days...', 'interval': day, 'total': 90})
+
+
+  num_days = 1
+  for day in range(num_days):
+    shout_game_turn_interval(game.id, {'statusMsg': 'Calculating days...', 'interval': day, 'total': num_days})
     check_facility_daily(game, day)
     check_generator_daily(game, state, day)
     # file.write("+" * 80 +"\n")
     # file.write(f"day: {day} ----  {datetime.now().time()}\n")
     # file.write("+" * 80 + "\n")
-
+    
     for hr in range(24):
       # filedebug.write(f"day({day}) hr({hr})...    {datetime.now().time()}\n")
       check_facility_hourly(game, hr)
       check_generator_hourly(game, state, hr)
       state = get_state_vars(state, mods, game.id)
+
+        
+      file.write("=" * 80 + "\n")
+      file.write(debug_output_modifiers(i + ((day * 24) + hr), mods))
+
+  #     return ({
+  #   'i':i,
+  #   'gens':gens,
+  #   'availCap':availCap,
+  #   'fuel_costs':fuel_costs,
+  #   'opMaint_gen':opMaint_gen,
+  #   'opMaint_fac':opMaint_fac,
+  #   'dc':dc,
+  #   'cn':cn,
+  #   'nc':nc,
+  #   'life':life,
+  #   'aoc':aoc,
+  #   'types':types,
+  #   'pn':pn
+  # })
 
       # file.write(f"length of gens is {len(state['gens'])} for hr: {hr}")
 
@@ -414,12 +448,22 @@ def run_turn(game, mods):
         fac.om_cost += state['opMaint_fac'][j]
 
 
+      file.write("\n" + "+" * 80 + "\n")
+      file.write("Before iso() runs...\n")
+      file.write(debug_output_state_vars(state))
+      
+
       # file.write("+" * 80 +"\n")
       # file.write(f"state = {state}")           
       
       # if hr == 1 and day % 3 == 0:
       # state = iso(mods, state, filedebug, game.id, True)
       state = iso(mods, state, file, game.id)
+
+      file.write("\n" + "+" * 80 + "\n")
+      file.write("After iso() runs...\n")
+      file.write(debug_output_state_vars(state))
+
       # else:
       #   state = iso(mods, state, file, game.id)
 
@@ -479,10 +523,14 @@ def run_turn(game, mods):
 #
 # ###############################################################################
 def iso(mods, state, file, gid, debug=False):
+  
 
   # file.write(f"\tiso start  {datetime.now().time()}\n")
   i           = state['i']
-  demand = np.sum(mods['ed'].squeeze()[:,i])
+  # logging.info(f"i = {i}")
+  # demand = 1000 
+  demand = np.sum(mods['ed'][:,i])
+  # demand = np.sum(mods['ed'].squeeze()[:,i])
   ng     = len(state['gens'])
   mc     = np.sum([state['opMaint_gen'], state['opMaint_fac'], state['fuel_costs']], axis=0)
   jj     = np.argsort(mc)
@@ -521,7 +569,7 @@ def iso(mods, state, file, gid, debug=False):
       player_revenue[state['pn'][j]] += [revenue]
       profit = (price - state['opMaint_gen'][j] - state['opMaint_fac'][j] - state['fuel_costs'][j]) * state['availCap'][j]
       player_profit[state['pn'][j]] += [profit]
-      # gen_profit[j]         = profit
+      state['gens'][j].quarterly_profit += profit
       state['dc'][j] += state['availCap'][j]
       term1  = state['availCap'][j]/float(state['nc'][j]*state['life'][j])
       term2  = term1*0.05
@@ -539,6 +587,9 @@ def iso(mods, state, file, gid, debug=False):
       loss = (state['opMaint_gen'][j] + state['opMaint_fac'][j] ) * state['availCap'][j]
       player_profit[state['pn'][j]] += [-loss]
       # gen_profit[j] = loss
+
+  
+  
 
     # if i%61==0:
     #   id   = state['gens'][j].id
@@ -663,6 +714,43 @@ def get_state_vars(state, mods, gid):
     'types':types,
     'pn':pn
   })
+# ###############################################################################  
+#
+# ###############################################################################
+def debug_output_state_vars(state):
+  generator_columns = []
+  generator_columns += [[f"Player #: {gen.facility.player_number}" for gen in state['gens']]]
+  generator_columns += [[f"Company: {gen.facility.company.name}" for gen in state['gens']]]
+  generator_columns += [[f"Fac ID: {gen.facility.id}" for gen in state['gens']]]
+  generator_columns += [[f"Gen ID: {gen.id}" for gen in state['gens']]]
+  generator_columns += [[f"type: {state['types'][idx]}" for idx, gen in enumerate(state['gens'])]]
+  generator_columns += [[f"NP Cap: {state['nc'][idx]}" for idx, gen in enumerate(state['gens'])]]
+  generator_columns += [[f"Condition: {state['cn'][idx]}" for idx, gen in enumerate(state['gens'])]]
+  generator_columns += [[f"Avail Cap: {state['availCap'][idx]}" for idx, gen in enumerate(state['gens'])]]
+  generator_columns += [[f"Fuel Cost: {state['fuel_costs'][idx]}" for idx, gen in enumerate(state['gens'])]]
+  generator_columns += [[f"Fac Op Maint: {state['opMaint_fac'][idx]}" for idx, gen in enumerate(state['gens'])]]
+  generator_columns += [[f"Gen Op Maint: {state['opMaint_gen'][idx]}" for idx, gen in enumerate(state['gens'])]]
+  generator_columns += [[f"Duty Cycles: {state['dc'][idx]}" for idx, gen in enumerate(state['gens'])]]
+  generator_columns += [[f"Life: {state['life'][idx]}" for idx, gen in enumerate(state['gens'])]]
+  generator_columns += [[f"AOC: {state['aoc'][idx]}" for idx, gen in enumerate(state['gens'])]]
+
+
+  # generator_columns += [[f"test col #{idx}" for idx in range(len(state['gens']))]]
+  # logging.info(f"gens= {gens}")
+  # generator_columns += [f"Test # {str(i)}\n" for i in range(len(state['gens']))]
+  column_defs = "".join([" | {: <37}" for gen in state['gens']])
+  columns = ""
+
+  for row in generator_columns:
+    columns += f"\n{column_defs}".format(*row)
+   
+  return (
+    f"game state for hour: {state['i']}\n" +
+    f"Number of active generators: {len(state['gens'])}\n" +
+    # f"{column_defs}\n" +
+    f"{columns}\n" +
+    f"\n"
+  )
 
 # ###############################################################################  
 #
