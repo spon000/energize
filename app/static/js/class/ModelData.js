@@ -14,7 +14,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.addFacility.path + "row=" + row + "&col=" + col)
           loaded.then((results) => {
-            // console.log("resultes = ", results);
+            // console.log("results = ", results);
             resolve(results)
           });
         });
@@ -29,7 +29,7 @@ define([
 
           const loaded = $.get(networkCallMap.addGenerators.path + "fid=" + fid + "&ftid=" + fTypeId + "&gens=" + serializedGenerators);
           loaded.then((results) => {
-            // console.log("addGenerators resultes = ", results);
+            // console.log("addGenerators results = ", results);
             resolve(results)
           });
         });
@@ -41,7 +41,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.updateFacilityType.path + "fid=" + fid + "&type=" + type)
           loaded.then((results) => {
-            // console.log("resultes = ", results);
+            // console.log("results = ", results);
             resolve(results)
           });
         });
@@ -55,7 +55,7 @@ define([
           const loaded = $.get(networkCallMap.updateFacility.path + "fid=" + fid + "&facility=" + serializedFacility);
 
           loaded.then((results) => {
-            // console.log("updateFacilityType resultes = ", results);
+            // console.log("updateFacilityType results = ", results);
             resolve(results)
           });
         });
@@ -67,7 +67,7 @@ define([
           const loaded = $.get(networkCallMap.updateGenerators.path + "fid=" + fid + "&gens=" + serializedGenerators)
 
           loaded.then((results) => {
-            // console.log("updateGenerators resultes = ", results);
+            // console.log("updateGenerators results = ", results);
             resolve(results)
           });
         });
@@ -78,7 +78,7 @@ define([
           const loaded = $.get(networkCallMap.updateGlobalBidPolicy.path + "option=" + option);
 
           loaded.then((results) => {
-            // console.log("updateGlobalBidPolicy resultes = ", results);
+            // console.log("updateGlobalBidPolicy results = ", results);
             resolve(results)
           });
         });
@@ -89,7 +89,7 @@ define([
           const loaded = $.get(networkCallMap.updateGlobalMaintPolicy.path + "option=" + option);
 
           loaded.then((results) => {
-            // console.log("updateGlobalMaintPolicy resultes = ", results);
+            // console.log("updateGlobalMaintPolicy results = ", results);
             resolve(results)
           });
         });
@@ -101,7 +101,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.deleteFacility.path + "fid=" + fid)
           loaded.then((results) => {
-            // console.log("deleteFacility resultes = ", results);
+            // console.log("deleteFacility results = ", results);
             resolve(results)
           });
         });
@@ -111,7 +111,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.deleteGenerator.path + "genid=" + genId)
           loaded.then((results) => {
-            // console.log("delGenerator resultes = ", results);
+            // console.log("delGenerator results = ", results);
             resolve(results)
           });
         });
@@ -121,7 +121,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.delGenerators.path + "fid=" + fid)
           loaded.then((results) => {
-            // console.log("delGeneratorsInFacility resultes = ", results);
+            // console.log("delGeneratorsInFacility results = ", results);
             resolve(results)
           });
         });
@@ -133,7 +133,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.playerFacility.path + "fid=" + facilityId)
           loaded.then((results) => {
-            // console.log("getPlayerFacility resultes = ", results);
+            // console.log("getPlayerFacility results = ", results);
             resolve(results)
           });
         });
@@ -143,7 +143,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.playerFacilities.path)
           loaded.then((results) => {
-            // console.log("resultes = ", results);
+            // console.log("results = ", results);
             resolve(results)
           });
         });
@@ -153,7 +153,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.playerGenerators.path)
           loaded.then((results) => {
-            // console.log("resultes = ", results);
+            // console.log("results = ", results);
             resolve(results)
           })
         });
@@ -163,7 +163,7 @@ define([
         return new Promise(resolve => {
           const loaded = $.get(networkCallMap.generatorDetailHtml.path + "genid=" + genId)
           loaded.then((results) => {
-            // console.log("resultes = ", results);
+            // console.log("results = ", results);
             resolve(results)
           });
         });

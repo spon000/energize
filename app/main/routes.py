@@ -1,4 +1,6 @@
 import random, json
+import time
+import logging
 
 from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app
 from flask_login import current_user, login_required
@@ -6,6 +8,10 @@ from app import db
 from app.models import User, Game, Company
 from app.main.forms import CreateGameForm, JoinGameForm, RejoinGameForm
 # from app.main.utils import get_random_player
+
+# Setup logging parms
+format = "%(asctime)s: %(filename)s: %(lineno)d: %(message)s"
+logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
 
 main = Blueprint('main', __name__)
 
@@ -24,25 +30,23 @@ def home():
 @login_required
 def creategame():
   form = CreateGameForm()
-
+  
   # ************ After submission *************
   if form.validate_on_submit():
-    if current_user.state == "creating":
-      flash(f'You are already creating a game. please wait for game to finish initializing','warning')
+    if current_user.state == "joining":
+      flash(f'You are already joining a game. please wait for game to finish initializing','warning')
       return render_template("title.html")
-      
-    num_companies = Company.query.filter_by(id_user=current_user.id).count()
+    else: 
+      current_user.state = "joining"      
+
+    # Check to see if user has 5 companies currently playing the game. Don't count games that are finished.  
+    # This needs to be fixed to not include finished games in the query.
+    num_playing_companies = Company.query.filter(Company.id_user == current_user.id).count()
     
-    if num_companies < current_user.companies_max:
-      # current_user.state = "creating"
+    if num_playing_companies < current_user.companies_max:
       game = Game(name=form.gamename.data)
       db.session.add(game)
       db.session.commit()
-      # company = Company(name=form.companyname.data, id_user=current_user.id, player_number=0, player_type="human")
-      # db.session.add(company)
-      # db.session.commit()
-      # # current_user.current_company = company.id
-      # db.session.commit()
       return redirect(url_for('game.initgame', gid=game.id, name=form.companyname.data))
     else:
       flash(f'You are already playing too many concurrent games. Try rejoining one in progress','danger')

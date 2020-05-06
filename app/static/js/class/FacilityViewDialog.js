@@ -139,7 +139,7 @@ define([
             this._modificationTypes = fdata['modification_types'];
             this._generatorModificationTypes = fdata['modification_types'];
 
-            // console.log("fdata = ", fdata);
+            console.log("fdata = ", fdata);
           });
         }
 
@@ -270,6 +270,8 @@ define([
             owned: this._ownedFacility,
             facilityType: this._facilityType,
             facility: this._facility,
+            omCosts: this._toMoney(this._facility.om_cost * this._facility.total_capacity),
+            profit: this._toMoney(this._getAllGeneratorProfits()),
             modTypes: this._modificationTypes,
             company: this._company,
             numGenerators: this._generators.length,
@@ -835,6 +837,19 @@ define([
         }
 
         /* *********************************************************************************** */
+        // Convert to money value
+        _toMoney(amount) {
+          return "$" + (amount != 0 ? (amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')) : "0.00");
+        }
+
+        /* *********************************************************************************** */
+        // Convert to money value
+        _toPercentage(amount) {
+          return "%" + ((amount * 100).toFixed(2)).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        /* *********************************************************************************** */
+
         _addHtml(html, htmlId, windowHtml) {
           return $(windowHtml).find("#" + htmlId).append(html);
         }
@@ -1016,23 +1031,15 @@ define([
 
           // console.log("_createGeneratorListTable() this._generators = ", this._generators);
           this._generators.forEach((gen, index) => {
-            let profit = "rgb(255, 0, 0)" //getProfit(gen);
-            let condition = "rgb(250, 218, 94)" //getCondition(gen);
-            let age = this._getAge(gen).color;
-
-            let profitColor = profit.color;
-            let conditionColor = condition.color;
-            let ageColor = age.color;
-
             if (gen.state != "decomissioning" || gen.state != "decomissioned") {
               generator_table_data.push({
                 fid: gen.id_facility,
                 id: gen.id,
                 name: "generator " + this._padZeroes((gen.generator_number), 2),
                 cap: gen.gentype_details.nameplate_capacity,
-                prof: profit,
-                age: age,
-                cond: condition,
+                prof: this._getGeneratorProfit(gen),
+                age: this._getGeneratorAge(gen),
+                cond: this._getGeneratorCondition(gen),
                 bidp: gen.local_bid_policy,
                 maintp: gen.local_maintenance_policy,
                 decom: gen.decom_start,
@@ -1045,10 +1052,12 @@ define([
             height: 250,
             layout: "fitDataFill",
             data: generator_table_data,
+            tooltips: true,
             groupBy: ["state"],
             columns: [
               {
                 title: "Name", field: "name", width: 107, align: "center",
+                tooltip: false,
                 formatter: this._name_cell,
                 // onRendered: () => { console.log("capacity rendered") },
                 formatterParams: {
@@ -1057,6 +1066,7 @@ define([
               },
               {
                 title: "Capacity", field: "cap", align: "center",
+                tooltip: false,
                 formatter: this._capacity_cell,
                 // onRendered: () => { console.log("capacity rendered") },
                 formatterParams: {
@@ -1065,6 +1075,15 @@ define([
               },
               {
                 title: "Profit", field: "prof", width: 90,
+                tooltipGenerationMode: "hover",
+                tooltip: (cell) => {
+                  let toolTip = this._checkToolTipState(cell.getData().state)
+                  if (toolTip)
+                    return toolTip;
+
+                  // console.log("cell.getValue() = ", cell.getValue());
+                  return `Profit: ${this._toMoney(cell.getValue().qProfit)}, Profit Margin: ${this._toPercentage(cell.getValue().profit_margin)}`
+                },
                 formatter: this._profit_cell,
                 formatterParams: {
                   scope: this
@@ -1072,6 +1091,20 @@ define([
               },
               {
                 title: "Age", field: "age", width: 90,
+                tooltipGenerationMode: "hover",
+                tooltip: (cell) => {
+                  let toolTip = this._checkToolTipState(cell.getData().state)
+                  if (toolTip)
+                    return toolTip;
+
+                  let TURNS_PER_YEAR = 4;
+                  let MONTHS_PER_TURN = 3;
+                  let years = Math.floor(cell.getValue().age / TURNS_PER_YEAR);
+                  let months = (cell.getValue().age % TURNS_PER_YEAR) * MONTHS_PER_TURN;
+
+                  return `Age: ${years} year(s), ${months} month(s)`;
+                },
+
                 formatter: this._age_cell,
                 formatterParams: {
                   scope: this
@@ -1079,6 +1112,14 @@ define([
               },
               {
                 title: "Condition", field: "cond", width: 90,
+                tooltipGenerationMode: "hover",
+                tooltip: (cell) => {
+                  let toolTip = this._checkToolTipState(cell.getData().state)
+                  if (toolTip)
+                    return toolTip;
+
+                  return `Condition: ${cell.getValue().condition}`;
+                },
                 formatter: this._condition_cell,
                 formatterParams: {
                   scope: this
@@ -1086,6 +1127,7 @@ define([
               },
               {
                 title: "Bid Policy", field: "bidp", align: "center",
+                tooltip: false,
                 formatter: this._bidPolicy_cell,
                 // onRendered: () => { console.log("bid policy rendered") },
                 formatterParams: {
@@ -1096,6 +1138,7 @@ define([
               },
               {
                 title: "Maint Policy", field: "maintp", align: "center",
+                tooltip: false,
                 formatter: this._maintPolicy_cell,
                 formatterParams: {
                   scope: this,
@@ -1105,6 +1148,7 @@ define([
               },
               {
                 title: "Decom", field: "decom", align: "center",
+                tooltip: false,
                 formatter: this._decom_cell,
                 formatterParams: {
                   scope: this,
@@ -1209,10 +1253,12 @@ define([
         /* *********************************************************************************** */
         _profit_cell(cell, formatterParams) {
           let scope = formatterParams.scope;
+          let color = cell.getValue() ? cell.getValue().color : null;
           let templateParms = {
             state: cell.getData().state,
-            color: cell.getValue()
+            color: color
           }
+
           let html = Handlebars.compile(FacilityViewTmplt.colorBox)(templateParms);
 
           return html;
@@ -1221,9 +1267,10 @@ define([
         /* *********************************************************************************** */
         _age_cell(cell, formatterParams) {
           let scope = formatterParams.scope;
+          let color = cell.getValue() ? cell.getValue().color : null;
           let templateParms = {
             state: cell.getData().state,
-            color: cell.getValue()
+            color: color
           }
           let html = Handlebars.compile(FacilityViewTmplt.colorBox)(templateParms);
 
@@ -1233,9 +1280,10 @@ define([
         /* *********************************************************************************** */
         _condition_cell(cell, formatterParams) {
           let scope = formatterParams.scope;
+          let color = cell.getValue() ? cell.getValue().color : null;
           let templateParms = {
             state: cell.getData().state,
-            color: cell.getValue()
+            color: color
           }
           let html = Handlebars.compile(FacilityViewTmplt.colorBox)(templateParms);
 
@@ -1260,8 +1308,12 @@ define([
 
 
         /* *********************************************************************************** */
-        _color_cell() {
-
+        _getCellColor(type) {
+          switch (type) {
+            case "good": return "rgba(0, 255, 0, .8)"
+            case "medium": return "rgba(250, 218, 94, .8)"
+            case "bad": return "rgba(255, 0, 0, .8)"
+          }
         }
 
 
@@ -1289,8 +1341,8 @@ define([
             "state": "new",
             "name": "generator " + scope._padZeroes((scope._generators.length + 1), 2),
             "cap": 0,
-            "profit": 0,
-            "age": 0,
+            "profit": scope._getGeneratorProfit(null),
+            "age": scope._getGeneratorAge(null),
             "value": 0,
             "bidp": "N/A",
             "maintp": "N/A",
@@ -1334,30 +1386,173 @@ define([
         }
 
         /* *********************************************************************************** */
-        getProfit(generator) {
-          let profit = generator.revenue - generator.om_cost;
-          let color = "rgb(255, 0, 0)";
-          if (profit >= 250 && profiit <= 1000) color = "rgb(250, 218, 94)";
-          else if (profit > 1000) color = "rgb(0,255,0)";
+        _getAllGeneratorProfits() {
+          let totalProfit = 0
+          console.log("generators = ", this._generators);
 
-          return ({
-            profit: profit,
-            color: color
+          this._generators.forEach((generator) => {
+            let results = {}
+
+            if (generator.state == "available") {
+              results = this._getGeneratorProfit(generator);
+              console.log("results = ", results);
+              totalProfit += results.qProfit;
+            }
           });
+
+          console.log("totalProfit = ", totalProfit);
+          return totalProfit;
         }
-
         /* *********************************************************************************** */
-        _getAge(generator) {
-          // console.log("generator = ", generator);
-          let currentQtrs = ((this._currentDate.current_year - 1) * this._qtrsPerYear) + this._currentDate.current_quarter
-          // startQtrs = (parseInt(generator.start_prod_dategenerator.substr(2, 4)) - 1) * this._qtrsPerYear) + 0))
+        _getGeneratorProfit(generator) {
+          console.log("generator = ", generator);
+          if (!generator) {
+            return ({
+              color: null,
+              qProfit: 0,
+              profit_margin: 0,
+              margin: 0,
+            });
+          }
 
-          return {
-            color: "rgb(0, 255, 0)",
-            age: 20
+          let margin = generator.gentype_details.fixed_cost_build * generator.gentype_details.nameplate_capacity / generator.gentype_details.build_time;
+          let qProfit = generator.quarterly_profit;
+          let profit_margin = qProfit / margin;
+
+          // console.log(`margin = ${margin}, qProfit = $${qProfit}, profit_margin = %${profit_margin * 100}`);
+
+          switch (true) {
+            case (profit_margin > .10):
+              return ({
+                color: this._getCellColor("good"),
+                qProfit: qProfit,
+                profit_margin: profit_margin,
+                margin: margin,
+              });
+            case (profit_margin >= .02):
+              return ({
+                color: this._getCellColor("medium"),
+                qProfit: qProfit,
+                profit_margin: profit_margin,
+                margin: margin,
+              });
+            default:
+              return ({
+                color: this._getCellColor("bad"),
+                qProfit: qProfit,
+                profit_margin: profit_margin,
+                margin: margin,
+              });
           }
         }
 
+        /* *********************************************************************************** */
+        _getGeneratorAge(generator) {
+          // console.log("generator = ", generator);
+          if (!generator) {
+            return ({
+              color: null,
+              age: 0,
+            });
+          }
+
+          let ratio = (generator.gentype_details.lifespan - generator.generator_age) / generator.gentype_details.lifespan
+          switch (true) {
+            case (ratio > .40):
+              return ({
+                color: this._getCellColor("good"),
+                age: generator.generator_age
+              });
+            case (ratio > .20):
+              return ({
+                color: this._getCellColor("medium"),
+                age: generator.generator_age
+              });
+            case (ratio >= .10):
+              return ({
+                color: this._getCellColor("bad"),
+                age: generator.generator_age
+              });
+            default:
+              return ({
+                color: this._getCellColor("bad"),
+                age: generator.generator_age
+              });
+          }
+        }
+
+        /* *********************************************************************************** */
+        _getGeneratorAge2(generator) {
+          // console.log("generator = ", generator);
+          if (!generator) {
+            return ({
+              color: null,
+              age: 0
+            });
+          }
+
+          let ratio = (generator.gentype_details.build_time - generator.generator_age) / generator.gentype_details.build_time
+          switch (true) {
+            case (ratio <= .10):
+              return ({
+                color: this._getCellColor("bad"),
+                age: generator.generator_age
+              });
+            case (ratio <= .20):
+              return ({
+                color: this._getCellColor("medium"),
+                age: generator.generator_age
+              });
+            case (ratio <= .30):
+              return ({
+                color: this._getCellColor("good"),
+                age: generator.generator_age
+              });
+            default:
+              return ({
+                color: this._getCellColor("good"),
+                age: generator.generator_age
+              });
+          }
+        }
+
+        /* *********************************************************************************** */
+        _getGeneratorCondition(generator) {
+
+          if (!generator) {
+            return ({
+              color: null,
+              condition: 0
+            });
+          }
+
+          switch (true) {
+
+            case (generator.condition >= .67):
+              return ({
+                color: this._getCellColor("good"),
+                condition: generator.condition
+              });
+            case (generator.condition > .25):
+              return ({
+                color: this._getCellColor("medium"),
+                condition: generator.condition
+              });
+            case (generator.condition >= .10):
+              return ({
+                color: this._getCellColor("bad"),
+                condition: generator.condition
+              });
+            default:
+              return ({
+                color: this._getCellColor("bad"),
+                condition: generator.condition
+              });
+          }
+        }
+
+
+        /* *********************************************************************************** */
         _checkAction(state, scope) {
           let action = "";
           switch (state) {
@@ -1379,6 +1574,21 @@ define([
           }
 
           return action
+        }
+
+        _checkToolTipState(state) {
+
+          if (state == "decommissioning" || state == "decomissioned" || state == "start_decom")
+            return `Generator has been decomissioned`;
+
+          if (state == "building" || state == "new")
+            return `Generator is under construction`;
+
+          if (state == "unavailable")
+            return `Generator has been made unavailable`;
+
+          return null;
+
         }
         // let profit = generator.revenue - generator.om_cost;
         // let color = "rgb(255, 0, 0)";

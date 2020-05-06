@@ -1,9 +1,12 @@
 import numpy as np
 import pickle
 import json
+import logging
+import time
 
 from os import path
 from app import celery
+from collections import OrderedDict as od
 # import math
 # import time
 # import scipy
@@ -12,6 +15,10 @@ from app import celery
 # import matplotlib as mpl
 # mpl.use('Agg')
 # import matplotlib.pyplot as plt
+
+# Setup logging parms
+format = "%(asctime)s: %(filename)s: %(lineno)d: %(message)s"
+logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
 
 mods_filename_prefix = 'modifiers'
 mods_filename_extension = '.pkl'
@@ -23,12 +30,10 @@ def init_modifiers(game, cities):
   if path.exists(get_filename(game.id)):
     return None
     
-  print("-"*80)
-  print("initializing Modifiers...")
-  print("-"*80)
+  logging.info("initializing Modifiers...")
 
-  t  = np.linspace(0, game.total_years, game.total_years * 4 * 90 * 24)
-  # t  = np.linspace(0, 1, 1 * 4 * 90 * 24)
+  t  = np.linspace(0, 1, game.total_years * 4 * 90 * 24)
+
   cc = cloud_cover(t)
   ri = rain_intensity(cc)
   su = sun_up(t)
@@ -42,7 +47,7 @@ def init_modifiers(game, cities):
     'cc':cc,
     'ri':ri,
     'su':su,
-    'sp': sp,
+    'sp':sp,
     'fp':fp,
     'pg':pg,
     'ed':ed
@@ -101,8 +106,9 @@ def fuel_prices(t):
   nuclear = bounded_random_walk(390,2390,len(t))
   coal    = bounded_random_walk(20/2000.0,50/2000.0,len(t))
   natgas  = bounded_random_walk(2/1000.0,6/1000.0,len(t))
+
   # plt.figure()
-  #plt.plot(nuclear,label='nuclear')
+  # plt.plot(nuclear,label='nuclear')
   # plt.plot(coal / (12000.0/10465.0), label='coal')
   # plt.plot(natgas / (1010.0/7812.0), label='natgas')
   # plt.legend()
@@ -110,28 +116,44 @@ def fuel_prices(t):
   # plt.close()
   return [nuclear,coal,natgas]
 
-def pop_growth(t,citiesPop):
-  pg = []
+def pop_growth(t, citiesPop):
+  cities = {}
   for city in citiesPop:
-    pg     += [0]
-    pg[-1]  = [city.population]
-    gr      = bounded_random_walk(-0.02,+0.04,len(t)) / (90*4*24.0)
+    cities[city.name] = [city.population]
+    gr = bounded_random_walk(-0.02, +0.04, len(t)) / (90 * 4 * 24.0)
     for it in range(len(t)-1):
-      pg[-1] += [pg[-1][-1] * (1+gr[it]) ]
-    city.population = pg[-1][-1]
+      cities[city.name] += [cities[city.name][-1] * (1 + gr[it])]
+    
   # plt.figure()
   # plt.plot( t,np.sum(np.array(pg),axis=0) )
   # plt.savefig('pop_growth.eps',format='eps',bbox_inches='tight')
   # plt.close()
-  return pg
+  return cities
 
-def energy_demand(t,pg,su,cc):
+def energy_demand(t, pg, su, cc):
   ed=[]
   for cityPop in pg:
-    ed     += [0]
-    ed[-1]  = [0.65*np.multiply( 3.0*np.array(cityPop,dtype='float'), (1.75+0.5*np.sin(t*np.pi/(90.0*4.0))+0.5*su+0.15*(1-cc)) )]
+    pop = pg[cityPop]
+    ed += [0]
+    ed[-1] = (0.65 * np.multiply(3.0 * np.array(pop, dtype='float'), (1.75 + 0.5 * np.sin(t * np.pi / (90.0 * 4.0)) + 0.5 * su + 0.15 * (1 - cc))))
+
   # plt.figure()
   # plt.plot( t,np.sum(np.array(ed).squeeze()/1.0e6,axis=0) )
   # plt.savefig('energy_demand.eps',format='eps',bbox_inches='tight')
   # plt.close()
   return ed
+
+def debug_output_modifiers(state_i, mods):
+  return (
+    f"Modifiers for hour {state_i}:\n" +
+    f"CC (Cloud Cover) = {mods['cc'][state_i]}\n" +
+    f"RI (Rain Intensity) = {mods['ri'][state_i]}\n" +
+    f"SU (Sun-up) = {mods['su'][state_i]}\n" +
+    f"SP (Solar Potential) = {mods['sp'][state_i]}\n" +
+    f"FP (Fuel Prices) - Nuclear = {mods['fp'][0][state_i]}\n" +
+    f"FP (Fuel Prices) - Coal = {mods['fp'][1][state_i]}\n" +
+    f"FP (Fuel Prices) - NatGas = {mods['fp'][2][state_i]}\n" +
+    f"PG and ED (Population Growth and Energy Demand):\n" +
+    "".join([f"PG & ED for city, {cityname}. PG = {mods['pg'][cityname][state_i]}, ED = {mods['ed'][idx][state_i]}\n" for idx, cityname in enumerate(mods['pg'])]) 
+  )
+

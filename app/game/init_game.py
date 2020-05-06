@@ -1,6 +1,8 @@
 import numpy as np
 import math
 import json
+import logging
+import time
 
 from sqlalchemy import func
 from app import db
@@ -20,10 +22,19 @@ from app.game.utils import hours_per_turn, hours_per_year
 
 from app.gamesio.routes import force_run_turn
 
+
+# Setup logging parms
+format = "%(asctime)s: %(filename)s: %(lineno)d: %(message)s"
+logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
+
 #######################################################################################
-# Main function
+# init_game function populates tables with game data.
 #######################################################################################
-def init_game_models(game):
+def init_game(game):
+  # Set the game state to 'inializing'.
+  game.state="initializing"
+  db.session.commit()
+
   # seed the randomizer
   np.random.seed()
   
@@ -48,7 +59,11 @@ def init_game_models(game):
 
   # Generate empty history table (file)
   #init_history_table(game)
-  
+
+  # Everything is done. Set the state to 'new' and return
+  game.state="new"
+  db.session.commit()
+
   return True
 
 #######################################################################################
@@ -130,7 +145,7 @@ def init_facilities(game):
       # lifespan_max = db.session.query(db.func.max(GeneratorType.lifespan)).filter_by(id_facility_type=new_facility.id_type).scalar()
       
       # draw an age from a Poisson distribution such that "most" generators are about 2/3 through their lifespan
-      age_hours = int(np.random.poisson(facility_type.lifespan * hours_per_turn * 0.66, size=1)[0])
+      age_hours = (int(np.random.poisson(lam=(facility_type.lifespan * .66), size=1)[0]) * hours_per_turn)
 
       # ensure that the age doesn't exceed the GeneratorType lifespan
       if age_hours > (facility_type.lifespan * hours_per_turn):
@@ -140,7 +155,7 @@ def init_facilities(game):
       new_facility.build_turn = 0
       new_facility.prod_turn = facility_type.lifespan - int(age_hours / hours_per_turn)
 
-      # print(
+      # logging.info(
       #   f"{'-'*80}\n"
       #   f"age_hours = {age_hours}\n"
       #   f"facility lifespan = {facility_type.lifespan}\n"
@@ -182,7 +197,8 @@ def init_generators(game):
       genType_lspan_hours = generator_type.lifespan * hours_per_turn
 
       # draw age from Poisson distribution, ensuring that it does not exceed facility age or generator lifespan
-      age_hours = int(np.random.poisson(genType_lspan_hours * 0.66, size=1)[0])
+      age_hours = (int(np.random.poisson(generator_type.lifespan * 0.66, 1)[0]) * hours_per_turn)
+
 
       if (age_hours > genType_lspan_hours):
         age_hours = genType_lspan_hours
@@ -191,15 +207,19 @@ def init_generators(game):
       new_generator.build_turn = 0
       new_generator.prod_turn = generator_type.lifespan - int(age_hours / hours_per_turn)
 
-      # print(
+      # logging.info(
       #   f"{'-'*80}\n"
       #   f"facility_prod_date = {facility.start_prod_date}\n"
-      #   f"generator_prod_date = {hours_to_date(game.zero_year, prod_date_hours)}\n\n"
+      #   f"generator_prod_date = {hours_to_date(prod_date_hours)}\n\n"
       #   f"gnerator_age_hours = {age_hours}\n"
       # )
 
       new_generator.start_prod_date  = prod_date_hours
       new_generator.start_build_date = prod_date_hours - genType_buildTime_hours
+
+      # Get a random condition for generators already built.
+      condition = np.random.poisson(lam=(50), size=1)[0]
+      new_generator.condition = condition / 100
 
   # Commit (write to database) all the added records.
   db.session.commit()

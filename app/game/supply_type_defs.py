@@ -157,13 +157,13 @@ prompt_types = [
     'long_description' : 'A blizzard has struck, and {} of your facilities were offline for {} days.',
   },
   {
-    'title' : 'blizzard-news',
+    'title' : 'blizzard-unaffected',
     'category': 'News Brief', 
     'image': 'default.png', 
     'priority': 'information', 
     'scope': 'company',
-    'short_description' : 'Blizzard knocks out facilities',
-    'long_description' : 'A blizzard has struck and knocked out {} facilities, causing a potential {} MW of capacity to remain offline for {} days.',
+    'short_description' : 'Lots of snowfall',
+    'long_description' : 'A blizzard has struck but none of your facilities were affected.',
                                                                     #Sum of the nameplate capacity of all generators unavailable during the blizzard event.
   },    
 ]

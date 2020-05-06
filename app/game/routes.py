@@ -6,6 +6,8 @@ import json
 import math 
 import threading
 import numpy as np
+import time
+import logging
 
 from sqlalchemy import func
 from sqlalchemy.orm.session import make_transient
@@ -13,12 +15,16 @@ from app import db
 from app.models import User, Game, Company, Facility, Generator, City, FacilityType, GeneratorType, PowerType, ResourceType, Prompt, PromptType
 from app.models import FacilitySchema, GeneratorSchema, FacilityModificationSchema, GeneratorModificationSchema, CitySchema, CompanySchema, GameSchema, FacilityTypeSchema, PromptSchema, PromptTypeSchema
 from app.models import GeneratorTypeSchema, PowerTypeSchema, ResourceTypeSchema, FacilityModificationTypeSchema, GeneratorModificationType, GeneratorModificationTypeSchema
-from app.game.init_game import init_game_models
+from app.game.init_game import init_game
 from app.game.utils import format_date, convert_to_money_string, get_age, turns_to_hours, get_current_game_date, add_commas_to_number
 from app.game.modifiers import load_modifiers
 from app.game.prompts import assign_prompt
 from app.game.sio_outgoing import shout_game_turn_complete, shout_new_facility, shout_update_facility, shout_delete_facility
 from app.gamesio.routes import force_run_turn
+
+# Setup logging parms
+format = "%(asctime)s: %(filename)s: %(lineno)d: %(message)s"
+logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
 
 game = Blueprint('game', __name__)
 #################################################################################  
@@ -27,28 +33,29 @@ game = Blueprint('game', __name__)
 @login_required
 def initgame(gid, name):
   game = Game.query.filter_by(id=gid).first()
-
+  
   if game == None:
-    flash(f'Error creating game (code:010)','danger')  
+    flash(f'Error creating game (code:010)','danger')
+    current_user.state="unknown"
+    db.session.commit()
     return render_template("title.html")
 
   if game.state != "initializing":
     flash(f'Error creating game (code:011)','danger')
+    current_user.state="unknown"
+    db.session.commit()
     return render_template("title.html")
 
-  if init_game_models(game) == True:
-    game.state = "new"
-    current_user.state = "creating"
-    db.session.commit()
-    print("-"*80)
-    print("creating game...")
-    flash(f'Game is initializing. Please wait...','warning')
+  logging.info("initializing game...")
+
+  if init_game(game) == True:
     force_run_turn(json.dumps({'gameId': game.id, 'initialTurn': True}))
   else:
     flash(f'Error creating game (code:012)','danger')
+    current_user.state="unknown"
+    db.session.commit()
     return render_template("title.html")    
 
-  game.state = "playing"
   db.session.commit()
   return redirect(url_for('game.joingame' , gid=gid, name=name))
 
@@ -58,6 +65,11 @@ def initgame(gid, name):
 @login_required
 def joingame(gid, name):
   game = Game.query.filter_by(id=gid).first()
+
+  if game.state == "runturn":
+     logging.info("running a turn...")
+    
+    
   current_user.state = "playing"
   db.session.commit()
   
@@ -296,34 +308,51 @@ def power_types():
   
   return jsonify({'power_types': serialized_power_types})
 
-
 # ###############################################################################  
 #
 # ###############################################################################
-# @game.route("/playergenerators", methods=["GET"])
-# @login_required
-# def player_generators():
-#   gid = request.args.get('gid', None)
-#   company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
-#   facilities = Facility.query.filter_by(id_game=gid, id_company=company.id)
+@game.route("/playergenerators", methods=["GET"])
+@login_required
+def player_generators():
+  gid = request.args.get('gid', None)
+  game = Game.query.filter_by(id=gid).first()
+  company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
+  facilities = Facility.query.filter_by(id_game=gid, id_company=company.id)
   
-#   facility_capacities = list()
-#   for facility in facilities:
-#     elegible_generators = list(filter(lambda generator : generator.state != 'available', facility.generators))
-#     print("*"*80)
-#     print(elegible_generators)
-#     print("\n")
+  player_generators = dict()
+  generator_schema = GeneratorSchema(many=True)
 
-#     facility_capacities.append({
-#       "facility_id": str(facility.id),
-#       "facility_capacity": str((sum(list(gen.generator_type.nameplate_capacity for gen in elegible_generators)))),
-#     })
+  for facility in facilities:
+    facility_generators = list(facility.generators)
+    serialized_facility_generators = generator_schema.dump(facility_generators)
 
-#   print("*"*80)
-#   print(facility_capacities)
-#   print("\n")
+    for gen in serialized_facility_generators[0]:
+      generator_type = GeneratorType.query.filter_by(id=gen['generator_type']).first()
+      gen['build_time'] = generator_type.build_time
+      gen['lifespan'] = generator_type.lifespan
+      gen['fixed_cost_build'] = generator_type.fixed_cost_build
+      gen['nameplate_capacity'] = generator_type.nameplate_capacity
+
+      gen['generator_age'] = get_age(game, gen['start_prod_date'], True)
+
+    player_generators.update({str(facility.id): serialized_facility_generators[0]})
+  
+  #   elegible_generators = list(filter(lambda generator : generator.state != 'available', facility.generators))
+  #   print("*"*80)
+  #   print(elegible_generators)
+  #   print("\n")
+
+  #   facility_capacities.append({
+  #     "facility_id": str(facility.id),
+  #     "facility_capacity": str((sum(list(gen.generator_type.nameplate_capacity for gen in elegible_generators)))),
+  #   })
+
+  # print("*"*80)
+  # print(facility_capacities)
+  # print("\n")
  
-#   return jsonify(facility_capacities)
+  # return jsonify(facility_capacities)
+  return jsonify({'player_generators': player_generators})
 
 # ###############################################################################  
 #
@@ -333,6 +362,7 @@ def power_types():
 def player_facility():
 
   gid = request.args.get('gid', None)
+  game = Game.query.filter_by(id=gid).first()
   fid = request.args.get('fid', None)
   owned_facility = False
 
@@ -352,9 +382,17 @@ def player_facility():
   facility_type_serialized = facility_type_schema.dump(facility_type).data
 
   generators = Generator.query.filter_by(id_facility=facility.id, id_game=gid).all()
+  
+
   generators_schema = GeneratorSchema(many=True)
   generators_serialized = generators_schema.dump(generators).data
 
+  # Add generator age, condition, and profit to each generator.
+  for gen in generators_serialized:
+    gen['generator_age'] = str(get_age(game, gen['start_prod_date'], True))
+
+  # logging.debug(f"generator_serialized info = {generators_serialized[0]}")
+  
   generator_modifications = [{'id': gen.id, 'mods': gen.modifications} for gen in generators]
   generator_modifications_schema = GeneratorModificationSchema(many=True)
   generator_modifications_serialized = generator_modifications_schema.dump(generator_modifications).data
@@ -396,11 +434,22 @@ def player_facility():
 def player_facilities():
 
   gid = request.args.get('gid', None)
+  game = Game.query.filter_by(id=gid).first()
   company = Company.query.filter_by(id_game=gid, id_user=current_user.id).first()
 
   facilities = Facility.query.filter_by(id_game=gid, id_company=company.id).all()
   facilities_schema = FacilitySchema(many=True)
   facilities_serialized = facilities_schema.dump(facilities).data
+
+  facility_data = list()
+  for facility in facilities:
+    facility_data.append({
+      "facility_id": str(facility.id),
+      "facility_lifespan": str(facility.facility_type.lifespan),
+      "facility_age": str(get_age(game, facility.start_prod_date, True)),
+      "facility_cond": str("cond"),
+      "facility_profit": str(sum(list(gen.quarterly_profit for gen in facility.generators))),
+    })
 
   facility_capacities = list()
   for facility in facilities:
@@ -412,9 +461,11 @@ def player_facilities():
       "facility_build_capacity": str((sum(list(gen.generator_type.nameplate_capacity for gen in building_generators)))),
     })
 
+  
   return jsonify({
     'facilities': facilities_serialized,
     'facility_capacities': facility_capacities,
+    'facility_data': facility_data,
   })
 
 # ###############################################################################  
@@ -501,9 +552,9 @@ def update_facility():
 
   bad_key_fields = ['id', 'id_type', 'id_company', 'id_game']
 
-  print(f"*"*80)
-  print(f"facility = {facility_updates}")
-  print(f"*"*80)
+  # print(f"*"*80)
+  # print(f"facility = {facility_updates}")
+  # print(f"*"*80)
 
   facility = Facility.query.filter_by(id=fid, id_game=gid).first()
   facility_update_keys = list(facility_updates.keys())
@@ -650,9 +701,9 @@ def update_generators():
   gid = request.args.get('gid', None)
   fid = request.args.get('fid', None)
   generator_updates = json.loads(request.args.get('gens', None))
-  print(f"*"*80)
-  print(f"generators = {generator_updates}")
-  print(f"*"*80)
+  # print(f"*"*80)
+  # print(f"generators = {generator_updates}")
+  # print(f"*"*80)
   bad_key_fields = ['id', 'id_game', 'id_facility'] 
 
   updated_generators = []

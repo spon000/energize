@@ -22,9 +22,9 @@ class User(db.Model, UserMixin):
   email = db.Column(db.String(120), unique=True, nullable=False, default='jd@gmail.com')
   image_file = db.Column(db.String(20), nullable=False, default='default.png')
   password = db.Column(db.String(60), nullable=False)
-  companies_max = db.Column(db.Integer, nullable=False, default=4)
+  companies_max = db.Column(db.Integer, nullable=False, default=3)
   current_company = db.Column(db.Integer, nullable=False, default=0)
-  state = db.Column(db.Enum("creating", "playing", "unknown"), default="unknown")
+  state = db.Column(db.Enum("joining", "playing", "unknown"), default="unknown")
     
   # Relational data
   companies = db.relationship('Company')
@@ -53,7 +53,7 @@ class Game(db.Model):
   companies_max = db.Column(db.Integer, nullable=False, default=5)
   companies_joined = db.Column(db.Integer, default=0)
   companies_ready = db.Column(db.Integer, default=0)
-  state = db.Column(db.Enum("initializing", "new", "runturn", "waiting", "playing", "finished"), default="initializing")
+  state = db.Column(db.Enum("initializing", "new", "runturn", "waiting", "playing", "finished", "error"), default="initializing")
   turn_number = db.Column(db.Integer, default=0)
   zero_year = db.Column(db.Integer, default=1920)
 
@@ -172,7 +172,7 @@ class Facility(db.Model):
   layer = db.Column(db.Integer, default=2)
   area = db.Column(db.Float)
   counter = db.Column(db.Integer,default=0)
-
+  
   # Relational data
   facility_type = db.relationship('FacilityType')
   generators = db.relationship('Generator')
@@ -232,6 +232,7 @@ class Generator(db.Model):
   revenue = db.Column(db.Float, default=0)
   extension = db.Column(db.Float, default=0)
   construction = db.Column(db.Float, default=0)
+  quarterly_profit = db.Column(db.Float, default=0)
   
   
   # Relational Data

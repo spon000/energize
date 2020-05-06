@@ -45,20 +45,22 @@ define([
           this._facilityTypes = null;
           this._facilityCapacities = null;
           this._facilityConstructCapacities = null;
+          this._chart = null;
 
 
           this._getDialogData().then((data) => {
             this._facilities = data[0].facilities;
             this._facilityCapacities = data[0].facility_capacities;
+            this._facilityData = data[0].facility_data;
             this._facilityConstructCapacities = data[0].facility_build_capacities;
             this._facilityTypes = data[1].facility_types;
             this._portfolioDialogHtml = data[2];
+            this._playerGenerators = data[3].player_generators;
             console.log("ready to open dialog...", data);
 
             this._openPortfolioDialog(this, this._createGraphAndTable)
           });
         }
-
 
 
         /* *********************************************************************************** */
@@ -68,45 +70,54 @@ define([
           return Promise.all([
             this._modelData.getPlayerFacilities(),
             this._modelData.getFacilityTypes(),
-            this._modelData.getPortfolioHtml()
+            this._modelData.getPortfolioHtml(),
+            this._modelData.getPlayerGenerators()
           ]).then((data) => data)
+            .then((data) => data)
             .then((data) => data)
             .then((data) => data);
         }
 
 
         /* *********************************************************************************** */
-        _createFacilityChartData() {
+        _createFacilityChartsData() {
           let typesCount = this._facilityTypes.reduce((typesCount, facilityType) => {
             let typeCount = this._facilities.reduce((typeCount, facility) => {
               if (facility.facility_type == facilityType.id) {
                 let idString = String(facilityType.id);
-                typeCount.hasOwnProperty(idString) ? typeCount[idString] += 1 : typeCount[idString] = 1;
+
+                typeCount.hasOwnProperty(idString) ? (
+                  typeCount[idString].num += 1,
+                  typeCount[idString].cap += parseInt(this._getTotalFacilityCapacity(facility))
+                ) : typeCount[idString] = { num: 1, cap: parseInt(this._getTotalFacilityCapacity(facility)) }
               }
 
               return typeCount;
             }, {});
 
+            // console.log("typeCount = ", typeCount);
+
             if (Object.entries(typeCount).length !== 0) {
-              typesCount.data.push(typeCount[String(facilityType.id)]);
+              typesCount.numData.push(typeCount[String(facilityType.id)].num);
+              typesCount.capData.push(typeCount[String(facilityType.id)].cap);
               typesCount.labels.push(facilityType.name)
               typesCount.bgColors.push(typeChartColors[String(facilityType.id)])
               typesCount.borderColors.push(typeChartColors[String(facilityType.id)].split(",").slice(0, 3).concat([" 1)"]).join());
               typesCount.type.push(typeCount);
             }
             return typesCount;
-          }, { type: [], labels: [], data: [], bgColors: [], borderColors: [] });
+          }, { type: [], labels: [], numData: [], capData: [], bgColors: [], borderColors: [] });
 
           // console.log("typesCount = ", typesCount);
           return typesCount
         }
 
-
         /* *********************************************************************************** */
         _createGraphAndTable(scope) {
-          let ownedTypes = scope._createFacilityChartData();
+          let ownedTypes = scope._createFacilityChartsData();
           // console.log("types = ", ownedTypes);
-          scope._createChartOfOwnedFacilityTypes(ownedTypes);
+          // scope._createChartOfOwnedFacilityTypes(ownedTypes, "Owned Facility Capacities", "capData");
+          scope._createChartOfOwnedFacilityTypes(ownedTypes, "Facility Types Owned", "numData");
           scope._createTotalCompanyCapacity();
           scope._createTotalConstructCapacity();
           scope._createFacilityListTable();
@@ -135,21 +146,29 @@ define([
         }
 
         /* *********************************************************************************** */
-        _createChartOfOwnedFacilityTypes(ownedTypes) {
+        _createChartOfOwnedFacilityTypes(ownedTypes, label, dataTypePropertyName) {
           // let chartContext = document.getElementById(this._elementIdPortfolioChart).getContext();
-          let chart = new Chart(document.getElementById(this._elementIdPortfolioChart), {
+          if (this._chart)
+            this._chart.destroy();
+          let ctx = document.getElementById(this._elementIdPortfolioChart).getContext("2d");
+          this._chart = new Chart(ctx, {
             type: 'pie',
             data: {
               labels: ownedTypes.labels,
               datasets: [{
-                label: "Owned Facilities",
-                data: ownedTypes.data,
+                label: label,
+                data: ownedTypes[dataTypePropertyName],
                 backgroundColor: ownedTypes.bgColors,
                 borderColor: ownedTypes.borderColors,
                 borderWidth: 1
               }]
             },
             options: {
+              legend: {
+                position: 'left',
+                align: 'start'
+
+              },
               scales: {
                 // xAxes: [{
                 // stacked: true,
@@ -163,7 +182,10 @@ define([
               }
             }
           });
-          $(this._portfolioDialog).find(this._elementIdPortfolioChart).append(chart);
+
+          // console.log("ownedTypes = ", ownedTypes)
+
+          // $(this._portfolioDialog).find(this._elementIdPortfolioChart).html(chart);
         }
 
         /* *********************************************************************************** */
@@ -171,6 +193,7 @@ define([
           $(".portfolio-facility-name-link").on("click", this, this._viewFacility);
           $(".option-bid-policy").on("change", this, this._changeBidPolicy);
           $(".option-mnt-policy").on("change", this, this._changeMaintPolicy);
+          $(".portfolio-graph-tab").on("click", this, this._changeChartData);
         }
 
         /* *********************************************************************************** */
@@ -187,9 +210,25 @@ define([
           scope._modelData.updateGlobalMaintPolicy(evt.currentTarget.value)
         }
 
+        _changeChartData(evt) {
+          let scope = evt.data;
+          let tab = evt.currentTarget;
+          let dataName = $(tab).attr("value");
+          let title = $(tab).attr("title");
+          let chartTypes = scope._createFacilityChartsData();
+
+          scope._createChartOfOwnedFacilityTypes(chartTypes, title, dataName);
+          $("#portfolio-chart-title").html(title);
+
+          let graphTabs = $(".portfolio-graph-tab").removeClass("active");
+          $(tab).addClass("active");
+
+          // console.log(`dataName = ${dataName}, title = ${title}`);
+        }
+
         /* *********************************************************************************** */
         _viewFacility(evt) {
-          console.log("_viewFacility() evt = ", evt);
+          // console.log("_viewFacility() evt = ", evt);
           let scope = evt.data;
           let fid = $(evt.currentTarget).attr("fid");
           let facilityViewDialog = new FacilityViewDialog(fid);
@@ -267,9 +306,153 @@ define([
           return this._numberWithCommas(this._facilityCapacities.reduce((totalCap, facCap) => totalCap += parseInt(facCap.facility_capacity), 0));
         }
 
+        _getFacilityAge(facilityId) {
+          // console.log("this._facilityData = ", this._facilityData);
+          let facilityData = this._facilityData.find(fd => facilityId == fd.facility_id)
+          // console.log("facilityData = ", facilityData);
+          let age = parseInt(facilityData.facility_age);
+          let lifespan = parseInt(facilityData.facility_lifespan);
+
+          let ratio = (lifespan - age) / lifespan;
+
+          // console.log("ratio = ", ratio)
+
+          switch (true) {
+            case (ratio > .75):
+              return ({
+                color: this._getCellColor("good"),
+                age: age
+              });
+            case (ratio > .30):
+              return ({
+                color: this._getCellColor("medium"),
+                age: age
+              });
+            case (ratio >= 0):
+              return ({
+                color: this._getCellColor("bad"),
+                age: age
+              });
+            default:
+              return ({
+                color: this._getCellColor("bad"),
+                age: age
+              });
+          }
+        }
+
+        _getCellColor(type) {
+          switch (type) {
+            case "good": return "rgba(0, 255, 0, .8)"
+            case "medium": return "rgba(250, 218, 94, .8)"
+            case "bad": return "rgba(255, 0, 0, .8)"
+          }
+        }
+
         _numberWithCommas(x) {
           return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
+
+        _getAgeStatus(facility) {
+          // console.log("_getAgeStatus-facility = ", facility);
+          // console.log("_getAgeStatus-playerGenerators = ", this._playerGenerators);
+          let ageCounts = [0, 0, 0];
+          this._playerGenerators[facility.id].forEach((generator) => {
+          });
+
+          return ({
+            'color': this._getCellColor("medium"),
+            'tooltipMsg': "This facility is aged"
+          });
+        }
+
+        _getProfitStatus(facility) {
+          // console.log("_getProfitStatus-facility = ", facility);
+          // console.log("_getProfitStatus-playerGenerators = ", this._playerGenerators[facility.id]);
+
+          let profitMarginCounts = [0, 0, 0];
+          this._playerGenerators[facility.id].forEach((generator) => {
+            if (generator.state === "available") {
+              let margin = generator.fixed_cost_build * generator.nameplate_capacity / generator.build_time;
+              let qProfit = generator.quarterly_profit;
+              let profit_margin = qProfit / margin * 100;
+
+              if (profit_margin > 10)
+                profitMarginCounts[0] += 1;
+              else if (profit_margin > 2)
+                profitMarginCounts[1] += 1;
+              else
+                profitMarginCounts[2] += 1;
+            }
+          });
+
+          switch (true) {
+            case (profitMarginCounts[2] > 0):
+              return ({
+                color: this._getCellColor("bad"),
+                tooltipMsg: "" + profitMarginCounts[2] + (profitMarginCounts[2] > 1 ? " generators " : " generator ") + "had a quarterly profit of less than 2 percent."
+              });
+            case (profitMarginCounts[1] > 0):
+              return ({
+                color: this._getCellColor("medium"),
+                tooltipMsg: "" + profitMarginCounts[1] + (profitMarginCounts[1] > 1 ? " generators " : " generator ") + "had a quarterly profit of less than 10 percent."
+              });
+            default:
+              return ({
+                color: this._getCellColor("good"),
+                tooltipMsg: "All your generators had a quarterly profit of more than 10 percent."
+              });
+          }
+        }
+
+        _getConditionStatus(facility) {
+          // console.log("_getConditionStatus-facility = ", facility);
+          // console.log("_getConditionStatus-playerGenerators = ", this._playerGenerators);
+          let profitConditionCounts = [0, 0, 0];
+          this._playerGenerators[facility.id].forEach((generator) => {
+            if (generator.condition >= .67)
+              profitConditionCounts[0] += 1
+            else if (generator.condition >= .25)
+              profitConditionCounts[1] += 1
+            else
+              profitConditionCounts[2] += 1
+          });
+
+          switch (true) {
+            case (profitConditionCounts[2] > 0):
+              return ({
+                color: this._getCellColor("bad"),
+                tooltipMsg: "" + profitConditionCounts[2] + (profitConditionCounts[2] > 1 ? " generators " : " generator ") + "have a condition rating of 'poor'."
+              });
+            case (profitConditionCounts[1] > 0):
+              return ({
+                color: this._getCellColor("medium"),
+                tooltipMsg: "" + profitConditionCounts[1] + (profitConditionCounts[1] > 1 ? " generators " : " generator ") + "have a condition rating of 'worn'."
+              });
+            default:
+              return ({
+                color: this._getCellColor("good"),
+                tooltipMsg: "all generators have a condition rating of 'good'."
+              });
+          }
+        }
+
+        _checkToolTipState(state) {
+
+          if (state == "abandoned")
+            return `Facility has been decomissioned`;
+
+          if (state == "inactive")
+            return 'Facility in inactive this quarter';
+
+          if (state == "building" || state == "new" || state == "paused")
+            return `Facility is under construction`;
+
+          return null;
+
+        }
+
+
 
 
         /* *********************************************************************************** */
@@ -280,13 +463,14 @@ define([
 
           // console.log("_createFacilityListTable() this._facilities = ", this._facilities);
           this._facilities.forEach((facility, index) => {
-            let profit = "rgb(255, 0, 0)" //getProfit(gen);
-            let condition = "rgb(250, 218, 94)" //getCondition(gen);
-            let age = "rgb(0, 255, 0)"  //this._getAge(facilitygen).color;
+            let profit = this._getProfitStatus(facility)        //"rgba(255, 0, 0, .8)" //getProfit(gen);
+            let condition = this._getConditionStatus(facility)  //"rgba(250, 218, 94, .8)" //getCondition(gen);
+            let age = this._getAgeStatus(facility);             //
+            // console.log("condition = ", condition);
 
-            let profitColor = profit.color;
-            let conditionColor = condition.color;
-            let ageColor = age.color;
+            // let profitColor = profit.color;
+            // let conditionColor = condition.color;
+            // let ageColor = age.color;
 
             facility_table_data.push({
               facility: facility,
@@ -305,6 +489,7 @@ define([
           const facilityTableDef = {
             height: 238,
             layout: "fitData",
+            tooltopGenerationMode: "hover",
             data: facility_table_data,
             columns: [
               {
@@ -335,19 +520,37 @@ define([
 
               {
                 title: "Profit", field: "prof", width: 80,
-                formatter: this._color_cell,
+                tooltipGenerationMode: "hover",
+                tooltip: (cell) => {
+                  let toolTip = this._checkToolTipState(cell.getData().state)
+                  if (toolTip)
+                    return toolTip;
+
+                  // console.log("cell.getValue() = ", cell.getValue());
+                  return (cell.getValue().tooltipMsg);
+                },
+                formatter: this._profit_color_cell,
                 formatterParams: {}
               },
 
               {
                 title: "Age", field: "age", width: 80,
-                formatter: this._color_cell,
+                formatter: this._age_color_cell,
                 formatterParams: {}
               },
 
               {
                 title: "Condition", field: "cond", width: 80,
-                formatter: this._color_cell,
+                tooltipGenerationMode: "hover",
+                tooltip: (cell) => {
+                  let toolTip = this._checkToolTipState(cell.getData().state)
+                  if (toolTip)
+                    return toolTip;
+
+                  // console.log("cell.getValue() = ", cell.getValue());
+                  return (cell.getValue().tooltipMsg);
+                },
+                formatter: this._cond_color_cell,
                 formatterParams: {}
               },
             ]
@@ -374,13 +577,30 @@ define([
           return `<a href="#" class="portfolio-facility-name-link" fid="${cell.getData().fid}"> ${cell.getValue()} </a>`
         }
 
-        _color_cell(cell, formatterParams) {
+        _profit_color_cell(cell, formatterParams) {
           return (cell.getData().facility.state == "active" ?
-            `<label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px;background:${cell.getValue()};"></label>`
+            `<label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px;background:${cell.getValue().color};"></label>`
+            :
+            ` <label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px; background:repeating-linear-gradient(45deg, #010101, #010101 10px, #f5cb42 10px, #f5cb42 20px);"></label>`
+          )
+        }
+
+        _age_color_cell(cell, formatterParams) {
+          // console.log("color = ", color);
+          return (cell.getData().facility.state == "active" ?
+            `<label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px;background:${cell.getValue().color};"></label>`
             :
             ` <label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px; background:repeating-linear-gradient(45deg, #010101, #010101 10px, #f5cb42 10px, #f5cb42 20px);"></label>`
           )
 
+        }
+
+        _cond_color_cell(cell, formatterParams) {
+          return (cell.getData().facility.state == "active" ?
+            `<label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px;background:${cell.getValue().color};"></label>`
+            :
+            ` <label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px; background:repeating-linear-gradient(45deg, #010101, #010101 10px, #f5cb42 10px, #f5cb42 20px);"></label>`
+          )
         }
 
 

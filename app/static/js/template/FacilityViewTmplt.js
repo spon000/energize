@@ -44,22 +44,23 @@ define([], function () {
 
             <div class="row">
               <h6 class="col-lg-5" style="font-weight: bold;"> OM Costs: </h6>
-              <label class="col-lg-4"> $ </label>
+              <label class="col-lg-4"> {{ omCosts }} </label>
             </div>
 
+            <!--
             <div class="row">
               <h6 class="col-lg-5" style="font-weight: bold;"> Revenue: </h6>
               <label class="col-lg-4"> $ </label>
             </div>
+            -->
 
             <div class="row">
               <h6 class="col-lg-5" style="font-weight: bold;"> Profit: </h6>
-              <!-- <label class="col-lg-4"> $ {{ formatCurrency facilityType.fixed_cost_build }} </label> -->
-              <label class="col-lg-4"> $ </label>
+              <label class="col-lg-4"> {{ profit }} </label>
             </div>
 
             <div class="row">
-              <h6 class="col-lg-5" style="font-weight: bold;"> Capacity: </h6>
+              <h6 class="col-lg-5" style="font-weight: bold;"> Available Capacity: </h6>
               <label class="col-lg-4"> {{ facility.total_capacity }} MW </label>
             </div>
 
@@ -73,6 +74,9 @@ define([], function () {
         <div class="container">
           {{#if owned}}
           <div class="row">
+            <p/>
+            <!--
+            
             <div class="vfd-multiselect col-xl-12">
               <div class="selectbox">
                 <select>
@@ -87,6 +91,7 @@ define([], function () {
               {{/each}}
               </div>
             </div>                
+            -->
           </div>
           {{/if}}
         </div>

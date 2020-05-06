@@ -3,6 +3,13 @@ import scipy
 import scipy.signal
 import scipy.stats
 
+import logging
+import time
+
+# Setup logging parms
+format = "%(asctime)s: %(filename)s: %(lineno)d: %(message)s"
+logging.basicConfig(format=format, level=logging.INFO, datefmt="%H:%M:%S")
+
 import app.game.constants as cons
 
 from math import trunc
@@ -67,24 +74,32 @@ def quarterly_events(game, mods):
 def check_heatwave(game, mods, probability = .40):
   # Roll random number to decide if a new heatwave starts
   
+  # Duration days and hours
   dur_days = 4 + np.random.randint(9)
   dur_hours = dur_days * cons.hours_per_day
+
+  # Starting day and hour
   start_day = np.random.randint(cons.days_per_quarter - 15)
-  start_hour = (game.turn_number * cons.hours_per_quarter) + (start_day * cons.hours_per_quarter)
+  start_hour = (game.turn_number * cons.hours_per_quarter) + (start_day * cons.hours_per_day)
+  end_hour = start_hour + dur_hours
+
+  # End day
   end_day = start_day + dur_days
+
+  #
   peak = np.random.uniform(0.10, 0.25)
   
+  # Create random percentage to see if heatwave occurs
   check = np.random.uniform(0, 1)
-  print("*"*80)
-  print(f"Heatwave... {int(check*100)}%")
+
   if check < probability:
     # create randomly fluctuating timeseries to represent increase in energy demand due to heat
     x1 = np.linspace(0, 14, 6)
     y1 = np.random.uniform(0.2, 0.5, 6)
     y1[0] = 0
     y1[-1] = 0
-    y1 = y1 * (1.0 / (1 + np.exp(-10 * (x1 - 1)))) * (1.0 - 1.0 / (1 + np.exp(-10 * (x1 - dur_days))))
-    x2  = np.linspace(0, 14, 14 * 24)
+    y1 *= (1.0 / (1 + np.exp(-10 * (x1 - 1)))) * (1.0 - 1.0 / (1 + np.exp(-10 * (x1 - dur_days))))
+    x2  = np.linspace(0, 14, dur_hours)
     y2  = scipy.interpolate.interp1d(x1, y1, kind='cubic')(x2)
     y2 *= (1.0 / (1 + np.exp(-10 * (x2 - 1)))) * (1.0 - 1.0 / (1 + np.exp(-10 * (x2 - dur_days))))
     y2 /= np.max(y2)
@@ -92,9 +107,14 @@ def check_heatwave(game, mods, probability = .40):
     y2 += 1.0
 
     # update the energy demand accordingly
-    for jj in range(len(mods['ed'])):
-      for kk in range(dur_days * cons.hours_per_day):
-        mods['ed'][jj][0][start_hour + kk] *= y2[kk] 
+    mods['ed'][:,start_hour:end_hour] = mods['ed'][:,start_hour:end_hour] * y2
+
+
+    # for jj in range(len(mods['ed'])):
+
+
+    #   for kk in range(dur_days * cons.hours_per_day):
+    #     mods['ed'][jj][0][start_hour + kk] *= y2[kk] 
   
     # in the future, the location of the heatwave would also be decided here
     # therefore the demand of individual cities might become too high for the transmission lines in some places
@@ -174,8 +194,7 @@ def check_blizzard(game, mods, probability = .25):
     end_day = start_day + dur_days      
 
     check = np.random.uniform(0, 1)
-    print("*"*80)
-    print(f"Blizzard... {int(check*100)}%")
+    logging.info(f"Blizzard... {int(check*100)}% : {int(probability*100)}%")
     if check < probability:
       # determine set of facilities affected (ie knocked offline)
       polyx = [0, 0, 80, 160, 240,  240, 0]
