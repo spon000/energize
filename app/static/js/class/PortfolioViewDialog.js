@@ -349,6 +349,10 @@ define([
           }
         }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
         _numberWithCommas(x) {
           return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
@@ -463,10 +467,17 @@ define([
 
           // console.log("_createFacilityListTable() this._facilities = ", this._facilities);
           this._facilities.forEach((facility, index) => {
+<<<<<<< HEAD
             let profit = this._getProfitStatus(facility)        //"rgba(255, 0, 0, .8)" //getProfit(gen);
             let condition = this._getConditionStatus(facility)  //"rgba(250, 218, 94, .8)" //getCondition(gen);
             let age = this._getAgeStatus(facility);             //
             // console.log("condition = ", condition);
+=======
+            let profit = "rgba(255, 0, 0, .8)" //getProfit(gen);
+            let condition = "rgba(250, 218, 94, .8)" //getCondition(gen);
+            let age = this._getFacilityAge(facility.id);
+            // console.log("age = ", age);
+>>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
 
             // let profitColor = profit.color;
             // let conditionColor = condition.color;
@@ -520,6 +531,7 @@ define([
 
               {
                 title: "Profit", field: "prof", width: 80,
+<<<<<<< HEAD
                 tooltipGenerationMode: "hover",
                 tooltip: (cell) => {
                   let toolTip = this._checkToolTipState(cell.getData().state)
@@ -529,6 +541,8 @@ define([
                   // console.log("cell.getValue() = ", cell.getValue());
                   return (cell.getValue().tooltipMsg);
                 },
+=======
+>>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
                 formatter: this._profit_color_cell,
                 formatterParams: {}
               },
@@ -541,6 +555,7 @@ define([
 
               {
                 title: "Condition", field: "cond", width: 80,
+<<<<<<< HEAD
                 tooltipGenerationMode: "hover",
                 tooltip: (cell) => {
                   let toolTip = this._checkToolTipState(cell.getData().state)
@@ -550,6 +565,8 @@ define([
                   // console.log("cell.getValue() = ", cell.getValue());
                   return (cell.getValue().tooltipMsg);
                 },
+=======
+>>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
                 formatter: this._cond_color_cell,
                 formatterParams: {}
               },
@@ -578,6 +595,7 @@ define([
         }
 
         _profit_color_cell(cell, formatterParams) {
+<<<<<<< HEAD
           return (cell.getData().facility.state == "active" ?
             `<label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px;background:${cell.getValue().color};"></label>`
             :
@@ -587,12 +605,32 @@ define([
 
         _age_color_cell(cell, formatterParams) {
           // console.log("color = ", color);
+=======
+>>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
           return (cell.getData().facility.state == "active" ?
             `<label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px;background:${cell.getValue().color};"></label>`
             :
             ` <label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px; background:repeating-linear-gradient(45deg, #010101, #010101 10px, #f5cb42 10px, #f5cb42 20px);"></label>`
           )
+        }
 
+        _age_color_cell(cell, formatterParams) {
+          let color = cell.getValue();
+          // console.log("color = ", color);
+          return (cell.getData().facility.state == "active" ?
+            `<label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px;background:${color.color};"></label>`
+            :
+            ` <label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px; background:repeating-linear-gradient(45deg, #010101, #010101 10px, #f5cb42 10px, #f5cb42 20px);"></label>`
+          )
+
+        }
+
+        _cond_color_cell(cell, formatterParams) {
+          return (cell.getData().facility.state == "active" ?
+            `<label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px;background:${cell.getValue()};"></label>`
+            :
+            ` <label style="height:100%;width:100%;padding:5px;margin:0;border-style:solid;border-width:2px; background:repeating-linear-gradient(45deg, #010101, #010101 10px, #f5cb42 10px, #f5cb42 20px);"></label>`
+          )
         }
 
         _cond_color_cell(cell, formatterParams) {

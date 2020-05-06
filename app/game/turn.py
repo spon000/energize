@@ -404,7 +404,11 @@ def run_turn(game, mods):
   quarterly_events(game, mods)
 
 
+<<<<<<< HEAD
   num_days = 90
+=======
+  num_days = 1
+>>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
   for day in range(num_days):
     shout_game_turn_interval(game.id, {'statusMsg': 'Calculating days...', 'interval': day, 'total': num_days})
     check_facility_daily(game, day)
@@ -420,8 +424,13 @@ def run_turn(game, mods):
       state = get_state_vars(state, mods, game.id)
 
         
+<<<<<<< HEAD
       # file.write("=" * 80 + "\n")
       # file.write(debug_output_modifiers(i + ((day * 24) + hr), mods))
+=======
+      file.write("=" * 80 + "\n")
+      file.write(debug_output_modifiers(i + ((day * 24) + hr), mods))
+>>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
 
   #     return ({
   #   'i':i,
@@ -448,9 +457,15 @@ def run_turn(game, mods):
         fac.om_cost += state['opMaint_fac'][j]
 
 
+<<<<<<< HEAD
       # file.write("\n" + "+" * 80 + "\n")
       # file.write("Before iso() runs...\n")
       # file.write(debug_output_state_vars(state))
+=======
+      file.write("\n" + "+" * 80 + "\n")
+      file.write("Before iso() runs...\n")
+      file.write(debug_output_state_vars(state))
+>>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
       
 
       # file.write("+" * 80 +"\n")
@@ -460,9 +475,15 @@ def run_turn(game, mods):
       # state = iso(mods, state, filedebug, game.id, True)
       state = iso(mods, state, file, game.id)
 
+<<<<<<< HEAD
       # file.write("\n" + "+" * 80 + "\n")
       # file.write("After iso() runs...\n")
       # file.write(debug_output_state_vars(state))
+=======
+      file.write("\n" + "+" * 80 + "\n")
+      file.write("After iso() runs...\n")
+      file.write(debug_output_state_vars(state))
+>>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
 
       # else:
       #   state = iso(mods, state, file, game.id)
