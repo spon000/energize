@@ -75,6 +75,7 @@ define([], function () {
           {{#if owned}}
           <div class="row">
             <p/>
+            <p/>
             <!--
             
             <div class="vfd-multiselect col-xl-12">

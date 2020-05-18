@@ -1,0 +1,8 @@
+(lifespan - age) > 130% buildtime
+(lifespan - age) > 125% buildtime
+(lifespan - age) > 110% buildtime
+
+
+Cities window
+
+world market --> download history table.

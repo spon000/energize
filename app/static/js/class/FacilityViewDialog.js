@@ -1082,11 +1082,7 @@ define([
                     return toolTip;
 
                   // console.log("cell.getValue() = ", cell.getValue());
-<<<<<<< HEAD
                   return `Profit: ${this._toMoney(cell.getValue().qProfit)}, Profit Margin: ${this._toPercentage(cell.getValue().profit_margin)}`
-=======
-                  return `Profit: $${cell.getValue().qProfit}, Profit Margin: %${cell.getValue().profit_margin}`
->>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
                 },
                 formatter: this._profit_cell,
                 formatterParams: {
@@ -1261,11 +1257,7 @@ define([
           let color = cell.getValue() ? cell.getValue().color : null;
           let templateParms = {
             state: cell.getData().state,
-<<<<<<< HEAD
             color: color
-=======
-            color: cell.getValue().color
->>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
           }
 
           let html = Handlebars.compile(FacilityViewTmplt.colorBox)(templateParms);
@@ -1279,11 +1271,7 @@ define([
           let color = cell.getValue() ? cell.getValue().color : null;
           let templateParms = {
             state: cell.getData().state,
-<<<<<<< HEAD
             color: color
-=======
-            color: cell.getValue().color
->>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
           }
           let html = Handlebars.compile(FacilityViewTmplt.colorBox)(templateParms);
 
@@ -1296,11 +1284,7 @@ define([
           let color = cell.getValue() ? cell.getValue().color : null;
           let templateParms = {
             state: cell.getData().state,
-<<<<<<< HEAD
             color: color
-=======
-            color: cell.getValue().color
->>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
           }
           let html = Handlebars.compile(FacilityViewTmplt.colorBox)(templateParms);
 
@@ -1403,7 +1387,6 @@ define([
         }
 
         /* *********************************************************************************** */
-<<<<<<< HEAD
         _getAllGeneratorProfits() {
           let totalProfit = 0
           console.log("generators = ", this._generators);
@@ -1433,28 +1416,11 @@ define([
             });
           }
 
-=======
-        _getGeneratorProfit(generator) {
-          console.log("generator = ", generator);
-          if (!generator) {
-            return ({
-              color: null,
-              qProfit: 0,
-              profit_margin: 0,
-              margin: 0,
-            });
-          }
-
->>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
           let margin = generator.gentype_details.fixed_cost_build * generator.gentype_details.nameplate_capacity / generator.gentype_details.build_time;
           let qProfit = generator.quarterly_profit;
           let profit_margin = qProfit / margin;
 
-<<<<<<< HEAD
           // console.log(`margin = ${margin}, qProfit = $${qProfit}, profit_margin = %${profit_margin * 100}`);
-=======
-          console.log(`margin = ${margin}, qProfit = $${qProfit}, profit_margin = %${profit_margin * 100}`);
->>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
 
           switch (true) {
             case (profit_margin > .10):
@@ -1479,17 +1445,11 @@ define([
                 margin: margin,
               });
           }
-<<<<<<< HEAD
         }
 
         /* *********************************************************************************** */
         _getGeneratorAge(generator) {
-=======
-        }
-
-        /* *********************************************************************************** */
-        _getGeneratorAge(generator) {
-          // console.log("generator = ", generator);
+          console.log("generator = ", generator);
           if (!generator) {
             return ({
               color: null,
@@ -1497,56 +1457,20 @@ define([
             });
           }
 
-          let ratio = (generator.gentype_details.lifespan - generator.generator_age) / generator.gentype_details.lifespan
+          let ratio = (generator.gentype_details.lifespan - generator.generator_age) / generator.gentype_details.build_time;
+          console.log("ratio = ", ratio);
           switch (true) {
-            case (ratio > .40):
+            case (ratio > 1.30):
               return ({
                 color: this._getCellColor("good"),
                 age: generator.generator_age
               });
-            case (ratio > .20):
+            case (ratio > 1.25):
               return ({
                 color: this._getCellColor("medium"),
                 age: generator.generator_age
               });
-            case (ratio >= .10):
-              return ({
-                color: this._getCellColor("bad"),
-                age: generator.generator_age
-              });
-            default:
-              return ({
-                color: this._getCellColor("bad"),
-                age: generator.generator_age
-              });
-          }
-        }
-
-        /* *********************************************************************************** */
-        _getGeneratorAge2(generator) {
->>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
-          // console.log("generator = ", generator);
-          if (!generator) {
-            return ({
-              color: null,
-<<<<<<< HEAD
-              age: 0,
-            });
-          }
-
-          let ratio = (generator.gentype_details.lifespan - generator.generator_age) / generator.gentype_details.lifespan
-          switch (true) {
-            case (ratio > .40):
-              return ({
-                color: this._getCellColor("good"),
-                age: generator.generator_age
-              });
-            case (ratio > .20):
-              return ({
-                color: this._getCellColor("medium"),
-                age: generator.generator_age
-              });
-            case (ratio >= .10):
+            case (ratio >= 1.10):
               return ({
                 color: this._getCellColor("bad"),
                 age: generator.generator_age
@@ -1569,12 +1493,6 @@ define([
             });
           }
 
-=======
-              age: 0
-            });
-          }
-
->>>>>>> c67667c6729a2bfc51a4c4c13acd0d4d201da1f5
           let ratio = (generator.gentype_details.build_time - generator.generator_age) / generator.gentype_details.build_time
           switch (true) {
             case (ratio <= .10):
