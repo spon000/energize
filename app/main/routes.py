@@ -2,7 +2,7 @@ import random, json
 import time
 import logging
 
-from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app
+from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app, session
 from flask_login import current_user, login_required
 from app import db 
 from app.models import User, Game, Company

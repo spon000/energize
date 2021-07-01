@@ -13,7 +13,8 @@ def load_user(user_id):
 #   db.Column('company_id', db.Integer, db.ForeignKey('company.id'), primary_key=True))
 
 #########################################################################################
-# User Model
+# User Model, inherits from UserMixin to get some default methods (is_authenticated, is_active,
+# is_anonymous, and get_id)
 class User(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
  
@@ -30,7 +31,7 @@ class User(db.Model, UserMixin):
   companies = db.relationship('Company')
 
   # Methods
-
+ 
   # Allows you to access object properties as an associative array ex: generator['state']
   def __getitem__(self, key):
     return getattr(self, key)

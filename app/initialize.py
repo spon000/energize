@@ -45,7 +45,7 @@ def initialize_db(app, make_users=False):
     # Create dummy user.
     u1 = User(
       password = bcrypt.generate_password_hash("122130124032").decode('utf-8'),
-      companies_max = 5
+      companies_max = 1
     )
 
     u2 = User(

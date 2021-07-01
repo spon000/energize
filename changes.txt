@@ -1,0 +1,14 @@
+committed <??>
+    - added \changes.txt file in order to keep track modifications
+    - Took out celery. We'll just use python threads for threading
+    - removed folder \python_packages. It had old version of shapley 
+        is no longer needed.
+    - removed file config_sqllite.py. Didn't need it.
+    - removed waitress package from requirements.txt and run.py and 
+        runturn.py
+    - added is_safe_url() \app\users\utils.py. Used is in \app\users\routes.py
+    - added cookie settings to config.py
+    - added session.clear() to user logout routine to invalidate the remember_me cookie 
+
+
+

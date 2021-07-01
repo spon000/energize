@@ -17,7 +17,7 @@ import app.game.constants as cons
 # mpl.use('Agg')
 # import matplotlib.pyplot as plt
 from datetime import datetime 
-from app import db, celery
+from app import db
 from app.models import Facility, Generator, City, Company, Game, Prompt
 from app.models import FacilityType, GeneratorType
 

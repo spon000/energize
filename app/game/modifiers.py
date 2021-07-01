@@ -5,7 +5,6 @@ import logging
 import time
 
 from os import path
-from app import celery
 from collections import OrderedDict as od
 # import math
 # import time
@@ -65,7 +64,6 @@ def get_filename(gid):
   return mods_filename_prefix + '1' + mods_filename_extension
 
 
-# @celery.task()
 def load_modifiers(game):
   mods_filename = get_filename(game.id)
   mods_file = open(mods_filename, 'rb')

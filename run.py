@@ -3,7 +3,6 @@ import sys
 from app.initialize import initialize_db
 from app import create_app
 from app.config import Config
-from waitress import serve
 
 app = create_app()
 

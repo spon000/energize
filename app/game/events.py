@@ -15,7 +15,7 @@ import app.game.constants as cons
 from math import trunc
 from datetime import datetime 
 
-from app import db, celery
+from app import db
 from app.models import Facility, Generator, City, Company, Game, Prompt
 from app.models import FacilityType, GeneratorType
 
